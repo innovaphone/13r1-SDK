@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>apiwebsocket_client</title>
+    <link rel="stylesheet" href="../../web/lib1/innovaphone.doc.css" type="text/css" />
+</head>
+
+<body>
+    <h1>apiwebsocket_client</h1>
+
+    <h2>Overview</h2>
+    <h3>General</h3>
+    <p>
+        The apiwebsocket_client library contains a class ApiWebsocketClient, that can be used
+        as a base class for providing and consuming client APIs in local services. The ApiProvider
+        and ApiConsumer base classes can be used to implement such APIs.
+    </p>
+    <p>
+        The ApiWebsocketClient connects to an ApiRelay instance, that is usually also a local service.
+        The websocket protocol is used for the connection.
+    </p>
+
+    <h2>ApiWebsocketClient</h2>
+    <p>
+        Base class for using client APIs.
+    </p>
+    <h3>ApiWebsocketClient(class IIoMux * const iomux, class ISocketProvider * const tcp, class ISocketProvider * const tls, class IDns * const dns, class IInstanceLog * const log, const char * uri, const char * pwd, const char * dn)</h3>
+    <p>
+        Contructor function.
+        <dl>
+            <dt>uri</dt>
+            <dd>The websocket URI of the api relay service.</dd>
+            <dt>pwd</dt>
+            <dd>The password for authenticating to the api relay service.</dd>
+            <dt>dn</dt>
+            <dd>The display name that shall be used for API providers.</dd>
+        </dl>
+    </p>
+    <h3>void ApiWebsocketClientClose()</h3>
+    <p>
+        Shall be called to close the connection and all attached API providers and consumers. 
+        The application will get the <code>ApiWebsocketClientCloseComplete</code> callback
+        when this is done.
+    </p>
+    <h3>virtual void ApiWebsocketClientCloseComplete()</h3>
+    <p>
+        Will be called after the connection and all attached API providers and consumers have been closed.
+        Applications that use the library should not exit before this callback is received.
+    </p>
+
+    <h2>ApiProvider</h2>
+    <p>
+        Base class for client API providers.
+        An ApiProvider is attached during creation to an ApiWebsocketClient.
+        It is deleted by the ApiWebsocketClient. So the application doesn't need to keep a reference to it.
+    </p>
+    <h3>ApiProvider(class ApiWebsocketClient * const client, const char * api)</h3>
+    <p>
+        Constructor function.
+        <dl>
+            <dt>client</dt>
+            <dd>The ApiWebsocketClient instance to be used by the provider.</dd>
+            <dt>api</dt>
+            <dd>The name of the API that is implemented by this class (e.g. com.innovaphone.search).</dd>
+        </dl>
+    </p>
+    <h3>virtual void ApiProviderRecv(const char * client, const char * consumer, const char * src, class json_io & msg, word base)</h3>
+    <p>
+        This callback is called when an ApiRequest is received. ApiResults should be sent using the <code>ApiProviderSend</code> function. 
+        The extra parameters (client, consumer and src) must be echoed back in the response.
+    </p>
+    <h3>virtual void ApiProviderClose()</h3>
+    <p>
+        This callback is called before the object is deleted by the AppWebsocketClient. 
+        Subclasses should stop any activities and then call <code>ApiProviderClosed()</code>.
+    </p>
+    <h3>virtual void ApiProviderConnected()</h3>
+    <p>
+        Called when the provider is connected to the api relay.
+    </p>
+    <h3>virtual void ApiProviderDisconnected()</h3>
+    <p>
+        Called when the provider is disconnected from the api relay.
+    </p>
+    <h3>void ApiProviderSend(const char * client, const char * consumer, const char * src, class json_io & msg, word base, char * buffer)</h3>
+    <p>
+        This function is used for sending ApiResult messages. 
+        The parameters client, consumer and src should be echoed from the corresponding ApiRequest message received using <code>ApiProviderRecv</code>.
+    </p>
+    <h3>void ApiProviderUpdate(class json_io & json, word base, char * buffer)</h3>
+    <p>
+        This function is used for sending a new ApiModel to the client.
+    </p>
+    <h3>void ApiProviderClosed()</h3>
+    <p>
+        This function should be called after the <code>ApiProviderClose()</code> callback, when the implementing class has stopped any activities.
+    </p>
+
+    <h2>ApiConsumer</h2>
+    <p>
+        Base class for client API consumers.
+        An ApiConsumer is attached during creation to an ApiWebsocketClient.
+        It is deleted by the ApiWebsocketClient. So the application doesn't need to keep a reference to it.
+    </p>
+    <h3>ApiConsumer(class ApiWebsocketClient * const client, const char * api)</h3>
+    <p>
+        Constructor function.
+        <dl>
+            <dt>client</dt>
+            <dd>The ApiWebsocketClient instance to be used by the consumer.</dd>
+            <dt>api</dt>
+            <dd>The name of the API that is used by this class (e.g. com.innovaphone.search).</dd>
+        </dl>
+    </p>
+    <h3>virtual void ApiConsumerRecv(const char * provider, const char * src, class json_io & msg, word base)</h3>
+    <p>
+        This function is called when an ApiResult message is received.
+    </p>
+    <h3>virtual void ApiConsumerUpdate(class json_io & model, word base)</h3>
+    <p>
+        This function is called when the API model has changed.
+    </p>
+    <h3>virtual void ApiConsumerClose()</h3>
+    <p>
+        This callback is called before the object is deleted by the AppWebsocketClient.
+        Subclasses should stop any activities and then call <code>ApiConsumerClosed()</code>.
+    </p>
+    <h3>virtual void ApiConsumerConnected()</h3>
+    <p>
+        Called when the consumer is connected to the api relay.
+    </p>
+    <h3>virtual void ApiConsumerDisconnected()</h3>
+    <p>
+        Called when the consumer is disconnected from the api relay.
+    </p>
+    <h3>void ApiConsumerSend(const char * provider, const char * src, class json_io & msg, word base, char * buffer)</h3>
+    <p>
+        Call this function to send an ApiRequst message to the client.
+    </p>
+    <h3>void ApiConsumerClosed()</h3>
+    <p>
+        This function should be called after the <code>ApiConsumerClose()</code> callback, when the implementing class has stopped any activities.
+    </p>
+</body>
+</html>

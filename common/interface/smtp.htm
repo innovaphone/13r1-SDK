@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone SDK - SMTP implementation</title>
+    <link rel="stylesheet" href="../../docu/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../docu/vs.css">
+</head>
+
+<body>
+    <script src="../../docu/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <h1>SMTP</h1>
+    <p>
+        Smtp is a library, which provides the service to send emails using SMTP.
+        
+    </p>
+
+    <h2>File information</h2>
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/interface/smtp.h<br /><br /></td></tr>
+        <tr>
+            <td><a href="#classes"><b>Classes</b></a></td>
+            <td>
+                <a href="#class-ismtpprovider">ISmtpProvider</a><br>
+                <a href="#class-ismtp">ISmtp</a><br>
+                <a href="#class-ismtpsend">ISmtpSend</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#ismtpprovider-members"><b>class ISmtpProvider members</b></a></td>
+            <td>
+                <a href="#CreateSmtpProvider">CreateSmtpProvider</a><br>
+                <a href="#~ISmtpProvider">~ISmtpProvider</a><br>
+                <a href="#CreateSmtp">CreateSmtp</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#ismtp-members"><b>class ISmtp members</b></a></td>
+            <td>
+                <a href="#~ISmtp">~ISmtp</a><br>
+                <a href="#CreateSend">CreateSend</a><br>
+                <a href="#SendChunk">SendChunk</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#ismtpsend-members"><b>class ISmtpSend members</b></a></td>
+            <td>
+                <a href="#AddTo">AddTo</a><br>
+                <a href="#AddBody">AddBody</a><br>
+                <a href="#AddAttachment">AddAttachment</a><br>
+                <a href="#Start">Start</a><br>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#examples"><b>Examples</b></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+
+    <a name="classes"><h1>Classes</h1></a>
+    <a name="class-ismtpprovider"><h2>ISmtpProvider</h2></a>
+    <pre><code class="C++">class ISmtpProvider {
+    ...
+};</code></pre>
+    <p>
+        The SMTP Provider that must be initialized on the main class.
+    </p>
+    <a name="class-ismtp"><h2>ISmtp</h2></a>
+    <pre><code class="C++">class ISmtp {
+    ...
+};</code></pre>
+    <p>
+        The SMTP class. The constructor (smtpProvider->CreateSmtp()) must be called in the App Instance constructor.
+    </p>
+
+    <a name="class-ismtpsend"><h2>ISmtpSend</h2></a>
+    <pre><code class="C++">class ISmtpSend {
+    ...
+};</code></pre>
+    <p>
+        The SMTP task to send an email.
+    </p>
+
+
+    <a name="ismtpprovider-members"><h1>class ISmtpProvider members</h1></a>
+
+    <a name="CreateSmtpProvider"><h2>CreateSmtpProvider</h2></a>
+    <pre><code class="C++">CreateSmtpProvider()</code></pre>
+    <p>
+        returns a new SMTP Provider.
+    </p>
+
+    <a name="~ISmtpProvider"><h2>~ISmtpProvider</h2></a>
+    <pre><code class="C++">~ISmtpProvider()</code></pre>
+    <p>
+        destructor, removes all elements from the SMTP Provider.
+    </p>
+
+    <a name="CreateSmtp"><h2>CreateSmtp</h2></a>
+    <pre><code class="C++">CreateSmtp(class IIoMux * iomux, class ISocketProvider * tcpSocketProvider, class ISocketProvider * tlsSocketProvider, class IInstanceLog * const log, const char *hostname)</code></pre>
+    <p>
+        returns a new SMTP object, which provides the interface functions.
+        'log' is used to log dependent of the log flag LOG_SMTP.
+        'iomux' is used to get de SMTP-server DNS address.
+    </p>
+
+
+    <a name="ismtp-members"><h1>class ISmtp members</h1></a>
+
+    <a name="~ISmtp"><h2>~ISmtp</h2></a>
+    <pre><code class="C++">~ISmtp()</code></pre>
+    <p>
+        class destructor.
+    </p>
+
+    <a name="CreateSend"><h2>CreateSend</h2></a>
+    <pre><code class="C++">CreateSend(const char *from, const char *fromName, const char *subject, const char *host, const char *server, const char *userSmtp, const char *password)</code></pre>
+    <p>
+        ISmtpSend constructor that  must be called with the email parameters: 'from' (sender's email address), 'fromName' (sender's name), 'subject' (subject for the email), 'host' (host name from the SMPT server), 'server' (the SMTP server i.e.: sophos.innovaphone.com), 'userSmtp' (the sender's user, if authentication is required), 'password' (the sender's password of the sender, if authentication is required). The socket is connected to the SMTP server inside this function.
+        </p>
+
+        <a name="SendChunk"><h2>SendChunk</h2></a>
+        <pre><code class="C++">SendChunk(const char *attachmentChunk, int sChunk, bool lastChunk, dword fileIndex)</code></pre>
+        <p>
+            Sends a chunk of an attachment. It must be called on TaskProgress with the parameters: 'attachmentChunk' (chunk of the file that will be attached), 'sChunk' (size of the chunk) and 'lastChunk' (indicates if this is the last chunk of the attachment).
+        </p>
+
+
+        <a name="ismtpsend-members"><h1>class ISmtpSend members</h1></a>
+
+        <a name="AddAttachment"><h2>AddAttachment</h2></a>
+        <pre><code class="C++">AddAttachment(const char *attachmentUrl)</code></pre>
+        <p>
+            Add a new attachment to the email. It should be called once per attachment setting as 'attachmentUrl' the filename of the attachment that will be sent.
+        </p>
+
+        <a name="AddTo"><h2>AddTo</h2></a>
+        <pre><code class="C++">AddTo(const char *rcpt)</code></pre>
+        <p>
+            Add a new receiver to the rcpt list. It should be called at least once before ISmtpSend.
+            The email will be sent to every rcpt if they are reachable (for example, it could be unreachable if your SMTP server is on "Relay Access denied" mode). If none of the receivers is reachable, the email will not be sent.
+        </p>
+
+        <a name="AddBody"><h2>AddBody</h2></a>
+        <pre><code class="C++">AddBody(const char *data, const char *format, const char *charset)</code></pre>
+        <p>
+            Add the body to the email. The function needs 3 arguments: 'data' (text that will be sent on the body), 'format' (text format i.e., text/html or text/plain) and 'charset' (text charset i.e., ISO-8859-1 or UTF-8).
+        </p>
+
+        <a name="Start"><h2>Start</h2></a>
+        <pre><code class="C++">Start(class UTask * user)</code></pre>
+        <p>
+            Starts the task that sends the email. The argument 'user' will be used for the callbacks for task completion.
+        </p>
+
+
+    <a name="examples"><h1>Examples</h1></a>
+    <pre><code class="C++">  
+//On the Main Class
+#include "common/interface/smtp.h"
+...
+ISmtpProvider * smtpProvider = CreateSmtpProvider();
+...
+AppService * service = new AppService(iomux, localSocketProvider, tcpSocketProvider, tlsSocketProvider, ..., smtpProvider, &serviceArgs);
+...
+delete smtpProvider;
+
+
+//On the App Instance Header
+class ISmtp * smtp;
+
+
+//On the App Instance Constructor
+app::app(IIoMux * const iomux, ISocketProvider * localSocketProvider, IWebserverPluginProvider * const webserverPluginProvider, IDatabaseProvider * databaseProvider, class Service * service, ISmtpProvider * smtpProvider, AppInstanceArgs * args) :
+AppInstance(service, args)
+{
+    ...
+    this->smtp = smtpProvider->CreateSmtp(iomux, tcpSocketProvider, tlsSocketProvider, this, "145.253.157.7");
+    this->logFlags |= LOG_SMTP; // to show the flags generated by the SMTP class
+}
+
+
+//On the App Instance Destructor
+app::~app()
+{
+    if (webserverPlugin) delete webserverPlugin;
+    if (smtp) delete smtp;
+}
+       
+
+//Class for sending Emails 
+SendEmail::SendEmail(class App * app): taskSmtp(this, &SendEmail::SmtpSendComplete, &SendEmail::SmtpSendFailed, &SendEmail::SmtpSendProgress)
+{        
+    ...
+}
+SendEmail::~SendEmail()
+{
+    ...
+}
+void SendEmail::Send()
+{
+    ISmtpSend * emailTask = registers->smtp->CreateSend("sender@innovaphone.com", "SenderName", "Subject", "sophos", "sophos.innovaphone.com", "usersmtp", "password");
+    emailTask->AddTo("receiver@innovaphone.com");
+    emailTask->AddTo("otherreceiver@innovaphone.com");
+    emailTask->AddBody("Body of the email...", "text/html", "ISO-8859-1");
+    emailTask->AddAttachment("test.txt");
+    emailTask->AddAttachment("Fish.png");
+    emailTask->AddAttachment("rfc821.pdf");
+    bufferrb = (char*)malloc(sizeof(char) * 4096);
+    emailTask->Start(&taskSmtp);
+}
+void SendEmail::SmtpSendComplete(class TaskSmtpSend * task)
+{
+    ...
+}
+void SendEmail::SmtpSendFailed(class TaskSmtpSend * task)
+{
+    ...
+}
+void SendEmail::SmtpSendProgress(class TaskSmtpSend * task, dword progress)
+{
+    //SmtpSendProgress will be called for every attachment added. For each attachment it will be called until lastChunk will be set as true.
+    //progress indicates the number of the attachment requested by the task.
+    //It starts with "0" for the first filename added.
+    
+    registers->smtp->SendChunk(ReadFiles(progress), len, lastChunk, progress);  
+}
+char * SendEmail::ReadFiles(dword file) //Example function to get the attachments chunks.
+{
+    char * path = (char*)"";
+    switch (file)
+    {
+    case 0:
+        path = (char*)"/path/test.txt";
+        break;
+    case 1:
+        path = (char*)"/path/Fish.png";
+        break;
+    case 2:
+        path = (char*)"/path/rfc821.pdf";
+        break;
+    default:
+        break;
+    }
+    if (!opened)
+    {
+        opened = true;
+        pFile = fopen(path, "rb");   
+        fseek(pFile, 0, SEEK_END);
+        lSize = ftell(pFile);
+        rewind(pFile);
+        lastChunk = false;
+        bytesRead = 0;
+    }
+    if (!feof(pFile))
+    {
+        len = 0;
+        len = fread(bufferrb, 1, 4096, pFile);
+        bytesRead += len;
+        if (bytesRead >= lSize) lastChunk = true;
+    }
+    if (lastChunk)
+    {
+        opened = false;
+        fclose(pFile);
+    }
+    return bufferrb;
+}
+        </code></pre>
+
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>com.innovaphone.calllist (App API)</title>
+    <link rel="stylesheet" href="../lib1/innovaphone.lib1.css" type="text/css" />
+    <link rel="stylesheet" href="../styles/innovaphone.Styles.css" type="text/css" />
+    <link rel="stylesheet" href="../lib1/innovaphone.doc.css" type="text/css" />
+</head>
+
+<body>
+    <h1>com.innovaphone.calllist (App API)</h1>
+    <p>
+        This API is used for communication with call-list apps.
+    </p>
+    <div class="fixme">Write documentation</div>
+
+    <h2>API model</h2>
+    <h3>Service info</h3>
+    <p>
+        The API doesn't define any service info.
+    </p>
+    <h3>Provider model</h3>
+    <p>
+        <pre>
+{
+  "mt": "ApiModel",
+  "api": "com.innovaphone.calllist",
+  "model": {
+  }
+}
+        </pre>
+    </p>
+
+    <h2>API messages</h2>
+    <p>
+        All messages are JSON objects that have a mandatory attribute "mt" that specifies the message type.
+    </p>
+    <h3>Requests</h3>
+    <dl>
+        <dt>Subscribe</dt>
+        <dd>
+            Caller declares that it is interested in call list entries.<p />
+            Call list app will provide the requested amount of available call list entries.<p />
+            Call list app wil also provide new entries at runtime.
+        </dd>
+        <dd>
+            <dl>
+                <dt>count</dt>
+                <dd>Number of currently available entries that are to be returned immediately.</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "Subscribe", count: "20" }</code></dd>
+    </dl>
+    <h3>Responses</h3>
+    <dl>
+        <dt>Update</dt>
+        <dd>
+            Call list app sends this message in direct response to "Subscribe" message.<p />
+            Call list app sends this message every time a new entries has been added.
+        </dd>
+        <dd>
+            <dl>
+                <dt>entries</dt>
+                <dd>Array of call list entries.</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "Update", entries: [{peer: "...", outbound: true, time: "..."}]}</code></dd>
+    </dl>
+</body>
+</html>

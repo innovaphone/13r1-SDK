@@ -1,0 +1,92 @@
+
+@font-face {
+    font-family: "titillium";
+    src: url('../web/fonts/titilliumweb-regular.ttf') format('truetype');
+}
+
+body {
+    font-family: titillium, 'Open Sans', Arial;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+}
+
+dl {
+    margin-left: 20px;
+}
+
+dt {
+    font-weight:bold;
+    margin: 5px 0px 5px 0px;
+}
+
+dd {
+	/* margin-bottom: 30px; */
+}
+
+a, a:visited {
+    text-decoration:none;
+    color:darkblue;
+}
+
+h2 {
+	border-bottom:1px solid rgb(217, 217, 217);
+	padding-top: 5px;
+}
+
+h3 {
+	/*margin-bottom: 5px;*/
+}
+
+h4 {
+	margin-bottom: 3px;
+	text-decoration: underline;
+}
+
+td {
+	padding-left: 10px;
+	vertical-align: top;
+}
+
+td.param {
+	text-align: right;
+	white-space: nowrap;
+}
+
+pre {
+	margin: 0px;
+	overflow: auto;
+	border: 1px solid rgb(217, 217, 217);
+}
+
+pre.sample {
+	width: 100%;
+	height: 400px;
+}
+
+pre.license {
+	padding: 10px;
+	width: 100%;
+	height: 250px;
+	overflow: auto;	
+	font-size: 8pt;
+}
+
+body {
+    overflow:scroll;
+    font-size: 14px;
+    padding: 40px;
+}
+
+div.fixme {
+    border: 1px solid grey;
+    background-color: #ffa080;
+}
+
+.fnhead {
+	background:rgb(230, 230, 230);
+	font-weight: bold;
+	margin-bottom: 5px;
+	margin-top: 20px;
+	padding: 2px 0px 2px 5px;
+}
