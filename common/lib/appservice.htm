@@ -1,234 +1,496 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>applicationservice</title>
-    <link rel="stylesheet" href="../../web/lib1/innovaphone.doc.css" type="text/css" />
+    <title>innovaphone SDK - Appservice implementation</title>
+    <link rel="stylesheet" href="../../web/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web/doc/vs.css">
 </head>
 
 <body>
-    <h1>applicationservice</h1>
+    <script src="../../web/doc/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <h1>Appservice</h1>
     <p>
-        Basically each App has one class which is derived from the base class AppService.<br />
-        This base class establishes a unix domain socket connection to the taskmanager over which <br />
-        starting and stopping of instances is controlled.<br />
-        Each instance itself is derived from AppInstance and gets its own <br />
-        AppInstanceArgs.
+        Interfaces to handle app services and app instances.<br />
+        Basically each App has one class which is derived from the base class AppService. This base class establishes a unix domain socket connection to the manager app, which controlls the creation, starting and stopping of instances.<br />
+        Each instance itself is derived from AppInstance and gets its own AppInstanceArgs.
     </p>
-    <h2>AppService</h2>
-    <p>
-        The service class of the App must be derived from the class AppService and implement<br />
-        the following virtual functions:
-    </p>
+    <h2>File information</h2>
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/lib/appservice.h<br><br></td></tr>
+        <tr>
+            <td><b>Classes</b></td>
+            <td>
+                <a href="#AppService">AppService</a><br>
+                <a href="#AppInstance">AppInstance</a><br>
+                <a href="#AppServiceApp">AppServiceApp</a><br>
+                <a href="#AppInstancePlugin">AppInstancePlugin</a><br>
+                <a href="#AppServiceSocket">AppServiceSocket</a><br>
+                <a href="#UAppServiceSocket">UAppServiceSocket</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Data types</b></td>
+            <td>
+                <a href="#ServiceAlarmSeverity">ServiceAlarmSeverity</a><br>
+                <a href="#ServiceAlarmType">ServiceAlarmType</a><br>
+                <a href="#AppServiceArgs">AppServiceArgs</a><br>
+                <a href="#AppInstanceArgs">AppInstanceArgs</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Examples</b></td>
+            <td>
+                <a href="#Example">Example</a><br>
+                <br>
+            </td>
+        </tr>
+    </table>
+    <h3>Logging</h3>
+    To enable logging for apps, the flag LOG_APP must be set in the managers diagnostic settings.
+
+    <h1>Classes</h1>
+    <a name="AppService"><h2>AppService</h2></a>
+    The service class of the App must be derived from the class AppService and implement the neccessary virtual functions.<br /><br />
+    <pre><code class="language-cpp">class AppService : public UAppServiceSocket, public IInstanceLog {    
+public:
+    <a href="#AppServiceConstructor" style="text-decoration:none;">AppService(class IIoMux * const iomux, class ISocketProvider * const localSocketProvider, AppServiceArgs * serviceArgs);</a>
+    
+    <a href="#CreateInstance" style="text-decoration:none;">virtual class AppInstance * CreateInstance(AppInstanceArgs * args) = 0;</a>
+    <a href="#AppServiceApps" style="text-decoration:none;">virtual void AppServiceApps(istd::list<AppServiceApp> * appList) = 0;</a>
+    <a href="#AppInstancePlugins" style="text-decoration:none;">virtual void AppInstancePlugins(istd::list<AppInstancePlugin> * pluginList) {};</a>
+
+    <a href="#AppStart" style="text-decoration:none;">void AppStart(AppInstanceArgs * args) override;</a>
+    <a href="#AppStopped" style="text-decoration:none;">void AppStopped(class AppInstance * instance);</a>
+    <a href="#GetAppServiceId" style="text-decoration:none;">const char * GetAppServiceId() const;</a>
+    <a href="#GetAppPlatformDNSName" style="text-decoration:none;">const char * GetAppPlatformDNSName() const;</a>
+    <a href="#SetAllInstancesLogFlags" style="text-decoration:none;">void SetAllInstancesLogFlags(ulong64 logFlags);</a>
+};</code></pre>
+
+    <h3>Public functions</h3>
+    <div class="fnhead"><a name="AppServiceConstructor">AppService</a></div>
     <dl>
-        <dt>class AppInstance * CreateInstance(AppInstanceArgs * args)</dt>
         <dd>
-            Creates an object of the instance class of the App which must be derived from the class <br />
-            AppInstance.<br />
-            If this object is closed and has finished closing, it <b>must</b> call AppClosed(), see below.
+            Constructor
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">class IIoMux * const <b>iomux </b></td><td>An <a href="../os/iomux.htm#IIoMux">IIoMux</a> pointer to the IIoMux class.</td></tr>
+                <tr><td class="param">ISocketProvider * const <b>localSocketProvider </b></td><td>An <a href="../interface/socket.htm#ISocketProvider">ISocketProvider</a> pointer to a local socket provider.</td></tr>
+                <tr><td class="param">AppServiceArgs * <b>serviceArgs </b></td><td>An <a href="#AppServiceArgs">AppServiceArgs</a> pointer to the service arguments struct.</td></tr>
+            </table>
         </dd>
-        <dt>void AppServiceApps(istd::list&lt;AppServiceApp&gt; * appList)</dt>
+    </dl>
+    <div class="fnhead"><a name="CreateInstance">CreateInstance</a></div>
+    <dl>
         <dd>
+            You <b>must</b> override this function inside your class which implements the AppService class.<br />
+            This function creates an object of the instance class of the App which must be derived from the class <a href="#AppInstance">AppInstance</a>.<br />
+            If this object is stopped and has finished stopping, it <b>must</b> call <a href="#AppStopped">AppStopped</a>, see below.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">AppInstanceArgs * <b>args </b></td><td>An <a href="#AppInstanceArgs">AppInstanceArgs</a> pointer to the instance arguments.</td></tr>
+            </table>
+            <h4>Return value</h4>
+            The created <a href="#AppInstance">AppInstance</a> object.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="AppServiceApps">AppServiceApps</a></div>
+    <dl>
+        <dd>
+            You <b>must</b> override this function inside your class which implements the AppService class.<br />
             Push your provided apps to the appList. Each app has to be an instance of class AppServiceApp.
             An app of an AppService might be configured inside the PBX App object.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">istd::list&lt;AppServiceApp&gt; * <b>appList </b></td><td>A list to add all <a href="#AppServiceApp">AppServiceApps</a>.</td></tr>
+            </table>
         </dd>
     </dl>
-    <p>
-        The following functions are public within the AppService class:
-    </p>
+    <div class="fnhead"><a name="AppInstancePlugins">AppInstancePlugins</a></div>
+    <dl>
+        <dd>
+            You <b>can</b> override this function inside your class which implements the AppService class if your app provides app instance plugins (PBX manager plugins).<br />
+            Push your provided plugins to the pluginList. Each app has to be an instance of class AppInstancePlugin.<br />
+            See <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin">publish manager plugins</a> for further reference.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">istd::list&lt;AppInstancePlugin&gt; * <b>pluginList </b></td><td>A list to add all <a href="#AppInstancePlugin">AppInstancePlugins</a>.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="AppStart">AppStart</a></div>
+    <dl>
+        <dd>
+            You can start an own app instance, e.g. inside your app-main.cpp, if you want to start an instance outside of the manager control.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">AppInstanceArgs * <b>args </b></td><td>An <a href="#AppInstanceArgs">AppInstanceArgs</a> pointer to the instance arguments.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="AppStopped">AppStopped</a></div>
+    <dl>
+        <dd>
+            Call this function when your app stopped.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">AppInstance * <b>instance </b></td><td>An <a href="#AppInstance">AppInstance</a> pointer to the instance object.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GetAppServiceId">GetAppServiceId</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The service id of the app service.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GetAppPlatformDNSName">GetAppPlatformDNSName</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The app platform DNS name which can be configured inside the manager settings.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="SetAllInstancesLogFlags">SetAllInstancesLogFlags</a></div>
+    <dl>
+        <dd>
+            Call this function if you want to set the logFlags of all instances to a certain value.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ulong64 <b>logFlags </b></td><td>The logFlags to set.</td></tr>
+            </table>
+        </dd>
+    </dl>
+
+    <a name="AppInstance"><h2>AppInstance</h2></a>
+    The instance class of an App must be derived from AppInstance and implement the neccessary virtual functions.<br /><br />
+    <pre><code class="language-cpp">class AppInstance : public IInstanceLog {    
+public:
+    <a href="#AppInstanceConstructor" style="text-decoration:none;">AppInstance(class AppService * appService, AppInstanceArgs * args)</a>
+    <a href="#GetAppServiceIdInstance" style="text-decoration:none;">const char * GetAppServiceId() const;</a>
+    <a href="#GetAppName" style="text-decoration:none;">const char * GetAppName() const;</a>
+    <a href="#GetAppDomain" style="text-decoration:none;">const char * GetAppDomain() const;</a>
+    <a href="#GetKey" style="text-decoration:none;">const char * GetKey() const;</a>
+    <a href="#SetLogFlags" style="text-decoration:none;">void SetLogFlags(ulong64 logFlags);</a>
+    <a href="#GenerateKey" style="text-decoration:none;">static char * GenerateKey(const char * appName, const char * appDomain);</a>
+    <a href="#LogV" style="text-decoration:none;">void LogV(const char * format, va_list ap);</a>
+    <a href="#Log" style="text-decoration:none;">void Log(const char * format, ...);</a>
+    <a href="#HexDump" style="text-decoration:none;">void HexDump(const void * buffer, size_t size);</a>
+    <a href="#SetAlarm" style="text-decoration:none;">void SetAlarm(word code, ServiceAlarmSeverity severity, char * text, char * details);</a>
+    <a href="#ClearAlarm" style="text-decoration:none;">void ClearAlarm(word code, ServiceAlarmSeverity severity, char * text, char * details);</a>
+    <a href="#SendEvent" style="text-decoration:none;">void SendEvent(word code, ServiceAlarmSeverity severity, char * text, char * details);</a>
+    <a href="#Stop" style="text-decoration:none;">virtual void Stop() = 0;</a>
+    <a href="#ServerCertificateUpdate" style="text-decoration:none;">virtual void ServerCertificateUpdate(const byte * cert, size_t certLen) {};</a>
+    <a href="#SetAppDomain" style="text-decoration:none;">virtual void SetAppDomain(const char * domain, const char * pwd) {};</a>
+};</code></pre>
+
+    <h3>Public functions</h3>
+    <div class="fnhead"><a name="AppInstanceConstructor">AppInstance</a></div>
+    <dl>
+        <dd>
+            Constructor
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">AppService * <b>service </b></td><td>An <a href="#AppService">AppService</a> pointer to the app service class.</td></tr>
+                <tr><td class="param">AppInstanceArgs * <b>instanceArgs </b></td><td>An <a href="#AppInstanceArgs">AppInstanceArgs</a> pointer to the instance arguments struct.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GetAppServiceIdInstance">GetAppServiceId</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The app service id.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GetAppName">GetAppName</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The app name.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GetAppDomain">GetAppDomain</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The app domain.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GetKey">GetKey</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The unique key string which identifies the app instance: "appname@appdomain".
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="SetLogFlags">SetLogFlags</a></div>
+    <dl>
+        <dd>
+            Call this function to set the logFlags of the instance.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ulong64 <b>logFlags </b></td><td>The logFlags to set.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GenerateKey">GenerateKey</a> (static function)</div>
+    <dl>
+        <dd>
+            Generates the unique string which identifies an intance.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>appName </b></td><td>The app name.</td></tr>
+                <tr><td class="param">const char * <b>appDomain </b></td><td>The app domain.</td></tr>
+            </table>
+
+            <h4>Return value</h4>
+            The unique key string which identifies the app instance: "appname@appdomain". Must be freed by the caller!
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="LogV">LogV</a></div>
+    <dl>
+        <dd>
+            Writes the log string to the debug output (e.g. file or debugging output).
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>format </b></td><td>The format string.</td></tr>
+                <tr><td class="param">va_list <b>ap </b></td><td>A variable argument list with all arguments which are used inside the format string.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="Log">Log</a></div>
+    <dl>
+        <dd>
+            Writes the log string to the debug output (e.g. file or debugging output).
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>format </b></td><td>The format string.</td></tr>
+                <tr><td class="param">...</td><td>Further arguments used inside format string.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="HexDump">HexDump</a></div>
+    <dl>
+        <dd>
+            Writes a hexdump of the buffer to the debug output (e.g. file or debugging output).
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const void * <b>buffer </b></td><td>The buffer.</td></tr>
+                <tr><td class="param">size_t <b>size</b></td><td>The size to dump.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="SetAlarm">SetAlarm</a></div>
+    <dl>
+        <dd>
+            Sets an alarm, which is sent to the manager (which again sends it to an alarm and events server). An alarm is active until it is cleared.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">word <b>code </b></td><td>A code to identify an alarm.</td></tr>
+                <tr><td class="param"><a href="#ServiceAlarmSeverity">ServiceAlarmSeverity</a> <b>severity </b></td><td>The severity.</td></tr>
+                <tr><td class="param">char * <b>text </b></td><td>The text which identifies the alarm.</td></tr>
+                <tr><td class="param">char * <b>details </b></td><td>Further details for the alarm.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="ClearAlarm">ClearAlarm</a></div>
+    <dl>
+        <dd>
+            Clears an alarm.
+            <h4>Parameters</h4>
+            See <a href="#SetAlarm">SetAlarm</a> for parameter reference.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="SendEvent">SendEvent</a></div>
+    <dl>
+        <dd>
+            Sends an event.
+            <h4>Parameters</h4>
+            See <a href="#SetAlarm">SetAlarm</a> for parameter reference.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="Stop">Stop</a></div>
+    <dl>
+        <dd>
+            You <b>must</b> override this function. It is called if the instance or service is stopped by the manager.<br />
+            You <b>must</b> call AppService::AppStopped asynchronously if everything has been stopped.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="ServerCertificateUpdate">ServerCertificateUpdate</a></div>
+    <dl>
+        <dd>
+            You <b>can</b> override this function if you need to be notified about the webserver certificate. You can then pass the certificate to an <a href="../interface/socket.htm#ISocketContext">ISocketContext</a>.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const byte * <b>cert </b></td><td>The certificate byte buffer.</td></tr>
+                <tr><td class="param">size_t <b>certLen </b></td><td>The length of the byte buffer.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="SetAppDomain">SetAppDomain</a></div>
+    <dl>
+        <dd>
+            Shouldn't be used inside app code.
+        </dd>
+    </dl>
+
+    <a name="AppServiceApp"><h2>AppServiceApp</h2></a>
+    The class AppServiceApp is used to describe an app which is provided by an AppService.
+    Each app has a (for the service) unique name, which will be later used inside the URL
+    which points to the app of the AppService.
+    <pre><code class="language-cpp">class AppServiceApp {    
+public:
+    <a href="#AppServiceAppConstructor" style="text-decoration:none;">AppServiceApp(const char * name, bool websocketOnly = false);</a>
+    <a href="#GetName" style="text-decoration:none;">const char * GetName();</a>
+    <a href="#IsWebsocketOnly" style="text-decoration:none;">bool IsWebsocketOnly();</a>
+};</code></pre>
+
+    <h3>Public functions</h3>
+    <div class="fnhead"><a name="AppServiceAppConstructor">AppServiceApp</a></div>
+    <dl>
+        <dd>
+            Constructor
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * <b>name </b></td><td>The name describes the last URL part of the app.</td></tr>
+                <tr><td class="param">bool <b>websocketOnly </b></td><td>An app which can be just used with a websocket connection.</td></tr>
+            </table>
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="GetName">GetName</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The name.
+        </dd>
+    </dl>
+    <div class="fnhead"><a name="IsWebsocketOnly">IsWebsocketOnly</a></div>
+    <dl>
+        <dd>
+            <h4>Return value</h4>
+            The websocketOnly value.
+        </dd>
+    </dl>
+
+    <a name="AppInstancePlugin"><h2>AppInstancePlugin</h2></a>
+    The class AppInstancePlugin is used to describe an app instance plugin.
+    <pre><code class="language-cpp">class AppInstancePlugin {    
+public:
+    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">AppInstancePlugin(const char * plugin, const char * icon, const char * langFile, bool wildcard = false, const char * api = NULL);</a>
     
-    <dl>
-        <dt>AppService(class IIoMux * const iomux, class ISocketProvider * const localSocketProvider, AppServiceArgs * serviceArgs)</dt>
-        <dd>Constructor</dd>
+    bool wildcard;
 
-        <dt>void AppStart(AppInstanceArgs * args)</dt>
-        <dd>
-            This function is just called for debugging purposes without the taskmanager inside the App main cpp.<br />
-            It directly starts an AppInstance with the given arguments.
-        </dd>
+    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetIcon();</a>
+    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetApi();</a>
+    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetPlugin();</a>
+    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetLangFile();</a>
+};</code></pre>
 
-        <dt>void AppStopped(class AppInstance * instance)</dt>
-        <dd>
-            AppStopped must be called by the class which is derived from AppInstance, <br />
-            if it finished it's stopping procedure and is ready to be deleted (which is done here).
-        </dd>
+    <h3>Public functions</h3>
+    See <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin">publish manager plugins</a> for further reference.
 
-        <dt>const char * GetAppServiceId() const</dt>
-        <dd>
-            Returns the AppServiceArgs serviceId.
-        </dd>
-    </dl>
+    <a name="AppServiceSocket"><h2>AppServiceSocket</h2></a>
+    This class is just used internally inside the manager and webserver.
 
-    <h3>AppServiceApp</h3>
-    <p>
-        The class AppServiceApp is used to describe an app which is provided by an AppService.
-        Each app has a (for the service) unique name, which will be later used inside the URL 
-        which points to the app of the AppService.
-    </p>
-    <dl>
-        <dt>AppServiceApp(const char * name, bool websocketOnly = false)</dt>
-        <dd>Constructor of the class AppServiceApp. The <b>name</b> describes the last URL part
-        of the app and the flag <b>websocketOnly</b> can be set to true, if there is no
-        corresponding HTML part for the App, just a websocket URL.</dd>
-    </dl>
+    <a name="UAppServiceSocket"><h2>UAppServiceSocket</h2></a>
+    This class is just used internally inside the manager and webserver.
 
-    <h3>AppServiceArgs</h3>
-    <p>
-        The AppServiceArgs are handed as command line parameters by the taskmanager<br />
-        to the application itself.
-    </p>
-    <dl>
-        <dt>const char * serviceID;</dt>
-        <dd>Currently the filename of a service binary.</dd>
+    <h1>Data types</h1>
+    <h2><a name="certificate_error_t">ServiceAlarmSeverity</a></h2>
+    <pre><code class="laguage-cpp">typedef enum {
+    ALARM_SEVERITY_INDETERMINATE,
+    ALARM_SEVERITY_MAJOR,
+    ALARM_SEVERITY_CRITICAL
+} ServiceAlarmSeverity;</code></pre>
 
-        <dt>const char * taskmanager;</dt>
-        <dd>The unix domain socket file of the taskmanager.</dd>
-    </dl>
-    
-    <h2>AppInstance</h2>
-    <p>
-        The instance class of an App must be derived from AppInstance and implement <br />
-        the following virtual functions:
-    </p>
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">enum ServiceAlarmSeverity</code> is used to determine the severity of an alarm.
 
-    <dl>
-        <dt>void Stop()</dt>
-        <dd>
-            This function is called if the taskmanager stops an instance. If stopping has finished, <br />
-            AppService AppStopped(this) <b>must</b> be called.
-        </dd>
-        <dt>void ServerCertificateUpdate(const byte * cert, size_t certLen)</dt>
-        <dd>
-            This function is called immediatly after the instance is created and if the server certificate is updated <br />
-            inside the taskmanager. cert might be a NULL pointer!<br />
-            This certificate can be used for an own ISocketContext instance which has been handed to server sockets, see the example below.<br />
-        </dd>
-    </dl>
+    <h2><a name="ServiceAlarmType">ServiceAlarmType</a></h2>
+    <pre><code class="laguage-cpp">typedef enum {
+    ALARM_TYPE_SET,
+    ALARM_TYPE_CLEAR,
+    ALARM_TYPE_ERROR
+} ServiceAlarmType;</code></pre>
 
-    <p>
-        The following members are protected within the AppInstance class:
-    </p>
-    <dl>
-        <dt>AppInstanceArgs args</dt>
-        <dt>class AppService * appService</dt>
-    </dl>
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">enum ServiceAlarmType</code> is used to determine the alarm type.
 
-    <p>
-        The following functions are public within the AppInstance class:
-    </p>
+    <h2><a name="AppServiceArgs">AppServiceArgs</a></h2>
+    <pre><code class="laguage-cpp">struct AppServiceArgs {
+    void Parse(int argc, char ** argv, bool keepDefaults = true);
+    const char * serviceID;
+    const char * manager;
+    const char * appPlatformDNSName;
+    ulong64 logFlags;
+    bool segfaulted;
+    bool disableHexdumps;
+    off_t logFileSize;
+};</code></pre>
 
-    <dl>
-        <dt>AppInstance(class AppService * appService, AppInstanceArgs * args)</dt>
-        <dd>Constructor</dd>
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">struct AppServiceArgs</code> holds the relevant app service arguments.
+    App service arguments are defined inside the manager.<br />
+    The AppService class gets them through command line arguments which are usually parsed inside the app-main.cpp.
+    <h3>Parameters</h3>
+    <table style="margin-left:-12px">
+        <tr><td class="param">const char * <b>serviceID </b></td><td></td></tr>
+        <tr><td class="param">const char * <b>manager </b></td><td>The unix domain socket file of the manager.</td></tr>
+        <tr><td class="param">const char * <b>appPlatformDNSName </b></td><td></td></tr>
+        <tr><td class="param">ulong64 <b>logFlags </b></td><td></td></tr>
+        <tr><td class="param">bool <b>segfaulted </b></td><td>Indicates if the service previously segfaulted.</td></tr>
+        <tr><td class="param">bool <b>disableHexdumps </b></td><td>This is set to true if hexdumps are disabled.</td></tr>
+        <tr><td class="param">off_t <b>logFileSize </b></td><td>The maximum log file size.</td></tr>
+    </table>
 
-        <dt>const char * GetAppServiceId() const</dt>
-        <dd>
-            Returns the AppServiceArgs serviceId.
-        </dd>
-        <dt>const char * GetAppName() const</dt>
-        <dd>
-            Returns the App name which is stored within the AppInstanceArgs.
-        </dd>
-        <dt>const char * GetAppDomain() const</dt>
-        <dd>
-            Returns the App domain which is stored within the AppInstanceArgs.
-        </dd>
+    <h2><a name="AppInstanceArgs">AppInstanceArgs</a></h2>
+    <pre><code class="laguage-cpp">struct AppInstanceArgs {
+    AppInstanceArgs();
+    void Parse(int argc, char ** argv, bool keepDefaults = true);
+    const char * appName;
+    const char * appDomain;
+    const char * appPassword;
+    const char * webserver;
+    const char * webserverPath;
+    const char * dbHost;
+    const char * dbName;
+    const char * dbUser;
+    const char * dbPassword;
+    const char * workingPath;
+    ulong64 logFlags;
+};</code></pre>
 
-        <dt>void Log(const char * format, ...)</dt>
-        <dd>
-            Your <b>primary</b> function to log messages! These messages are only logged, if the corresponding<br />
-            LOG_APP flag is set in the logFlags of the IInstanceLog base class.<br />
-            The function always logs the appName and appDomain of the AppInstanceArgs.<br />
-            <br />
-            <i>If you want to log during development independent of the log flags, you can use the debug class<br />
-            directly.</i>
-        </dd>
-        <dt>void LogV(const char * format, va_list ap)</dt>
-        <dd>
-            Like Log, just with a va_list argument list.
-        </dd>
-        <dt>void HexDump(const void * buffer, size_t size)</dt>
-        <dd>
-            Logs a hexdump of the given buffer.
-        </dd>
-    </dl>
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">struct AppInstanceArgs</code> holds the relevant app instance arguments.
+    App instance arguments are defined inside the manager.<br />
+    The AppService class gets them through the socket connection and uses them to create a new AppInstance class.
+    <h3>Parameters</h3>
+    <table style="margin-left:-12px">
+        <tr><td class="param">const char * <b>appName </b></td><td></td></tr>
+        <tr><td class="param">const char * <b>appDomain </b></td><td></td></tr>
+        <tr><td class="param">const char * <b>appPassword </b></td><td></td></tr>
+        <tr><td class="param">const char * <b>webserver </b></td><td>The unix domain socket file which is used to connect to the webserver.</td></tr>
+        <tr><td class="param">const char * <b>webserverPath </b></td><td>The relative path which is used to access the application via HTTP.</td></tr>
+        <tr><td class="param">const char * <b>dbHost </b></td><td>Usually an empty string, as the connection is done with unix domain sockets to the local database server.</td></tr>
+        <tr><td class="param">const char * <b>dbName </b></td><td></td></tr>
+        <tr><td class="param">const char * <b>dbUser </b></td><td></td></tr>
+        <tr><td class="param">const char * <b>dbPassword </b></td><td></td></tr>
+        <tr><td class="param">const char * <b>workingPath </b></td><td></td></tr>
+        <tr><td class="param">ulong64 <b>logFlags </b></td><td></td></tr>
+    </table>
 
-    <a name="IInstanceLog"><h3>base class IInstanceLog</h3></a>
-    <p>
-        This class is used for log flag dependent logs inside interface classes, e.g. the IDatabase interface.<br />
-        The log flags are set through the taskmanager and controlled by the taskmanager web interface.<br />
-        Dependent of the log flags, the interface classes provide AppInstance related logs, so that each interface<br />
-        log can be assigned to a certain AppInstance object.
-    </p>
-    <h4>available log flags</h4>
-    <dl>
-        <dt>LOG_APP</dt>
-        <dt>LOG_DATABASE</dt>
-        <dt>LOG_DB_FILES</dt>
-        <dt>LOG_DNS</dt>
-        <dt>LOG_ETHERNET</dt>
-        <dt>LOG_FILE</dt>
-        <dt>LOG_FILES</dt>
-        <dt>LOG_HTTP_CLIENT</dt>
-        <dt>LOG_HTTP_FILE</dt>
-        <dt>LOG_PROCESS</dt>
-        <dt>LOG_TLS</dt>
-        <dt>LOG_UDS</dt>
-        <dt>LOG_TCP</dt>
-        <dt>LOG_WEBSERVER_PLUGIN</dt>
-        <dt>LOG_WEBSOCKET_CLIENT</dt>
-        <dt>LOG_APP_WEBSOCKET</dt>
-        <dt>LOG_WEBDAV_SERVICE</dt>
-    </dl>
-    <h4>public functions (normally just used by common interface classes)</h4>
-    <dl>
-        <dt>void Log(enum LogFlags flag, const char * format, ...)</dt>
-        <dd>Logs with debug->appPrintfV if the log flag is set.</dd>
-        <dt>void HexDump(enum LogFlags flag, const void * buffer, size_t size)</dt>
-        <dd>Logs with debug->appHexdump if the log flag ist set.</dd>
-        <dt>bool LogFlagSet(enum LogFlags flag)</dt>
-        <dd>Returns true if the log flag is currently set.</dd>
-    </dl>
-    <h4>protected members</h4>
-    <dl>
-        <dt>ulong64 logFlags</dt>
-        <dd>Contains the log flags, which are currently set (OR concatenated).</dd>
-    </dl>
-
-    <h3>struct AppInstanceArgs</h3>
-    <p>
-        App instance arguments are defined by an Administrator inside the taskmanager.<br />
-        The AppService class gets them through the socket connection and uses them<br />
-        to create a new AppInstance class.
-    </p>
-    <dl>
-        <dt>const char * appName;</dt>
-        <dd></dd>
-        <dt>const char * appDomain;</dt>
-        <dd></dd>
-        <dt>const char * appPassword;</dt>
-        <dd></dd>
-        <dt>const char * webserver;</dt>
-        <dd>The unix domain socket file which is used to connect to the webserver.</dd>
-        <dt>const char * webserverPath;</dt>
-        <dd>The relative path which is used to access the application via HTTP.</dd>
-        <dt>const char * dbHost;</dt>
-        <dd></dd>
-        <dt>const char * dbName;</dt>
-        <dd>The database name of the App instance.</dd>
-        <dt>const char * dbUser;</dt>
-        <dd></dd>
-        <dt>const char * dbPassword;</dt>
-        <dd></dd>
-    </dl>
-    
-    <h2>Example</h2>
-    <code type="cpp">
-        <pre>
-class TestInstance : public AppInstance {
+    <h1> Code Example </h1>
+    <a name="Example"></a>
+<pre class="sample"><code class="language-cpp">class TestInstance : public AppInstance {
     ISocketContext * socketContext;
     ISocket * socket;
-    void Stop();
-    void ServerCertificateUpdate(const byte * cert, size_t certLen);
+    void Stop() override;
+    void ServerCertificateUpdate(const byte * cert, size_t certLen)  override;
     void TryStop();
 public:
     TestInstance(class IIoMux * const iomux, class TestService * testService, class ISocketProvider * localSocketProvider, class IDatabaseProvider * databaseProvider, class IWebserverPluginProvider * webserverPluginProvider, AppInstanceArgs * instanceArgs);
@@ -244,8 +506,8 @@ class TestService : public AppService {
 public:
     TestService(class IIoMux * const iomux, class ISocketProvider * localSocketProvider, class ISocketProvider * tlsSocketProvider, class IDatabaseProvider * databaseProvider, class IWebserverPluginProvider * webserverPluginProvider, AppServiceArgs * serviceArgs);
     ~TestService();
-    class AppInstance * CreateInstance(AppInstanceArgs * instanceArgs);
-    void AppServiceApps(class json_io & json, word base);
+    class AppInstance * CreateInstance(AppInstanceArgs * instanceArgs) override;
+    void AppServiceApps(class json_io & json, word base) override;
 };
 
 TestService::TestService(class IIoMux * const iomux, class ISocketProvider * localSocketProvider, class ISocketProvider * tlsSocketProvider, class IDatabaseProvider * databaseProvider, class IWebserverPluginProvider * webserverPluginProvider,  AppServiceArgs * serviceArgs)
@@ -301,7 +563,7 @@ void TestInstance::TryStop()
     // if everything has been closed, call AppStopped
     appService->AppStopped(this);
 }
-        </pre>
     </code>
+  </pre>
 </body>
 </html>

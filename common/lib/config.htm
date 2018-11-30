@@ -3,12 +3,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>innovaphone SDK - Socket implementation</title>
-    <link rel="stylesheet" href="../../docu/innovaphone.doc.css" type="text/css" />
-    <link rel="stylesheet" href="../../docu/vs.css">
+    <link rel="stylesheet" href="../../web/doc/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web/doc/vs.css">
 </head>
 
 <body>
-    <script src="../../docu/highlight.pack.js"></script>
+    <script src="../../web/doc/highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 
     <h1>Config</h1>
@@ -60,6 +60,7 @@
         <tr><td><b>Examples</b></td><td>
                                           <a href="#ExampleConfigContext">ConfigContext</a><br>
                                           <a href="#ExampleConfigUse">Using config</a><br>
+                                          <a href="#ExampleFirstSteps">First steps</a><br>
                                           <br>
                                       </td></tr>
 	</table>
@@ -821,6 +822,8 @@ public:
     void SetValue(const char * value);
     bool HasDefaultValue() override;
     void Reset() override;
+    static void Encrypt(const char * seed, const char * password, char * out, size_t len);
+    static void Decrypt(const char * seed, const char * password, char * out, size_t len);
 };</code></pre>
 
 	<h3>Overview</h3>
@@ -890,16 +893,46 @@ public:
 		Resets the config item and set the value to the default value.
 	</dd>
 
+    <div class="fnhead">Encrypt</div>
+    <dd>
+        Encrypts a password with a seed and writes the result to an output buffer. The encrypted password can be decrypted with the same seed again.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>seed </b></td><td>A seed to use.</td></tr>
+            <tr><td class="param">const char * <b>password </b></td><td>The clear text password.</td></tr>
+            <tr><td class="param">char * <b>out </b></td><td>Output buffer. The buffer should have a size of strlen(password) * 2 + 1.</td></tr>
+            <tr><td class="param">size_t <b>len </b></td><td>The length of the output buffer.</td></tr>
+        </table>
+    </dd>
+
+    <div class="fnhead">Decrypt</div>
+    <dd>
+        Decrypts a password with a seed and writes the result to an output buffer.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>seed </b></td><td>A seed to use.</td></tr>
+            <tr><td class="param">const char * <b>password </b></td><td>The encrypted password.</td></tr>
+            <tr><td class="param">char * <b>out </b></td><td>Output buffer. The buffer should have a size of strlen(password) / 2 + 1.</td></tr>
+            <tr><td class="param">size_t <b>len </b></td><td>The length of the output buffer.</td></tr>
+        </table>
+    </dd>
 
 	<h1>JSON Messages</h1>
 	<h2>Overview</h2>
 	Below is the description of the JSON messages the ConfigContext shares with the JavaScript config library. Note that some of the fields are optional end depend on the value
 	of other fields. You are free to implement your only config javascript library, but note that this messages only will be accepted after sucessfully logging into an appservice
 	using the AppWebsocket javascript library. See <a href="../../web/config/config.htm">JavaScript config library</a> for details.
+    
+    <p>
+        The Config protocol supports the AppWebsocket "src" mechanism.
+    </p>
 	
 	<a name="BaseMessage"><h2>Base message</h2></a>
 	<pre><code class="json">{
     "api": "Config",
+    "src": string,
     "mt": "ConfigMessage"
 }</code></pre><br/>
 	All messages send from and to ConfigContext always have the same header. The property api defines the message as part of the configuration API of the SDK, mt defines the message
@@ -1185,5 +1218,55 @@ void MyApp::OnConfigChanged()
 }
 </code></pre>
 
+    <a name="ExampleFirstSteps"><h2>First Steps</h2></a>
+
+    <p>
+        To use config some preparations in your code needs to be done. The following steps appply
+        when you use ConfigContext as base class to your instance class and do not use a separate
+        class for the config. This is a good option in most cases.
+    </p>
+
+    <dl>
+        <dt>Includes</dt>
+        <dd>
+            Use config.h as include
+            <pre><code class="C++">#include "common/lib/config.h"</code></pre>
+        </dd>
+        <dt>Definitions in the instance class</dt>
+        <dd>
+            Use JsonApiContext and ConfigContext as base class
+            <pre><code class="C++">..., public JsonApiContext, public ConfigContext</code></pre>
+            Define a private function, as initialization complete handler
+            <pre><code class="C++">void ConfigInitComplete(class ITask * task);</code></pre>
+            Define a UTaskTemplate class so that this handler will be called
+            <pre><code class="C++">class UTaskTemplate&lt;YourApp, class ITask&gt; taskConfigInit;</code></pre>
+            Define public members for the config parameters, e.g
+            <pre><code class="C++">class ConfigString configParameter;</code></pre>
+        </dd>
+        <dt>Instance Code</dt>
+        <dd>
+            Initializations in the constructor of the instance class
+            <pre><code class="C++">ConfigContext(0, this),
+taskConfigInit(this, &yourApp::ConfigInitComplete),
+configParameter(this, "parameter", "")
+</code></pre>
+            Call RegisterJsonApi in the instance constructor, so that the Config lib
+            is known as Api provider
+            <pre><code class="C++">RegisterJsonApi(this);</code></pre>
+            Start config initialization after database is connected. E.g. in the
+            DatabaseConnectComplete function
+            <pre><code class="C++">    class ITask * task = CreateInitTask(database);
+    task->Start(&taskConfigInit);
+</code></pre>
+            Continue initialization when config init is complete
+            <pre><code class="C++">void YourApp::ConfigInitComplete(class ITask * task)
+{
+    ... more init ...
+}</code></pre>
+            Make sure the you instance class is passed as jsonApiContext in the AppWebsocket
+            constructor
+            <pre><code class="C++">AppWebsocket(webserverPlugin, yourApp, <b>yourApp</b>)</code></pre>
+        </dd>
+    </dl>
 </body>
 </html>

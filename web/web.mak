@@ -50,6 +50,7 @@
 -include $(IP_SRC)/web/ui1.popup/ui1.popup.mak
 -include $(IP_SRC)/web/ui1.scrolling/ui1.scrolling.mak
 -include $(IP_SRC)/web/ui1.svg/ui1.svg.mak
+-include $(IP_SRC)/web/ui1.switch/ui1.switch.mak
 
 -include $(IP_SRC)/web/ui1.text/ui1.text.mak
 

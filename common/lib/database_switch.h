@@ -77,7 +77,7 @@ public:
     long64 GetLong64Value(const char * columnName) override { return dataSet->GetLong64Value(columnName); }
     ulong64 GetULong64Value(const char * columnName) override { return dataSet->GetULong64Value(columnName); }
     bool GetBoolValue(const char * columnName) override { return dataSet->GetBoolValue(columnName); }
-    float GetFloatValue(const char * columnName) override { return dataSet->GetFloatValue(columnName); }
+    double GetDoubleValue(const char * columnName) override { return dataSet->GetDoubleValue(columnName); }
     const char * GetStringValue(const char * columnName) override { return dataSet->GetStringValue(columnName); }
     const char * GetStringValueWithNull(const char * columnName) override { return dataSet->GetStringValueWithNull(columnName); }
     size_t GetDataSize(const char * columnName) override { return dataSet->GetDataSize(columnName); }
@@ -88,7 +88,7 @@ public:
     long64 GetLong64Value(int column) override { return dataSet->GetLong64Value(column); }
     ulong64 GetULong64Value(int column) override { return dataSet->GetULong64Value(column); }
     bool GetBoolValue(int column) override { return dataSet->GetBoolValue(column); }
-    float GetFloatValue(int column) override { return dataSet->GetFloatValue(column); }
+    double GetDoubleValue(int column) override { return dataSet->GetDoubleValue(column); }
     const char * GetStringValue(int column) override { return dataSet->GetStringValue(column); }
     const char * GetStringValueWithNull(int column) override { return dataSet->GetStringValueWithNull(column); }
     size_t GetDataSize(int column) override { return dataSet->GetDataSize(column); }

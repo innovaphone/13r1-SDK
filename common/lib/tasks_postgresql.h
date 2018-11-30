@@ -70,6 +70,9 @@ private:
     enum { Idle, GetEnum, CreateEnumType, GetEnumValues, AddEnumItem, Finished } state;
     std::deque<char *> enumValues;
 
+    void DatabaseError(IDatabase * const database, db_error_t error) override;
+    void DatabaseExecSQLResult(IDatabase * const database, class IDataSet * dataset) override;
+
     void CreateEnum();
     void UpdateEnum(IDataSet * dataset);
 
@@ -79,7 +82,4 @@ public:
 
     void AddValue(const char * name);
     void Start(class UTask * user) override;
-
-    void DatabaseError(IDatabase * const database, db_error_t error) override;
-    void DatabaseExecSQLResult(IDatabase * const database, class IDataSet * dataset) override;
 };

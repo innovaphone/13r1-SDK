@@ -17,14 +17,14 @@ class HttpQueryArgs
 {
     char * query;
     char * pos;
-    HttpQueryArg current;
+    class HttpQueryArg current;
 
-    HttpQueryArg * Reset();
+    class HttpQueryArg * Reset();
 
 public:
     HttpQueryArgs(char * query);
 
-    HttpQueryArg * Current();
-    HttpQueryArg * Next();
+    class HttpQueryArg * Current();
+    class HttpQueryArg * Next();
 };
 NAMESPACE_END

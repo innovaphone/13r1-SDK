@@ -32,7 +32,8 @@ typedef enum {
     RM_SEPTEMBER,
     RM_OCTOBER,
     RM_NOVEMBER,
-    RM_DECEMBER
+    RM_DECEMBER,
+    RM_NO_MONTH = 0xFFFF
 } recurring_month_t;
 
 #define RD_ALL_DAYS     (RD_SUNDAY | RD_MONDAY | RD_TUESDAY | RD_WEDNESDAY | RD_THURSDAY | RD_FRIDAY | RD_SATURDAY)

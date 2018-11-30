@@ -109,7 +109,9 @@ typedef enum {
     WSP_RESPONSE_G729,
     WSP_RESPONSE_JPEG,
     WSP_RESPONSE_MP4,
-    WSP_RESPONSE_WEBM
+    WSP_RESPONSE_WEBM,
+    WSP_RESPONSE_PEM,
+    WSP_RESPONSE_MOBILECONFIG,
 } wsr_type_t;
 
 
@@ -158,7 +160,9 @@ static const ws_type_sfx_t suffixes[] = {
     { "g729", WSP_RESPONSE_G729 },
     { "jpeg", WSP_RESPONSE_JPEG },
     { "mp4", WSP_RESPONSE_MP4 },
-    { "webm", WSP_RESPONSE_WEBM }
+    { "webm", WSP_RESPONSE_WEBM },
+    { "pem", WSP_RESPONSE_PEM },
+    { "mobileconfig", WSP_RESPONSE_MOBILECONFIG },
 };
 
 
@@ -407,6 +411,7 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
     virtual bool IsEncryptedConnection() = 0;
 
+    virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t size) = 0;
     virtual void Recv(void * buffer = NULL, size_t len = 0) = 0;
     virtual void Close() = 0;

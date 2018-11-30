@@ -25,7 +25,10 @@ public:
     virtual void Start() {};
     virtual void Start(class UTask * user) = 0;
     virtual void Stop() { stopped = true; };
-    virtual void Progress(dword progress) { user->TaskProgress(this, progress); };
+    virtual void Complete() { if (user) user->TaskComplete(this); };
+    virtual void Failed() { if (user) user->TaskFailed(this); };
+    virtual void Progress(dword progress) { if (user) user->TaskProgress(this, progress); };
+    virtual void Finished() {};
     bool error;
     bool stopped;
 };

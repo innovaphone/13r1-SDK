@@ -60,10 +60,12 @@ public:
     virtual void SetParam(dword idx, long64 value) = 0;
     virtual void SetParam(dword idx, ulong64 value) = 0;
     virtual void SetParam(dword idx, bool value) = 0;
+    virtual void SetParam(dword idx, double value) = 0;
     virtual void SetParam(dword idx, int * value) = 0;
     virtual void SetParam(dword idx, dword * value) = 0;
     virtual void SetParam(dword idx, long64 * value) = 0;
     virtual void SetParam(dword idx, ulong64 * value) = 0;
+    virtual void SetParam(dword idx, double * value) = 0;
     virtual void SetParam(dword idx, bool * value) = 0;
     virtual void SetParam(dword idx, const char * value) = 0;
     virtual void SetParam(dword idx, const byte * buffer, size_t size) = 0;
@@ -126,7 +128,7 @@ public:
     virtual long64 GetLong64Value(const char * columnName) = 0;
     virtual ulong64 GetULong64Value(const char * columnName) = 0;
     virtual bool GetBoolValue(const char * columnName) = 0;
-    virtual float GetFloatValue(const char * columnName) = 0;
+    virtual double GetDoubleValue(const char * columnName) = 0;
     virtual const char * GetStringValue(const char * columnName) = 0;
     virtual const char * GetStringValueWithNull(const char * columnName) = 0;
     virtual size_t GetDataSize(const char * columnName) = 0;
@@ -137,7 +139,7 @@ public:
     virtual long64 GetLong64Value(int column) = 0;
     virtual ulong64 GetULong64Value(int column) = 0;
     virtual bool GetBoolValue(int column) = 0;
-    virtual float GetFloatValue(int column) = 0;
+    virtual double GetDoubleValue(int column) = 0;
     virtual const char * GetStringValue(int column) = 0;
     virtual const char * GetStringValueWithNull(int column) = 0;
     virtual size_t GetDataSize(int column) = 0;

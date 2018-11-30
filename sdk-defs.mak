@@ -1,12 +1,12 @@
 
 IP_SRC   = sdk
-HTTPFILES-FLAGS = -k
+HTTPFILES-FLAGS = -k -s 0,HTTP_GZIP
 
 SYSROOT  =
 INCLUDES = -I sdk
 # we need -fno-delete-null-pointer-checks as the btree implementations uses if(!this) ... GCC 6 removes this, as the new standard assumes that this is always NOT NULL
 CFLAGS	 = -Wall -Werror -fno-delete-null-pointer-checks -c -D NO_LEGACY -D BUILD=$(BUILD) 
-LIBS     = -lpthread -luuid 
+LIBS     = -lpthread -luuid -lhpdf -lpng -lcap -lpam -lcrypto -lssl -lmysqlclient -ldl -lz -lpq
 OUTDIR   = .
 BUILDDIR = .
 OBJ_EXT  = o
@@ -17,8 +17,11 @@ else
     CFLAGS += -g -O3
 endif
 
+TOOLSDIR := $(INNOVAPHONE-SDK)
+ifeq ($(TOOLSDIR),)
+# Let's try the old variable we used (T = TOOLS)
 TOOLSDIR := $(T)
-
+endif
 
 ### x86_64 #############
 ifeq ($(MAKECMDGOALS),x86_64)

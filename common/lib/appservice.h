@@ -100,7 +100,7 @@ public:
 
     void Connect(const char * address, const char * serviceID);
     void AppSendStatus(const char * appName, const char * appDomain, bool status, const char * webserverPath);
-    void AppSendAlarm(ServiceAlarmType type, ServiceAlarmSeverity severity, word code, char * text, char * details, const char * serviceID, const char * appName, const char * appDomain);
+    void AppSendAlarm(ServiceAlarmType type, ServiceAlarmSeverity severity, word code, const char * text, const char * details, const char * serviceID, const char * appName, const char * appDomain);
     void AppServiceShutdownComplete();
 
     const char * GetAppDomain() const override { return NULL; }
@@ -215,9 +215,9 @@ public:
     virtual void Stop() = 0;
     virtual void ServerCertificateUpdate(const byte * cert, size_t certLen) {};
 
-    void SetAlarm(word code, ServiceAlarmSeverity severity, char * text, char * details);
-    void ClearAlarm(word code, ServiceAlarmSeverity severity, char * text, char * details);
-    void SendEvent(word code, ServiceAlarmSeverity severity, char * text, char * details);
+    void SetAlarm(word code, ServiceAlarmSeverity severity, const char * text, const char * details);
+    void ClearAlarm(word code, ServiceAlarmSeverity severity, const char * text, const char * details);
+    void SendEvent(word code, ServiceAlarmSeverity severity, const char * text, const char * details);
 
     virtual void SetAppDomain(const char * domain, const char * pwd) {};
 };

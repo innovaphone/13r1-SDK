@@ -22,12 +22,6 @@ public:
     virtual void ChildExited(signed int pid, int signr, int exitCode, bool sigFault) = 0;
 };
 
-class IIoMainLoopExtension {
-
-public:
-    virtual void IoMainLoopExtension(int timeoutMs) = 0;
-};
-
 class UIoContext {
 protected:
     int		FDIIoMux;	// File descriptor	
@@ -56,7 +50,7 @@ class UIoExec {
 public:
     UIoExec();
     virtual ~UIoExec();
-    virtual void IoExec(void * execContext);
+    virtual void IoExec(void * execContext) = 0;
 };
 
 class IIoMux {
@@ -74,7 +68,6 @@ public:
     virtual void RegisterShutdownHandler(IShutdownHandler * shutdownHandler) = 0;
     virtual void RegisterChildExitedHandler(IChildExitedHandler * childExitedHandler) = 0;
     virtual void UnRegisterChildExitedHandler(IChildExitedHandler * childExitedHandler) = 0;
-    virtual void SetMainLoopExtension(IIoMainLoopExtension * mainLoopExtension) = 0;
     virtual void Lock() = 0;
     virtual void UnLock() = 0;
     virtual void SetExec(UIoExec * ioContext, void * execContext) = 0;
@@ -116,7 +109,9 @@ public:
     ~ITimer();
 
     void Start(unsigned timeoutMs);
+    void StartLocked(unsigned timeoutMs);
     void Cancel();
+    void CancelLocked();
     bool IsRunning() const { return running; };
 };
 

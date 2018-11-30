@@ -42,29 +42,82 @@ innovaphone.applicationSharing = innovaphone.applicationSharing || {};
 innovaphone.applicationSharing.PathPrefix = innovaphone.applicationSharing.PathPrefix || "";
 innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (function () {
 
-    // Constructor
-    function _AppSharing(logFunction, displayname) {
-        var log = logFunction ? function (text) { logFunction("AppSharing: " + text); } : function () { };
+    var INNO_HDR_FLAGS = 0  // Offset 2
+    var INNO_HDR_SEQ = 2  // Offset 2
+    var INNO_HDR_MSG_TYPE = 4
+    var INNO_HDR_APPL_ID = 5
+    var INNO_HDR_SENDER_ID = 6
+    var INNO_HDR_X_COOR = 8
+    var INNO_HDR_Y_COOR = 10
+    var INNO_HDR_X_DIM = 12
+    var INNO_HDR_Y_DIM = 14
+    var INNO_HDR_X_SIZE = 16
+    var INNO_HDR_Y_SIZE = 18
+    var INNO_HDR_RAW_COLOR = 20
+    var INNO_HDR_NUM_EQUAL = 24
+    var INNO_HDR_CRC_PNG256 = 28  // next three cannot appear in the same message
+    var INNO_HDR_LENGTH = 32  // basic header length
+    var INNO_HDR_RECEIVER_ID = INNO_HDR_LENGTH + 0;
+    var INNO_HDR_SEQ_NUM = INNO_HDR_LENGTH + 2;
+    var INNO_HDR_MSG_VK = INNO_HDR_LENGTH + 2;
+    var INNO_HDR_NUM_LOST = INNO_HDR_LENGTH + 4;
 
-        var INNO_HDR_FLAGS = 0  // Offset 2
-        var INNO_HDR_SEQ = 2  // Offset 2
-        var INNO_HDR_MSG_TYPE = 4
-        var INNO_HDR_APPL_ID = 5
-        var INNO_HDR_SENDER_ID = 6
-        var INNO_HDR_X_COOR = 8
-        var INNO_HDR_Y_COOR = 10
-        var INNO_HDR_X_DIM = 12
-        var INNO_HDR_Y_DIM = 14
-        var INNO_HDR_X_SIZE = 16
-        var INNO_HDR_Y_SIZE = 18
-        var INNO_HDR_RAW_COLOR = 20
-        var INNO_HDR_NUM_EQUAL = 24
-        var INNO_HDR_CRC_PNG256 = 28  // next three cannot appear in the same message
-        var INNO_HDR_LENGTH = 32  // basic header length
-        var INNO_HDR_RECEIVER_ID = INNO_HDR_LENGTH + 0;
-        var INNO_HDR_SEQ_NUM = INNO_HDR_LENGTH + 2;
-        var INNO_HDR_MSG_VK = INNO_HDR_LENGTH + 2;
-        var INNO_HDR_NUM_LOST = INNO_HDR_LENGTH + 4;
+    var BLOCK_MSG = 0;
+    var BLOCK_MSG_256 = 1;
+    var PLAIN_MSG = 2;
+    var NONE_COMP = 0;
+    var PNG_COMP = 1;
+    var JPEG_COMP = 2;
+    var END_BIT_SCTP = 0x80;
+    var START_BIT_SCTP = 0x40;
+    var END_BIT_IMG = 0x20;
+    var START_BIT_IMG = 0x10;
+    var INDEX_APP_ID = 10;
+
+    var DUMMY_MSG = 8;
+    var NEW_PICTURE = 9;
+    var STOP_SHARING = 10;
+    var SEND_NAME = 11;
+    var SEND_MOUSE_TYPE = 12;
+    var SEND_APP_NAME = 13;
+    var SEQ_LOST = 128;
+    var REQ_NEW_PIC = 130;
+    var GIVE_CONTROL = 131;
+    var TAKE_CONTROL = 132;
+    var REQUEST_CONTROL = 133;
+    var REQUEST_NAME = 135;
+    var DUMMY_MSG_RX = 136;
+    var LBUTTONDOWN = 192;
+    var KEYPRESSED_UP = 203;
+    var DISCARD_MSG = 254;
+
+    // Constructor
+    _Application = function (main, senderId, appId, appName, onUpdateParticipant, onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, dataChannel) {
+        var image_data = null;
+        var img_h = 0;
+        var img_w = 0;
+        var have_control = false;
+        var scale_image = true;
+        var m_offset_x = 0;
+        var m_offset_y = 0;
+        var last_mouse_x = 0;
+        var last_mouse_y = 0;
+        var sender_id = senderId;
+        var app_id = appId;
+        var app_name = appName;
+        var sender_name = "";
+        var container_id = null;
+        var onUpdateApp = onUpdateApp;
+        var onUpdateParticipant = onUpdateParticipant;
+        var onResizeApp = onResizeApp;
+        var onRemoveApp = onRemoveApp;
+        var onRemoteControl = onRemoteControl;
+        var onRequestRemoteControl = onRequestRemoteControl;
+        var data_channel = dataChannel;
+        var full_screen = false;
+        var full_screen_width = 0;
+        var full_screen_height = 0;
+        var cursor_offset = false;
 
         var CURSOR_IDC_ARROW = 0;
         var CURSOR_IDC_HAND = 1;
@@ -87,81 +140,6 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         var CURSOR_IDC_V2SPLIT = 18;
         var cursors_file = innovaphone.applicationSharing.PathPrefix + "cursors.png";
 
-        var BLOCK_MSG = 0;
-        var BLOCK_MSG_256 = 1;
-        var PLAIN_MSG = 2;
-        var NONE_COMP = 0;
-        var PNG_COMP = 1;
-        var JPEG_COMP = 2;
-        var INDEX_APP_ID = 10;
-        var END_BIT_SCTP = 0x80;
-        var START_BIT_SCTP = 0x40;
-        var END_BIT_IMG = 0x20;
-        var START_BIT_IMG = 0x10;
-        var inno_seq = 0;
-        var sender_changed = false;
-
-        var imageData = new Array(256);
-        var rx_apps = new Array(256);
-        var rx_tabs = new Array(256);
-        var img_h = new Array(256);
-        var img_w = new Array(256);
-        var app_name = new Array(256);
-        var activeApp = -1;
-        var activePart = -1;
-        var have_control = new Array(256);
-
-        for (var i = 0; i < 256; i++) {
-            imageData[i] = new Array(256);
-            rx_apps[i] = new Array(256);
-            rx_tabs[i] = new Array(256);
-            img_w[i] = new Array(256);
-            img_h[i] = new Array(256);
-            app_name[i] = new Array(256);
-            for (var j = 0; j < 256; j++) {
-                imageData[i][j] = null;
-                rx_apps[i][j] = 0;
-                rx_tabs[i][j] = 0;
-                img_w[i][j] = 0;
-                img_h[i][j] = 0;
-                app_name[i][j] = "app_" + i + "_" + j;
-            }
-            have_control[i] = false;
-        }
-
-        var scaleImage = false;
-        var sender_id = 0;
-        var sender_name = displayname;
-        var sender_name_len = sender_name.length;
-        var mouse_element = null;
-        var myCanvas = null;
-        var mouse_type = -1;
-        var m_offset_x = 0;
-        var m_offset_y = 0;
-        var container_id = null;
-        var dataChannel = null;
-        var jsonChannel = null;
-        var remote_part = "";
-        var last_mouse_x = 0;
-        var last_mouse_y = 0;
-        var onCreateApp = null;
-        var onRemoveApp = null;
-        var onResizeApp = null;
-        var num_packets_rx = 0;
-        var num_packets_proc = 0;
-
-        var canvas = new Array(3);
-        var ctx = new Array(3);
-
-        // canvas[0] just creates images for the different apps received
-        // canvas[1] contains the app being displayed in original size
-        // canvas[2] contains the app being displayed in original or adjusted size (what the user sees) 
-        for (var i = 0; i < 3; i++) {
-            canvas[i] = document.createElement("canvas");
-            canvas[i].setAttribute("id", "webrtc.sharing." + i);
-            ctx[i] = canvas[i].getContext("2d");
-        }
-
         var VK_BACK = 0x8, VK_TAB = 0x9, VK_CLEAR = 0xC, VK_RETURN = 0xD, VK_SPACE = 0x20;
         var VK_SHIFT = 0x10, VK_CONTROL = 0x11, VK_MENU = 0x12;
         var VK_CAPITAL = 0x14;
@@ -175,10 +153,6 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         var VK_a = 0x61, VK_z = 0x7A;
         var VK_LWIN = 0x5B;
 
-        var lastKeyDefined = 0x39;
-        var is_shift_down = false;
-        var is_ctrl_down = false;
-
         var keyCodes = [
              0, 1, 2, 3, 4, 5, 6, 7, VK_BACK, VK_TAB,
             10, 11, VK_CLEAR, VK_RETURN, 14, 15, VK_SHIFT, VK_CONTROL, VK_MENU, 19,
@@ -186,6 +160,25 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             30, 31, VK_SPACE, VK_PRIOR, VK_NEXT, VK_END, VK_HOME, VK_LEFT, VK_TOP, VK_RIGHT,
             VK_BOTTOM, 41, 42, 43, 44, 45, 46, 47,
             VK_0, VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_7, VK_8, VK_9];
+
+        var canvas_id = new Array(3);
+        var ctx_id = new Array(3);
+        // canvasIds[0] just creates images for the different apps received
+        // canvasIds[1] contains the app being displayed in original size
+        // canvasIds[2] contains the app being displayed in original or adjusted size (what the user sees) 
+        for (var k = 0; k < 3; k++) {
+            canvas_id[k] = document.createElement("canvas");
+            canvas_id[k].setAttribute("id", "webrtc.sharing." + senderId + "." + appId);
+            ctx_id[k] = canvas_id[k].getContext("2d");
+        }
+
+        mouse_element = document.createElement("div");
+        mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
+        mouse_type = -1;
+
+        var last_key_defined = 0x39;
+        var is_shift_down = false;
+        var is_ctrl_down = false;
 
         function getWidth() {
             return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || document.body.offsetWidth;
@@ -195,180 +188,434 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || document.body.offsetHeight;
         }
 
-        function getContainerWidth() {
-            if (container_id == null) return getWidth();
-            return parseInt(container_id.style.width, 10);
-        }
+        function mousewheel_l(e) {
+            if (!have_control) return;
+            //console.log('mousewheel_l');
 
-        function getContainerHeight() {
-            if (container_id == null) return getHeight();
-            return parseInt(container_id.style.height, 10);
-        }
-
-        function sendOwnName(app, dest) {
-            if (sender_name_len == 0) {
-                log('sender name is empty');
-                return;
+            if (!e) var e = window.event;
+            if (mouseWheel(e) == false) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.cancelBubble = false;
             }
-            log('Send display name (' + sender_name + ')');
-            var arrayMsgS = new ArrayBuffer(36 + 1 + (sender_name_len << 1));
-            var dmsg = new Uint8Array(arrayMsgS);
-            var t_seq = inno_seq++;
-            dmsg[INNO_HDR_FLAGS] = 0xf0;
-            dmsg[INNO_HDR_MSG_TYPE] = 11;  // SEND_NAME
-            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = app;
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (dest >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = dest & 0xff;
-            dmsg[INNO_HDR_LENGTH + 4] = (sender_name_len << 1);
-            var nstr = sender_name;
-            var ind_a = INNO_HDR_LENGTH + 5;
-            for (var i = 0; i < sender_name_len; i++) {
-                var c = nstr.charCodeAt(i);
-                //log('name = ' + c);
-                dmsg[ind_a + 0] = c & 0xff;
-                dmsg[ind_a + 1] = (c >> 8) & 0xff;
-                ind_a = ind_a + 2;
+        }
+
+        function mousewheel_a(e) {
+            if (!have_control) return;
+            //console.log('mousewheel_a');
+
+            if (!e) var e = window.event;
+            if (mouseWheel(e) == false) {
+                e.returnValue = false;
+                e.cancelBubble = true;
             }
-            if (dataChannel) dataChannel.send(arrayMsgS);
-            else if (jsonChannel) jsonChannel.send(arrayMsgS);
         }
 
-        function requestAppName(app, dest) {
-            var arrayMsg = new ArrayBuffer(36);
-            var dmsg = new Uint8Array(arrayMsg);
-            var t_seq = inno_seq++;
-            dmsg[INNO_HDR_FLAGS] = 0xf0;
-            dmsg[INNO_HDR_MSG_TYPE] = 135;  // REQUEST_NAME
-            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = app;
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (dest >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = dest & 0xff;
-            if (dataChannel) dataChannel.send(arrayMsg);
-            else if (jsonChannel) jsonChannel.send(arrayMsg);
-            else log('requestAppName failed');
+        function keyup_l(e) {
+            if (!have_control) return;
+            //console.log('keyup_l');
+
+            if (!e) var e = window.event;
+            if (keyUp(e) == false) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.cancelBubble = false;
+            }
         }
 
-        function requestNewPicture(app, dest) {
-            var arrayMsg = new ArrayBuffer(36);
-            var dmsg = new Uint8Array(arrayMsg);
-            var t_seq = inno_seq++;
-            dmsg[INNO_HDR_FLAGS] = 0xf0;
-            dmsg[INNO_HDR_MSG_TYPE] = 130;  // REQ_NEW_PIC
-            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = app;
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (dest >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = dest & 0xff;
-            if (dataChannel) dataChannel.send(arrayMsg);
-            else if (jsonChannel) jsonChannel.send(arrayMsg);
-            else log('requestNewPicture failed');
+        function keyup_a(e) {
+            if (!have_control) return;
+            //console.log('keyup_a');
+
+            if (!e) var e = window.event;
+            if (keyUp(e) == false) {
+                e.returnValue = false;
+                e.cancelBubble = true;
+            }
         }
 
-        function reportPacketLost(lost, num_lost, dest) {
-            var arrayMsgS = new ArrayBuffer(38);
-            var dmsg = new Uint8Array(arrayMsgS);
-            var t_seq = inno_seq++;
-            dmsg[INNO_HDR_FLAGS] = 0xf0;
-            dmsg[INNO_HDR_MSG_TYPE] = 128;                    // SEQ_LOST
-            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (dest >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = dest & 0xff;
-            dmsg[INNO_HDR_SEQ_NUM + 0] = (lost >> 8) & 0xff;
-            dmsg[INNO_HDR_SEQ_NUM + 1] = lost & 0xff;
-            dmsg[INNO_HDR_NUM_LOST + 0] = (num_lost >> 8) & 0xff;
-            dmsg[INNO_HDR_NUM_LOST + 1] = num_lost & 0xff;
-            if (dataChannel) dataChannel.send(arrayMsgS);
-            else if (jsonChannel) jsonChannel.send(arrayMsgS);
+        function keydown_l(e) {
+            if (!have_control) return;
+            //console.log('keydown_l');
+
+            if (!e) var e = window.event;
+            if (keyDown(e) == false) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.cancelBubble = false;
+            }
         }
 
-        function sharingEvent(type, data) {
-            //log('sharingEvent ' + type + ' data ' + data);
-            switch (type) {
-                case 'init':
-                    init(null);
-                    jsonChannel = data;
-                    break;
-                case 'setcontainer':
-                    setContainer(data);
-                    break;
-                case 'createAppCallback':
-                    onCreateApp = data;
-                    if (onCreateApp) {
-                        for (var i = 0; i < 256; i++) {
-                            for (var j = 0; j < 256; j++) {
-                                if ((rx_apps[i][j]) && (app_name[i][j] != ("app_" + i + "_" + j)) && (app_name[i][j] != "") && (rx_tabs[i][j] == 0)) {
-                                    onCreateApp(i, j, app_name[i][j]);
-                                    rx_tabs[i][j] = 1;
-                                }
-                            }
+        function keydown_a(e) {
+            if (!have_control) return;
+            //console.log('keydown_a');
+
+            if (!e) var e = window.event;
+            if (keyDown(e) == false) {
+                e.returnValue = false;
+                e.cancelBubble = true;
+            }
+        }
+
+        function keypress_l(e) {
+            if (!have_control) return;
+            //console.log('keypress_l');
+
+            if (!e) var e = window.event;
+            if (keyPress(e, 'keypress_l') == false) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.cancelBubble = false;
+            }
+        }
+
+        function keypress_a(e) {
+            if (!have_control) return;
+            //console.log('keypress_a');
+
+            if (!e) var e = window.event;
+            if (keyPress(e, 'keypress_a') == false) {
+                e.returnValue = false;
+                e.cancelBubble = true;
+            }
+        }
+
+        function onMouseMove(x, y, rect) {
+            if ((last_mouse_x == x) && (last_mouse_y == y)) {
+                return null;
+            }
+
+            last_mouse_x = x;
+            last_mouse_y = y;
+
+            var new_x = x;
+            var new_y = y;
+
+            if (container_id) {
+                var display_w = full_screen_width, display_h = full_screen_height;
+                if (img_w && img_h && full_screen_width && full_screen_height) {
+                    if (img_w >= img_h) {
+                        display_w = Math.min(img_w, full_screen_width);
+                        display_h = (img_h * display_w) / img_w;
+                        if (display_h > full_screen_height) {
+                            display_w = (display_w * full_screen_height) / display_h;
+                            display_h = full_screen_height;
                         }
                     }
-                    break;
-                case 'removeAppCallback':
-                    onRemoveApp = data;
-                    break;
-                case 'resizeAppCallback':
-                    onResizeApp = data;
-                    break;
-                case 'setname':
-                    setOwnName(data);
-                    break;
-                case 'changeDisplayApp':
-                    changeDisplayApp(data);
-                    break;
-                case 'changeDisplaySender':
-                    changeDisplaySender(data);
-                    break;
-                case 'fitToElement':
-                    fitToElement(data);
-                    break;
-                case 'adjustImageToCanvas':
-                    adjustImageToCanvas();
-                    break;
-                case 'requestControl':
-                    requestControl();
-                    break;
-                default:
-                    log('unknown event received: ' + type);
+                    else {
+                        display_h = Math.min(img_h, full_screen_height);
+                        display_w = (img_w * display_h) / img_h;
+                        if (display_w > full_screen_width) {
+                            display_h = (display_h * full_screen_width) / display_w;
+                            display_w = full_screen_width;
+                        }
+                    }
+
+                    var offX = 0, offY = 35;
+                    if (full_screen_width > display_w) offX = (full_screen_width - display_w) >> 1;
+                    if (display_w) {
+                        x -= offX;
+                        x = (img_w * x) / display_w;
+                    }
+                    if (display_h) {
+                        y -= offY;
+                        y = (img_h * y) / display_h;
+                    }
+
+                    new_x = (0 | x);
+                    new_y = (0 | y);
+                }
             }
-            //log('sharingEvent -> ' + type);
+            else {
+                new_x -= rect.left;
+                new_y -= rect.top;
+            }
+
+            var coord = new Array(2);
+            coord[0] = new_x;
+            coord[1] = new_y;
+
+            return coord;
+        }
+
+        function mouseMoveHandle(e) {
+            if (!have_control || !full_screen) return;
+            var rect = canvas_id[2].getBoundingClientRect();
+            console.log('mouseMoveHandle ' + e.clientY + ' x= ' + e.clientX);
+            console.log('rect ' + rect.top + ' b= ' + rect.bottom + ' l= ' + rect.left + ' r= ' + rect.right);
+            if (e.clientY < rect.top || e.clientX < rect.left) return;
+            if (e.clientY > rect.bottom || e.clientX > rect.right) return;
+
+            var coord = onMouseMove(e.clientX, e.clientY, rect);
+            if (coord) {
+                var arrayMsg = new ArrayBuffer(36);
+                var dmsg = new Uint8Array(arrayMsg);
+                var t_seq = main.getInnoSeq();
+                dmsg[INNO_HDR_FLAGS] = 0xf0;
+                dmsg[INNO_HDR_MSG_TYPE] = 198;
+                dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+                dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+                dmsg[INNO_HDR_APPL_ID] = app_id;
+                dmsg[INNO_HDR_X_COOR] = (coord[0] >> 8) & 0xff;
+                dmsg[INNO_HDR_X_COOR + 1] = coord[0] & 0xff;
+                dmsg[INNO_HDR_Y_COOR] = (coord[1] >> 8) & 0xff;
+                dmsg[INNO_HDR_Y_COOR + 1] = coord[1] & 0xff;
+                dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+                dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+                dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+                dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
+                if (data_channel) data_channel.send(arrayMsg);
+            }
+        }
+
+        function onMouseUp(button, x, y, rect) {
+            var mouse_click;
+            if (button == 0) {
+                mouse_click = 193;
+            }
+            else if (button == 2) {
+                mouse_click = 196;
+            }
+            else return null;
+
+            last_mouse_x = x;
+            last_mouse_y = y;
+
+            var new_x = x;
+            var new_y = y;
+
+            if (container_id) {
+                var display_w = full_screen_width, display_h = full_screen_height;
+                if (img_w && img_h && full_screen_width && full_screen_height) {
+                    if (img_w >= img_h) {
+                        display_w = Math.min(img_w, full_screen_width);
+                        display_h = (img_h * display_w) / img_w;
+                        if (display_h > full_screen_height) {
+                            display_w = (display_w * full_screen_height) / display_h;
+                            display_h = full_screen_height;
+                        }
+                    }
+                    else {
+                        display_h = Math.min(img_h, full_screen_height);
+                        display_w = (img_w * display_h) / img_h;
+                        if (display_w > full_screen_width) {
+                            display_h = (display_h * full_screen_width) / display_w;
+                            display_w = full_screen_width;
+                        }
+                    }
+
+                    var offX = 0, offY = 35;
+                    if (full_screen_width > display_w) offX = (full_screen_width - display_w) >> 1;
+                    if (display_w) {
+                        x -= offX;
+                        x = (img_w * x) / display_w;
+                    }
+                    if (display_h) {
+                        y -= offY;
+                        y = (img_h * y) / display_h;
+                    }
+
+                    new_x = (0 | x);
+                    new_y = (0 | y);
+                }
+            }
+            else {
+                new_x -= rect.left;
+                new_y -= rect.top;
+            }
+
+            var coord = new Array(3);
+            coord[0] = new_x;
+            coord[1] = new_y;
+            coord[2] = mouse_click;
+
+            return coord;
+        }
+
+        function mouseUpHandle(e) {
+            if (!have_control || !full_screen) return;
+            //log('mouseUpHandle');
+
+            var evt = e;
+            var rect = canvas_id[2].getBoundingClientRect();
+            if (evt.clientY < rect.top || evt.clientX < rect.left) return;
+            if (evt.clientY > rect.bottom || evt.clientX > rect.right) return;
+
+            var coord = onMouseUp(evt.button, evt.clientX, evt.clientY, rect);
+            if (coord) {
+                var arrayMsg = new ArrayBuffer(36);
+                var dmsg = new Uint8Array(arrayMsg);
+                var t_seq = main.getInnoSeq();
+                dmsg[INNO_HDR_FLAGS] = 0xf0;
+                dmsg[INNO_HDR_MSG_TYPE] = coord[2];   // mouse_click
+                dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+                dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+                dmsg[INNO_HDR_APPL_ID] = app_id;
+                dmsg[INNO_HDR_X_COOR] = (coord[0] >> 8) & 0xff;
+                dmsg[INNO_HDR_X_COOR + 1] = coord[0] & 0xff;
+                dmsg[INNO_HDR_Y_COOR] = (coord[1] >> 8) & 0xff;
+                dmsg[INNO_HDR_Y_COOR + 1] = coord[1] & 0xff;
+                dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+                dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+                dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+                dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
+                if (data_channel) data_channel.send(arrayMsg);
+            }
+        }
+
+        function onMouseDown(button, x, y, rect) {
+            var mouse_click;
+            if (button == 0) {
+                mouse_click = 192;
+            }
+            else if (button == 2) {
+                mouse_click = 195;
+            }
+            else return null;
+
+            last_mouse_x = x;
+            last_mouse_y = y;
+
+            var new_x = x;
+            var new_y = y;
+            if (container_id) {
+                var display_w = full_screen_width, display_h = full_screen_height;
+                if (img_w && img_h && full_screen_width && full_screen_height) {
+                    if (img_w >= img_h) {
+                        display_w = Math.min(img_w, full_screen_width);
+                        display_h = (img_h * display_w) / img_w;
+                        if (display_h > full_screen_height) {
+                            display_w = (display_w * full_screen_height) / display_h;
+                            display_h = full_screen_height;
+                        }
+                    }
+                    else {
+                        display_h = Math.min(img_h, full_screen_height);
+                        display_w = (img_w * display_h) / img_h;
+                        if (display_w > full_screen_width) {
+                            display_h = (display_h * full_screen_width) / display_w;
+                            display_w = full_screen_width;
+                        }
+                    }
+
+                    var offX = 0, offY = 35;
+                    if (full_screen_width > display_w) offX = (full_screen_width - display_w) >> 1;
+                    if (display_w) {
+                        x -= offX;
+                        x = (img_w * x) / display_w;
+                    }
+                    if (display_h) {
+                        y -= offY;
+                        y = (img_h * y) / display_h;
+                    }
+
+                    new_x = (0 | x);
+                    new_y = (0 | y);
+                }
+            }
+            else {
+                new_x -= rect.left;
+                new_y -= rect.top;
+            }
+
+            var coord = new Array(3);
+            coord[0] = new_x;
+            coord[1] = new_y;
+            coord[2] = mouse_click;
+
+            return coord;
+        }
+
+        function mouseDownHandle(e) {
+            if (!have_control) return;
+            //log('mouseDownHandle');
+
+            var evt = e;
+            //writeToScreen("mouseDownHandle " + e.button + ' ' + e.clientX + ' ' + e.clientY);
+            var rect = canvas_id[2].getBoundingClientRect();
+            if (evt.clientY < rect.top || evt.clientX < rect.left) return;
+            if (evt.clientY > rect.bottom || evt.clientX > rect.right) return;
+
+            var coord = onMouseDown(evt.button, evt.clientX, evt.clientY, rect);
+            if (coord) {
+                var arrayMsg = new ArrayBuffer(36);
+                var dmsg = new Uint8Array(arrayMsg);
+                var t_seq = main.getInnoSeq();
+                dmsg[INNO_HDR_FLAGS] = 0xf0;
+                dmsg[INNO_HDR_MSG_TYPE] = coord[2];   // mouse_click
+                dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+                dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+                dmsg[INNO_HDR_APPL_ID] = app_id;
+                dmsg[INNO_HDR_X_COOR] = (coord[0] >> 8) & 0xff;
+                dmsg[INNO_HDR_X_COOR + 1] = coord[0] & 0xff;
+                dmsg[INNO_HDR_Y_COOR] = (coord[1] >> 8) & 0xff;
+                dmsg[INNO_HDR_Y_COOR + 1] = coord[1] & 0xff;
+                dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+                dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+                dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+                dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
+                if (data_channel) data_channel.send(arrayMsg);
+            }
+        }
+
+        function mouseDoubleClickHandle(e) {
+            if (!have_control) return;
+            //log('mouseDoubleClickHandle');
+
+            var evt = e;
+            var rect = canvas_id[2].getBoundingClientRect();
+            if (evt.clientY < rect.top || evt.clientX < rect.left) return;
+            if (evt.clientY > rect.bottom || evt.clientX > rect.right) return;
+
+            //onMouseDoubleClick(evt.button, evt.clientX, evt.clientY, scale_image, img_w, img_h, rect);
+        }
+
+        function domMouseScroll(e) {
+            if (!have_control) return;
+            //log('domMouseScroll ' + e.wheelDelta);
+
+            var arrayMsg = new ArrayBuffer(36);
+            var dmsg = new Uint8Array(arrayMsg);
+            var t_seq = main.getInnoSeq();
+            dmsg[INNO_HDR_FLAGS] = 0xf0;
+            dmsg[INNO_HDR_MSG_TYPE] = 199;
+            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+            dmsg[INNO_HDR_APPL_ID] = app_id;
+            dmsg[INNO_HDR_X_COOR] = 0;
+            dmsg[INNO_HDR_X_COOR + 1] = (e.wheelDelta < 0 ? 1 : 0);
+            dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+            dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+            dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+            dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
+            if (data_channel) data_channel.send(arrayMsg);
+
+            e.stopPropagation();
+            e.preventDefault();
+            e.cancelBubble = false;
         }
 
         function mouseWheel(e) {
             // build msg!!!!
             var arrayMsg = new ArrayBuffer(36);
             var dmsg = new Uint8Array(arrayMsg);
-            var t_seq = inno_seq++;
+            var t_seq = main.getInnoSeq();
             dmsg[INNO_HDR_FLAGS] = 0xf0;
             dmsg[INNO_HDR_MSG_TYPE] = 199;
             dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
             dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = activeApp;
+            dmsg[INNO_HDR_APPL_ID] = app_id;
             dmsg[INNO_HDR_X_COOR] = 0;
             dmsg[INNO_HDR_X_COOR + 1] = (e.wheelDelta < 0 ? 1 : 0);
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
-            if (dataChannel) dataChannel.send(arrayMsg);
-            else if (jsonChannel) jsonChannel.send(arrayMsg);
+            dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+            dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+            dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+            dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
+            if (data_channel) data_channel.send(arrayMsg);
             return false;
         }
 
-        function onKeyUp(keyCode, shiftKey, altKey, ctrlKey, app) {
+        function onKeyUp(keyCode, shiftKey, altKey, ctrlKey) {
             //log("onKeyUp " + keyCode + ' ' + shiftKey + ' ' + altKey + ' ' + ctrlKey);
             var ret = Array(3);
 
@@ -395,35 +642,34 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
 
         function keyUp(e, type) {
             //log("IE-onKeyUp " + e.charCode + ' ' + e.which + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
-            var ret = onKeyUp(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey, activeApp);
+            var ret = onKeyUp(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey);
             if (ret[0] == 0) {
                 return false;
             }
             // build msg!!!!
             var arrayMsg = new ArrayBuffer(36);
             var dmsg = new Uint8Array(arrayMsg);
-            var t_seq = inno_seq++;
+            var t_seq = main.getInnoSeq();
             dmsg[INNO_HDR_FLAGS] = 0xf0;
             dmsg[INNO_HDR_MSG_TYPE] = ret[1];
             dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
             dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = activeApp;
+            dmsg[INNO_HDR_APPL_ID] = app_id;
             dmsg[INNO_HDR_X_COOR + 0] = (ret[2] >> 8) & 0xff;
             dmsg[INNO_HDR_X_COOR + 1] = ret[2] & 0xff;
             dmsg[INNO_HDR_Y_COOR + 0] = 0;
             dmsg[INNO_HDR_Y_COOR + 1] = 1;
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
+            dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+            dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+            dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+            dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
             dmsg[INNO_HDR_MSG_VK + 0] = (ret[2] >> 8) & 0xff;
             dmsg[INNO_HDR_MSG_VK + 1] = ret[2] & 0xff;
-            if (dataChannel) dataChannel.send(arrayMsg);
-            else if (jsonChannel) jsonChannel.send(arrayMsg);
+            if (data_channel) data_channel.send(arrayMsg);
             return true;
         }
 
-        function onKeyDown(keyCode, shiftKey, altKey, ctrlKey, app) {
+        function onKeyDown(keyCode, shiftKey, altKey, ctrlKey) {
             //log("onKeyDown " + keyCode + ' ' + shiftKey + ' ' + altKey + ' ' + ctrlKey);
             var ret = Array(3);
 
@@ -464,36 +710,35 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
 
         function keyDown(e) {
             //log("KeyDown " + e.charCode + ' ' + e.which + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
-            var ret = onKeyDown(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey, activeApp);
+            var ret = onKeyDown(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey);
             if (ret[0] == 0) {
                 if (ret[1]) {
                     var arrayMsg = new ArrayBuffer(36);
                     var dmsg = new Uint8Array(arrayMsg);
-                    var t_seq = inno_seq++;
+                    var t_seq = main.getInnoSeq();
                     dmsg[INNO_HDR_FLAGS] = 0xf0;
                     dmsg[INNO_HDR_MSG_TYPE] = ret[1];
                     dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
                     dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-                    dmsg[INNO_HDR_APPL_ID] = activeApp;
+                    dmsg[INNO_HDR_APPL_ID] = app_id;
                     dmsg[INNO_HDR_X_COOR + 0] = (ret[2] >> 8) & 0xff;
                     dmsg[INNO_HDR_X_COOR + 1] = ret[2] & 0xff;
                     dmsg[INNO_HDR_Y_COOR + 0] = 0;
                     dmsg[INNO_HDR_Y_COOR + 1] = 1;
-                    dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-                    dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-                    dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-                    dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
+                    dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+                    dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+                    dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+                    dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
                     dmsg[INNO_HDR_MSG_VK + 0] = (ret[2] >> 8) & 0xff;
                     dmsg[INNO_HDR_MSG_VK + 1] = ret[2] & 0xff;
-                    if (dataChannel) dataChannel.send(arrayMsg);
-                    else if (jsonChannel) jsonChannel.send(arrayMsg);
+                    if (data_channel) data_channel.send(arrayMsg);
                 }
                 return false;
             }
             return true;
         }
 
-        function onKeyPressed(keyCode, shiftKey, altKey, ctrlKey, app) {
+        function onKeyPressed(keyCode, shiftKey, altKey, ctrlKey) {
             var ret = Array(3);
 
             //log("onKeyPressed " + keyCode + ' ' + shiftKey + ' ' + altKey + ' ' + ctrlKey);
@@ -515,860 +760,435 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             //log("KeyPressed t=" + type + ' ' + e.charCode + ' ' + e.which + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
             if (type == 'keypress_l') {
                 var ch = e.keyCode || e.which;
-                var ret = onKeyPressed(e.keyCode || e.which, e.shiftKey, e.altKey, e.ctrlKey, activeApp);
+                var ret = onKeyPressed(e.keyCode || e.which, e.shiftKey, e.altKey, e.ctrlKey);
             }
             else {
                 var ch = e.keyCode;
-                var ret = onKeyPressed(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey, activeApp);
+                var ret = onKeyPressed(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey);
             }
             if (ret[0] == 0) {
                 if (ret[1]) {
                     var arrayMsg = new ArrayBuffer(36);
                     var dmsg = new Uint8Array(arrayMsg);
-                    var t_seq = inno_seq++;
+                    var t_seq = main.getInnoSeq();
                     dmsg[INNO_HDR_FLAGS] = 0xf0;
                     dmsg[INNO_HDR_MSG_TYPE] = ret[1];
                     dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
                     dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-                    dmsg[INNO_HDR_APPL_ID] = activeApp;
+                    dmsg[INNO_HDR_APPL_ID] = app_id;
                     dmsg[INNO_HDR_X_COOR + 0] = (ch >> 8) & 0xff;
                     dmsg[INNO_HDR_X_COOR + 1] = ch & 0xff;
                     dmsg[INNO_HDR_Y_COOR + 0] = 0;
                     dmsg[INNO_HDR_Y_COOR + 1] = 1;
-                    dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-                    dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-                    dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-                    dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
+                    dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+                    dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+                    dmsg[INNO_HDR_RECEIVER_ID + 0] = (sender_id >> 8) & 0xff;
+                    dmsg[INNO_HDR_RECEIVER_ID + 1] = sender_id & 0xff;
                     dmsg[INNO_HDR_MSG_VK + 0] = (ret[2] >> 8) & 0xff;
                     dmsg[INNO_HDR_MSG_VK + 1] = ret[2] & 0xff;
-                    if (dataChannel) dataChannel.send(arrayMsg);
-                    else if (jsonChannel) jsonChannel.send(arrayMsg);
+                    if (data_channel) data_channel.send(arrayMsg);
                 }
                 return false;
             }
             return true;
         }
 
-        function onMouseMove(x, y, app, scale_pic, pic_x, pic_y, rect, container_id) {
-            if ((last_mouse_x == x) && (last_mouse_y == y)) {
-                return null;
+        this.fitToElement = function () {
+            var c_w, c_h;
+
+            if (full_screen) {
+                c_w = full_screen_width;
+                c_h = full_screen_height;
+            }
+            else {
+                if (container_id.style.width != "100%") c_w = parseInt(container_id.style.width || container_id.offsetWidth, 10);
+                else c_w = parseInt(container_id.offsetWidth, 10);
+
+                if (container_id.style.height != "100%") c_h = parseInt(container_id.style.height || container_id.offsetHeight, 10);
+                else c_h = parseInt(container_id.offsetHeight, 10);
             }
 
-            last_mouse_x = x;
-            last_mouse_y = y;
-
-            var new_x = x;
-            var new_y = y;
-            if (scale_pic && container_id) {
-                var scale_x, scale_y;
-                if (pic_x)
-                    scale_x = parseInt(container_id.style.width, 10) / pic_x;
-                else
-                    scale_x = 1;
-                if (pic_y)
-                    scale_y = parseInt(container_id.style.height, 10) / pic_y;
-                else
-                    scale_y = 1;
-                var scale = (scale_x < scale_y ? scale_x : scale_y);
-
-                if (scale < 1) {
-                    var tw, th;
-                    if (scale > 0 && container_id.style.width && container_id.style.height) {
-                        tw = Math.floor(pic_x * scale); // target image width
-                        th = Math.floor(pic_y * scale); // target image height
-                    }
-                    else if (scale_x > 0 && scale_y > 0) {
-                        tw = Math.floor(pic_x * scale_x); // target image width
-                        th = Math.floor(pic_y * scale_y); // target image width
+            scale_image = !scale_image;
+            if(scale_image) {
+                var display_w = c_w, display_h = c_h;
+                if (img_w && img_h && c_w && c_h) {
+                    if (img_w >= img_h) {
+                        display_w = Math.min(img_w, c_w);
+                        display_h = (img_h * display_w) / img_w;
+                        if (display_h > c_h) {
+                            display_w = (display_w * c_h) / display_h;
+                            display_h = c_h;
+                        }
                     }
                     else {
-                        tw = pic_x;
-                        th = pic_y;
+                        display_h = Math.min(img_h, c_h);
+                        display_w = (img_w * display_h) / img_h;
+                        if (display_w > c_w) {
+                            display_h = (display_h * c_w) / display_w;
+                            display_w = c_w;
+                        }
                     }
-                    if (tw) x = (pic_x * x) / tw;
-                    if (th) y = (pic_y * (y - 30)) / th;
-
-                    new_x = (0 | x);
-                    new_y = (0 | y);
+                    display_w = Math.floor(display_w);
+                    display_h = Math.floor(display_h);
+                    canvas_id[2].width = display_w;
+                    canvas_id[2].height = display_h;
+                    canvas_id[2].style.width = display_w + "px";
+                    canvas_id[2].style.height = display_h + "px";
+                    ctx_id[2].drawImage(canvas_id[1], 0, 0, display_w, display_h);
+                }
+                else {
+                    console.log('AppSharing-fitToElement: dimensions not defined ' + img_w + ',' + img_h + ' ' + c_w + ',' + c_h);
                 }
             }
             else {
-                new_x -= rect.left;
-                new_y -= rect.top;
-            }
-
-            var coord = new Array(2);
-            coord[0] = new_x;
-            coord[1] = new_y;
-
-            return coord;
-        }
-
-        function mouseMoveHandle(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            var rect = canvas[2].getBoundingClientRect();
-            //log('mouseMoveHandle ' + e.clientY + ' x= ' + e.clientX);
-            //log('rect ' + rect.top + ' b= ' + rect.bottom + ' l= ' + rect.left + ' r= ' + rect.right);
-            if (e.clientY < rect.top || e.clientX < rect.left) return;
-            if (e.clientY > rect.bottom || e.clientX > rect.right) return;
-
-            var coord = onMouseMove(e.clientX, e.clientY, activeApp, scaleImage, img_w[activePart][activeApp], img_h[activePart][activeApp], rect, container_id);
-            if (coord) {
-                var arrayMsg = new ArrayBuffer(36);
-                var dmsg = new Uint8Array(arrayMsg);
-                var t_seq = inno_seq++;
-                dmsg[INNO_HDR_FLAGS] = 0xf0;
-                dmsg[INNO_HDR_MSG_TYPE] = 198;
-                dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-                dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-                dmsg[INNO_HDR_APPL_ID] = activeApp;
-                dmsg[INNO_HDR_X_COOR] = (coord[0] >> 8) & 0xff;
-                dmsg[INNO_HDR_X_COOR + 1] = coord[0] & 0xff;
-                dmsg[INNO_HDR_Y_COOR] = (coord[1] >> 8) & 0xff;
-                dmsg[INNO_HDR_Y_COOR + 1] = coord[1] & 0xff;
-                dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-                dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-                dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-                dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
-                if (dataChannel) dataChannel.send(arrayMsg);
-                else if (jsonChannel) jsonChannel.send(arrayMsg);
+                ctx_id[2].drawImage(canvas_id[1], 0, 0, c_w, c_h);
             }
         }
 
-        function onMouseUp(button, x, y, app, scale_pic, pic_x, pic_y, rect, container_id) {
-            var mouse_click;
-            if (button == 0) {
-                mouse_click = 193;
+        this.adjustImageToCanvas = function (width, height) {
+            var c_w, c_h;
+
+            if (full_screen) {
+                full_screen_width = width;
+                full_screen_height = height-35;
+                c_w = full_screen_width;
+                c_h = full_screen_height;
             }
-            else if (button == 2) {
-                mouse_click = 196;
+            else {
+                if (container_id.style.width != "100%") c_w = parseInt(container_id.style.width || container_id.offsetWidth, 10);
+                else c_w = parseInt(container_id.offsetWidth, 10);
+
+                if (container_id.style.height != "100%") c_h = parseInt(container_id.style.height || container_id.offsetHeight, 10);
+                else c_h = parseInt(container_id.offsetHeight, 10);
             }
-            else return null;
 
-            last_mouse_x = x;
-            last_mouse_y = y;
-
-            var new_x = x;
-            var new_y = y;
-            if (scale_pic && container_id) {
-                var scale_x, scale_y;
-                if (pic_x)
-                    scale_x = parseInt(container_id.style.width, 10) / pic_x;
-                else
-                    scale_x = 1;
-                if (pic_y)
-                    scale_y = parseInt(container_id.style.height, 10) / pic_y;
-                else
-                    scale_y = 1;
-                var scale = (scale_x < scale_y ? scale_x : scale_y);
-
-                if (scale < 1) {
-                    var tw, th;
-                    if (scale > 0 && container_id.style.width && container_id.style.height) {
-                        tw = Math.floor(pic_x * scale); // target image width
-                        th = Math.floor(pic_y * scale); // target image height
+            var display_w = c_w, display_h = c_h;
+            if (img_w && img_h && c_w && c_h) {
+                if (img_w >= img_h) {
+                    display_w = Math.min(img_w, c_w);
+                    display_h = (img_h * display_w) / img_w;
+                    if (display_h > c_h) {
+                        display_w = (display_w * c_h) / display_h;
+                        display_h = c_h;
                     }
-                    else if (scale_x > 0 && scale_y > 0) {
-                        tw = Math.floor(pic_x * scale_x); // target image width
-                        th = Math.floor(pic_y * scale_y); // target image width
+                }
+                else {
+                    display_h = Math.min(img_h, c_h);
+                    display_w = (img_w * display_h) / img_h;
+                    if (display_w > c_w) {
+                        display_h = (display_h * c_w) / display_w;
+                        display_w = c_w;
+                    }
+                }
+                display_w = Math.floor(display_w);
+                display_h = Math.floor(display_h);
+                canvas_id[2].width = display_w;
+                canvas_id[2].height = display_h;
+                canvas_id[2].style.width = display_w + "px";
+                canvas_id[2].style.height = display_h + "px";
+                ctx_id[2].drawImage(canvas_id[1], 0, 0, display_w, display_h);
+            }
+            else {
+                console.log('AppSharing-adjustImageToCanvas: dimensions not defined ' + img_w + ',' + img_h + ' ' + c_w + ',' + c_h);
+            }
+        }
+
+        this.processMessage = function (blob, length, params) {
+            var msg = params[0];
+            var imageRes = blob;
+            var rx_sender = params[13];
+            var rx_app = params[INDEX_APP_ID];
+            var index = INNO_HDR_SEQ_NUM + 2;  // INNO_HDR_SEQ_NUM+2;
+
+            if (msg == BLOCK_MSG || msg == BLOCK_MSG_256 || msg == PLAIN_MSG) {
+                //log('Image ' + params[1] + 'x' + params[2] + ' ' + params[3] + 'x' + params[4] + ' ' + params[5] + 'x' + params[6]);
+                //log('Image ' + uint8View[INNO_HDR_X_DIM] + ' ' + uint8View[INNO_HDR_X_DIM + 1] + ' ' + uint8View[INNO_HDR_Y_DIM] + ' ' + uint8View[INNO_HDR_Y_DIM + 1]);
+                if ((params[5] != img_w) || (params[6] != img_h)) {
+                    console.log('AppSharing: dimensions changed(' + rx_sender + ', ' + rx_app + ') ' + params[5] + 'x' + params[6] + ' old ' + img_w + 'x' + img_h);
+                    if (image_data) image_data = null;
+                    image_data = ctx_id[0].createImageData(params[5], params[6]);
+                    img_w = params[5];
+                    img_h = params[6];
+
+                    canvas_id[0].width = params[5];
+                    canvas_id[0].height = params[6];
+                    canvas_id[0].style.width = params[5] + "px";
+                    canvas_id[0].style.height = params[6] + "px";
+
+                    canvas_id[1].width = params[5];
+                    canvas_id[1].height = params[6];
+                    canvas_id[1].style.width = params[5] + "px";
+                    canvas_id[1].style.height = params[6] + "px";
+
+                    var c_w, c_h;
+
+                    if (full_screen) {
+                        c_w = full_screen_width;
+                        c_h = full_screen_height;
                     }
                     else {
-                        tw = pic_x;
-                        th = pic_y;
+                        if (container_id.style.width != "100%") c_w = parseInt(container_id.style.width || container_id.offsetWidth, 10);
+                        else c_w = parseInt(container_id.offsetWidth, 10);
+
+                        if (container_id.style.height != "100%") c_h = parseInt(container_id.style.height || container_id.offsetHeight, 10);
+                        else c_h = parseInt(container_id.offsetHeight, 10);
                     }
-                    if (tw) x = (pic_x * x) / tw;
-                    if (th) y = (pic_y * (y - 30)) / th;
 
-                    new_x = (0 | x);
-                    new_y = (0 | y);
-                }
-            }
-            else {
-                new_x -= rect.left;
-                new_y -= rect.top;
-            }
-
-            var coord = new Array(3);
-            coord[0] = new_x;
-            coord[1] = new_y;
-            coord[2] = mouse_click;
-
-            return coord;
-        }
-
-        function mouseUpHandle(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('mouseUpHandle');
-
-            var evt = e;
-            var rect = canvas[2].getBoundingClientRect();
-            if (evt.clientY < rect.top || evt.clientX < rect.left) return;
-            if (evt.clientY > rect.bottom || evt.clientX > rect.right) return;
-
-            var coord = onMouseUp(evt.button, evt.clientX, evt.clientY, activeApp, scaleImage, img_w[activePart][activeApp], img_h[activePart][activeApp], rect, container_id);
-            if (coord) {
-                var arrayMsg = new ArrayBuffer(36);
-                var dmsg = new Uint8Array(arrayMsg);
-                var t_seq = inno_seq++;
-                dmsg[INNO_HDR_FLAGS] = 0xf0;
-                dmsg[INNO_HDR_MSG_TYPE] = coord[2];   // mouse_click
-                dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-                dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-                dmsg[INNO_HDR_APPL_ID] = activeApp;
-                dmsg[INNO_HDR_X_COOR] = (coord[0] >> 8) & 0xff;
-                dmsg[INNO_HDR_X_COOR + 1] = coord[0] & 0xff;
-                dmsg[INNO_HDR_Y_COOR] = (coord[1] >> 8) & 0xff;
-                dmsg[INNO_HDR_Y_COOR + 1] = coord[1] & 0xff;
-                dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-                dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-                dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-                dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
-                if (dataChannel) dataChannel.send(arrayMsg);
-                else if (jsonChannel) jsonChannel.send(arrayMsg);
-            }
-        }
-
-        function onMouseDown(button, x, y, app, scale_pic, pic_x, pic_y, rect, container_id) {
-            var mouse_click;
-            if (button == 0) {
-                mouse_click = 192;
-            }
-            else if (button == 2) {
-                mouse_click = 195;
-            }
-            else return null;
-
-            last_mouse_x = x;
-            last_mouse_y = y;
-
-            var new_x = x;
-            var new_y = y;
-            if (scale_pic && container_id) {
-                var scale_x, scale_y;
-                if (pic_x)
-                    scale_x = parseInt(container_id.style.width, 10) / pic_x;
-                else
-                    scale_x = 1;
-                if (pic_y)
-                    scale_y = parseInt(container_id.style.height, 10) / pic_y;
-                else
-                    scale_y = 1;
-                var scale = (scale_x < scale_y ? scale_x : scale_y);
-
-                if (scale < 1) {
-                    var tw, th;
-                    if (scale > 0 && container_id.style.width && container_id.style.height) {
-                        tw = Math.floor(pic_x * scale); // target image width
-                        th = Math.floor(pic_y * scale); // target image height
-                    }
-                    else if (scale_x > 0 && scale_y > 0) {
-                        tw = Math.floor(pic_x * scale_x); // target image width
-                        th = Math.floor(pic_y * scale_y); // target image width
+                    if (container_id) {
+                        var display_w = c_w, display_h = c_h;
+                        if (img_w && img_h && c_w && c_h) {
+                            if (img_w >= img_h) {
+                                display_w = Math.min(img_w, c_w);
+                                display_h = (img_h * display_w) / img_w;
+                                if (display_h > c_h) {
+                                    display_w = (display_w * c_h) / display_h;
+                                    display_h = c_h;
+                                }
+                            }
+                            else {
+                                display_h = Math.min(img_h, c_h);
+                                display_w = (img_w * display_h) / img_h;
+                                if (display_w > c_w) {
+                                    display_h = (display_h * c_w) / display_w;
+                                    display_w = c_w;
+                                }
+                            }
+                            display_w = Math.floor(display_w);
+                            display_h = Math.floor(display_h);
+                            canvas_id[2].width = display_w;
+                            canvas_id[2].height = display_h;
+                            canvas_id[2].style.width = display_w + "px";
+                            canvas_id[2].style.height = display_h + "px";
+                            ctx_id[2].drawImage(canvas_id[1], 0, 0, display_w, display_h);
+                        }
+                        else {
+                            console.log('AppSharing: dimensions not defined ' + img_w + ',' + img_h + ' ' + c_w + ',' + c_h);
+                        }
                     }
                     else {
-                        tw = pic_x;
-                        th = pic_y;
+                        canvas_id[2].width = c_w;
+                        canvas_id[2].height = c_h;
+                        canvas_id[2].style.width = c_w + "px";
+                        canvas_id[2].style.height = c_h + "px";
                     }
-                    if (tw) x = (pic_x * x) / tw;
-                    if (th) y = (pic_y * (y - 30)) / th;
-
-                    new_x = (0 | x);
-                    new_y = (0 | y);
+                    if (onResizeApp) onResizeApp();
                 }
+                //log('Coordinates (' + params[1] + ',' + params[2] + '),(' + params[3] + ',' + params[4] + '),(' + params[5] + ',' + params[6] + ') ' + params[7]);
+                if (params[0] == PLAIN_MSG) {
+                    //log('PLAIN Message ' + params[1] + 'x' + params[2] + ' ' + params[3] + 'x' + params[4]);
+                    var raw_value = params[12];
+                    var offset = (params[2] * params[5] + params[1]) * 4;
+                    var img_data = image_data.data;
+                    for (var i = 0; i < params[4]; i++) {
+                        var n_offset = offset + (i * params[5] * 4);
+                        for (var j = 0; j < (params[3] * 4) ; j += 4) {
+                            // i+3 is alpha (the fourth element)
+                            img_data[n_offset + j + 0] = (raw_value >> 16) & 0xff;
+                            img_data[n_offset + j + 1] = (raw_value >> 8) & 0xff;
+                            img_data[n_offset + j + 2] = (raw_value >> 0) & 0xff;
+                            img_data[n_offset + j + 3] = 0xff;        // alpha
+                        }
+                    }
+                    if (params[8] & END_BIT_IMG) redrawCanvas(params[5], params[6]);
+                    return;
+                }
+                readPngCb(blob, params);
             }
-            else {
-                new_x -= rect.left;
-                new_y -= rect.top;
+            else if (params[0] == REQUEST_CONTROL) {
+                onRequestRemoteControl(sender_id, app_id);
             }
+            else if (params[0] == GIVE_CONTROL) { 
+                console.log('AppSharing: got control from ' + rx_sender + ' control ' + have_control);
 
-            var coord = new Array(3);
-            coord[0] = new_x;
-            coord[1] = new_y;
-            coord[2] = mouse_click;
-
-            return coord;
-        }
-
-        function mouseDownHandle(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('mouseDownHandle');
-
-            var evt = e;
-            //writeToScreen("mouseDownHandle " + e.button + ' ' + e.clientX + ' ' + e.clientY);
-            var rect = canvas[2].getBoundingClientRect();
-            if (evt.clientY < rect.top || evt.clientX < rect.left) return;
-            if (evt.clientY > rect.bottom || evt.clientX > rect.right) return;
-
-            var coord = onMouseDown(evt.button, evt.clientX, evt.clientY, activeApp, scaleImage, img_w[activePart][activeApp], img_h[activePart][activeApp], rect, container_id);
-            if (coord) {
-                var arrayMsg = new ArrayBuffer(36);
-                var dmsg = new Uint8Array(arrayMsg);
-                var t_seq = inno_seq++;
-                dmsg[INNO_HDR_FLAGS] = 0xf0;
-                dmsg[INNO_HDR_MSG_TYPE] = coord[2];   // mouse_click
-                dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-                dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-                dmsg[INNO_HDR_APPL_ID] = activeApp;
-                dmsg[INNO_HDR_X_COOR] = (coord[0] >> 8) & 0xff;
-                dmsg[INNO_HDR_X_COOR + 1] = coord[0] & 0xff;
-                dmsg[INNO_HDR_Y_COOR] = (coord[1] >> 8) & 0xff;
-                dmsg[INNO_HDR_Y_COOR + 1] = coord[1] & 0xff;
-                dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-                dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-                dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-                dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
-                if (dataChannel) dataChannel.send(arrayMsg);
-                else if (jsonChannel) jsonChannel.send(arrayMsg);
-            }
-        }
-
-        function mouseDoubleClickHandle(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('mouseDoubleClickHandle');
-
-            var evt = e;
-            var rect = canvas[2].getBoundingClientRect();
-            if (evt.clientY < rect.top || evt.clientX < rect.left) return;
-            if (evt.clientY > rect.bottom || evt.clientX > rect.right) return;
-
-            //onMouseDoubleClick(evt.button, evt.clientX, evt.clientY, activeApp, scaleImage, img_w[activePart][activeApp], img_h[activePart][activeApp], rect);
-        }
-
-        function domMouseScroll(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('domMouseScroll ' + e.wheelDelta);
-
-            var arrayMsg = new ArrayBuffer(36);
-            var dmsg = new Uint8Array(arrayMsg);
-            var t_seq = inno_seq++;
-            dmsg[INNO_HDR_FLAGS] = 0xf0;
-            dmsg[INNO_HDR_MSG_TYPE] = 199;
-            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = activeApp;
-            dmsg[INNO_HDR_X_COOR] = 0;
-            dmsg[INNO_HDR_X_COOR + 1] = (e.wheelDelta < 0 ? 1 : 0);
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
-            if (dataChannel) dataChannel.send(arrayMsg);
-            else if (jsonChannel) jsonChannel.send(arrayMsg);
-
-            e.stopPropagation();
-            e.preventDefault();
-            e.cancelBubble = false;
-        }
-
-        function restoreNoCtrlMode() {
-            if (container_id) {
-                for (i = 0; i < container_id.childNodes.length; i++) {
-                    if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                        myCanvas = container_id.childNodes[i];
-                        myCanvas.style["cursor"] = "default";
-                        break;
+                if (container_id) {
+                    for (i = 0; i < container_id.childNodes.length; i++) {
+                        if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
+                            var myCanvas = container_id.childNodes[i];
+                            myCanvas.style["cursor"] = "default";
+                            break;
+                        }
                     }
                 }
-            }
-            var doc = canvas[2].ownerDocument;
-            var win = null;
-            if (doc) {
-                win = doc.defaultView || doc.parentWindow;
-            }
-            else {
-                doc = container_id.ownerDocument;
+                var doc = canvas_id[2].ownerDocument;
+                var win = null;
                 if (doc) {
                     win = doc.defaultView || doc.parentWindow;
                 }
-            }
-            if (canvas[2].removeEventListener) {
-                canvas[2].removeEventListener("mousedown", mouseDownHandle, false);
-                canvas[2].removeEventListener("mousemove", mouseMoveHandle, false);
-                canvas[2].removeEventListener("mouseup", mouseUpHandle, false);
-                canvas[2].removeEventListener("dblclick", mouseDoubleClickHandle, false);
-                canvas[2].removeEventListener("DOMMouseScroll", domMouseScroll, false);
-                canvas[2].removeEventListener('mousewheel', mousewheel_l, false);
-                if (win) {
-                    win.removeEventListener('keypress', keypress_l, false);
-                    win.removeEventListener('keydown', keydown_l, false);
-                    win.removeEventListener('keyup', keyup_l, false);
-                }
-            }
-            else if (canvas[2].removeEvent) {
-                canvas[2].removeEvent("onmousedown", mouseDownHandle, false);
-                canvas[2].removeEvent("onmousemove", mouseMoveHandle, false);
-                canvas[2].removeEvent("onmouseup", mouseUpHandle, false);
-                canvas[2].removeEvent("ondblclick", mouseDoubleClickHandle, false);
-                canvas[2].removeEvent('onmousewheel', mousewheel_a, false);
-                canvas[2].removeEvent('mousewheel', mousewheel_a, false);
-                if (win) {
-                    win.removeEvent('keypress', keypress_a, false);
-                    win.removeEvent('keydown', keydown_a, false);
-                    win.removeEvent('keyup', keyup_a, false);
-                    win.removeEvent('onkeypress', keypress_a, false);
-                    win.removeEvent('onkeydown', keydown_a, false);
-                    win.removeEvent('onkeyup', keyup_a, false);
-                }
-            }
-            if (mouse_element == null) {
-                myCanvas = null;
-                mouse_element = document.createElement("div");
-                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
-                mouse_type = -1;
-                container_id.appendChild(mouse_element);
-            }
-        }
-
-        function restoreCtrlMode() {
-            if (container_id == null || canvas[2] == null) return;
-            if (container_id) {
-                for (i = 0; i < container_id.childNodes.length; i++) {
-                    if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                        var myCanvas = container_id.childNodes[i];
-                        myCanvas.style["cursor"] = "default";
-                        break;
+                else if (container_id) {
+                    doc = container_id.container.ownerDocument;
+                    if (doc) {
+                        win = doc.defaultView || doc.parentWindow;
                     }
                 }
+                if (canvas_id[2].addEventListener) {
+                    console.log('AppSharing: control addEventListener');
+                    canvas_id[2].addEventListener("mousedown", mouseDownHandle, false);
+                    canvas_id[2].addEventListener("mousemove", mouseMoveHandle, false);
+                    canvas_id[2].addEventListener("mouseup", mouseUpHandle, false);
+                    canvas_id[2].addEventListener("dblclick", mouseDoubleClickHandle, false);
+                    canvas_id[2].addEventListener("DOMMouseScroll", domMouseScroll, false);
+                    canvas_id[2].addEventListener('mousewheel', mousewheel_l, false);
+                    if (win) {
+                        win.addEventListener('keypress', keypress_l, false);
+                        win.addEventListener('keydown', keydown_l, false);
+                        win.addEventListener('keyup', keyup_l, false);
+                    }
+                }
+                else if (canvas_id[2].attachEvent) {
+                    console.log('AppSharing: control attachEvent');
+                    canvas_id[2].attachEvent("onmousedown", mouseDownHandle, false);
+                    canvas_id[2].attachEvent("onmousemove", mouseMoveHandle, false);
+                    canvas_id[2].attachEvent("onmouseup", mouseUpHandle, false);
+                    canvas_id[2].attachEvent("ondblclick", mouseDoubleClickHandle, false);
+                    canvas_id[2].attachEvent('mousewheel', mousewheel_a, false);
+                    canvas_id[2].attachEvent('onmousewheel', mousewheel_a, false);
+                    if (win) {
+                        win.attachEvent('keypress', keypress_a, false);
+                        win.attachEvent('keydown', keydown_a, false);
+                        win.attachEvent('keyup', keyup_a, false);
+                        win.attachEvent('onkeypress', keypress_a, false);
+                        win.attachEvent('onkeydown', keydown_a, false);
+                        win.attachEvent('onkeyup', keyup_a, false);
+                    }
+                }
+                mouse_type = -1;
+                if (container_id && mouse_element && mouse_element.parentNode == container_id) container_id.removeChild(mouse_element);
+                have_control = true;
+                onRemoteControl(sender_id, app_id, true);
             }
-            var doc = canvas[2].ownerDocument;
-            var win = null;
-            if (doc) {
-                win = doc.defaultView || doc.parentWindow;
-            }
-            else {
-                doc = container_id.ownerDocument;
+            else if (params[0] == TAKE_CONTROL) {
+                console.log('AppSharing: control removed from ' + rx_sender + ' control ' + have_control);
+
+                if (container_id) {
+                    for (i = 0; i < container_id.childNodes.length; i++) {
+                        if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
+                            var myCanvas = container_id.childNodes[i];
+                            myCanvas.style["cursor"] = "default";
+                            break;
+                        }
+                    }
+                }
+                var doc = canvas_id[2].ownerDocument;
+                var win = null;
                 if (doc) {
                     win = doc.defaultView || doc.parentWindow;
                 }
-            }
-            /*if (mouse_element) {
-                container_id.removeChild(mouse_element);
-                mouse_element = null;
+                else if (container_id) {
+                    doc = container_id.ownerDocument;
+                    if (doc) {
+                        win = doc.defaultView || doc.parentWindow;
+                    }
+                }
+                if (canvas_id[2].removeEventListener) {
+                    canvas_id[2].removeEventListener("mousedown", mouseDownHandle, false);
+                    canvas_id[2].removeEventListener("mousemove", mouseMoveHandle, false);
+                    canvas_id[2].removeEventListener("mouseup", mouseUpHandle, false);
+                    canvas_id[2].removeEventListener("dblclick", mouseDoubleClickHandle, false);
+                    canvas_id[2].removeEventListener("DOMMouseScroll", domMouseScroll, false);
+                    canvas_id[2].removeEventListener('mousewheel', mousewheel_l, false);
+                    if (win) {
+                        win.removeEventListener('keypress', keypress_l, false);
+                        win.removeEventListener('keydown', keydown_l, false);
+                        win.removeEventListener('keyup', keyup_l, false);
+                    }
+                }
+                else if (canvas_id[2].removeEvent) {
+                    canvas_id[2].removeEvent("onmousedown", mouseDownHandle, false);
+                    canvas_id[2].removeEvent("onmousemove", mouseMoveHandle, false);
+                    canvas_id[2].removeEvent("onmouseup", mouseUpHandle, false);
+                    canvas_id[2].removeEvent("ondblclick", mouseDoubleClickHandle, false);
+                    canvas_id[2].removeEvent('onmousewheel', mousewheel_a, false);
+                    canvas_id[2].removeEvent('mousewheel', mousewheel_a, false);
+                    if (win) {
+                        win.removeEvent('keypress', keypress_a, false);
+                        win.removeEvent('keydown', keydown_a, false);
+                        win.removeEvent('keyup', keyup_a, false);
+                        win.removeEvent('onkeypress', keypress_a, false);
+                        win.removeEvent('onkeydown', keydown_a, false);
+                        win.removeEvent('onkeyup', keyup_a, false);
+                    }
+                }
+                have_control = false;
+                onRemoteControl(sender_id, app_id, false);
                 mouse_type = -1;
-            }*/
-            if (canvas[2].addEventListener) {
-                log('control addEventListener');
-                canvas[2].addEventListener("mousedown", mouseDownHandle, false);
-                canvas[2].addEventListener("mousemove", mouseMoveHandle, false);
-                canvas[2].addEventListener("mouseup", mouseUpHandle, false);
-                canvas[2].addEventListener("dblclick", mouseDoubleClickHandle, false);
-                canvas[2].addEventListener("DOMMouseScroll", domMouseScroll, false);
-                canvas[2].addEventListener('mousewheel', mousewheel_l, false);
-                if (win) {
-                    win.addEventListener('keypress', keypress_l, false);
-                    win.addEventListener('keydown', keydown_l, false);
-                    win.addEventListener('keyup', keyup_l, false);
-                }
+                if (container_id && mouse_element) container_id.appendChild(mouse_element);
             }
-            else if (canvas[2].attachEvent) {
-                log('control attachEvent');
-                canvas[2].attachEvent("onmousedown", mouseDownHandle, false);
-                canvas[2].attachEvent("onmousemove", mouseMoveHandle, false);
-                canvas[2].attachEvent("onmouseup", mouseUpHandle, false);
-                canvas[2].attachEvent("ondblclick", mouseDoubleClickHandle, false);
-                canvas[2].attachEvent('mousewheel', mousewheel_a, false);
-                canvas[2].attachEvent('onmousewheel', mousewheel_a, false);
-                if (win) {
-                    win.attachEvent('keypress', keypress_a, false);
-                    win.attachEvent('keydown', keydown_a, false);
-                    win.attachEvent('keyup', keyup_a, false);
-                    win.attachEvent('onkeypress', keypress_a, false);
-                    win.attachEvent('onkeydown', keydown_a, false);
-                    win.attachEvent('onkeyup', keyup_a, false);
-                }
+            else {   // MSG
+                //log('readMsgCb');
+                readMsgCb(blob, length, params);
             }
-        }
-
-        function changeDisplaySender(clicked_id) {
-            var s_part_id = String(clicked_id);
-            log('changeDisplaySender ' + clicked_id + ' current sender = ' + activePart);
-            if (activePart == s_part_id) {
-                return;
-            }
-            sender_changed = true;
-            if (have_control[s_part_id] && !have_control[activePart]) {             // new one has control but old no
-                log('changeDisplaySender restoreCtrlMode');
-                restoreCtrlMode();
-            }
-            else if (!have_control[s_part_id] && have_control[activePart]) {        // new one has no control but old yes
-                log('changeDisplaySender restoreNoCtrlMode');
-                restoreNoCtrlMode();
-            }
-            activePart = s_part_id;
-        }
-
-        function changeDisplayApp(clicked_id) {
-            log('changeDisplayApp ' + clicked_id + ' current sender = ' + activePart + ' ch=' + sender_changed);
-            var s_app_id = String(clicked_id);
-            if ((activeApp == s_app_id) && (sender_changed == false)) {
-                return;
-            }
-            sender_changed = false;
-            var l_activeApp = activeApp;
-            activeApp = s_app_id;
-
-            ctx[1].clearRect(0, 0, img_w[activePart][l_activeApp], img_h[activePart][l_activeApp]);
-
-            canvas[0].width = img_w[activePart][activeApp];
-            canvas[0].height = img_h[activePart][activeApp];
-            canvas[0].style.width = img_w[activePart][activeApp] + 'px';
-            canvas[0].style.height = img_h[activePart][activeApp] + 'px';
-
-            canvas[1].width = img_w[activePart][activeApp];
-            canvas[1].height = img_h[activePart][activeApp];
-            canvas[1].style.width = img_w[activePart][activeApp] + 'px';
-            canvas[1].style.height = img_h[activePart][activeApp] + 'px';
-
-            if (imageData[activePart][activeApp]) {
-                ctx[1].putImageData(imageData[activePart][activeApp], 0, 0);
-                if (scaleImage && container_id) {
-                    var scale_x, scale_y;
-                    if (img_w[activeApp])
-                        scale_x = parseInt(container_id.style.width, 10) / img_w[activePart][activeApp];
-                    else
-                        scale_x = 1;
-                    if (img_h[activeApp])
-                        scale_y = parseInt(container_id.style.height, 10) / img_h[activePart][activeApp];
-                    else
-                        scale_y = 1;
-                    scale = (scale_x < scale_y ? scale_x : scale_y);
-                    if (scale < 1) {
-                        var tw, th;
-                        if (scale > 0 && container_id.style.width && container_id.style.height) {
-                            tw = Math.floor(img_w[activePart][activeApp] * scale); // target image width
-                            th = Math.floor(img_h[activePart][activeApp] * scale); // target image height
-                        }
-                        else if (scale_x > 0 && scale_y > 0) {
-                            tw = Math.floor(img_w[activePart][activeApp] * scale_x); // target image width
-                            th = Math.floor(img_h[activePart][activeApp] * scale_y); // target image width
-                        }
-                        else {
-                            tw = img_w[activePart][activeApp];
-                            th = img_h[activePart][activeApp];
-                        }
-                        canvas[2].width = tw;
-                        canvas[2].height = th;
-                        canvas[2].style.width = tw + "px";
-                        canvas[2].style.height = th + "px";
-                        ctx[2].drawImage(canvas[1], 0, 0, tw, th);
-                    }
-                    else {
-                        canvas[2].width = img_w[activePart][activeApp];
-                        canvas[2].height = img_h[activePart][activeApp];
-                        canvas[2].style.width = img_w[activePart][activeApp] + "px";
-                        canvas[2].style.height = img_h[activePart][activeApp] + "px";
-                        ctx[2].drawImage(canvas[1], 0, 0, img_w[activePart][activeApp], img_h[activePart][activeApp]);
-                    }
-                }
-                else {
-                    canvas[2].width = img_w[activePart][activeApp];
-                    canvas[2].height = img_h[activePart][activeApp];
-                    canvas[2].style.width = img_w[activePart][activeApp] + "px";
-                    canvas[2].style.height = img_h[activePart][activeApp] + "px";
-                    ctx[2].drawImage(canvas[1], 0, 0, img_w[activePart][activeApp], img_h[activePart][activeApp]);
-                }
-            }
-        }
-
-        function setOwnName(data) {
-            sender_name = data;
-            if (sender_name) sender_name_len = sender_name.length;
-            else sender_name_len = 0;
-            if (activePart != -1 && sender_name_len > 0) sendOwnName(0xff, activePart);
-        }
-
-        function fitToElement(remScaleImage) {
-            log('fit_to_element = ' + scaleImage + ' r = ' + remScaleImage + ' act=' + activeApp + ' part=' + activePart + ' cont=' + container_id);
-            scaleImage = remScaleImage;
-            if (canvas[2] != null && activePart != -1 && activeApp != -1) {
-                if (scaleImage && container_id) {
-                    var scale_x, scale_y;
-                    if (img_w[activePart][activeApp]) {
-                        scale_x = parseInt(container_id.style.width || container_id.offsetWidth, 10) / img_w[activePart][activeApp];
-                    }
-                    else {
-                        scale_x = 1;
-                    }
-                    if (img_h[activePart][activeApp]) {
-                        scale_y = parseInt(container_id.style.height || container_id.offsetHeight, 10) / img_h[activePart][activeApp];
-                    }
-                    else {
-                        scale_y = 1;
-                    }
-                    scale = (scale_x < scale_y ? scale_x : scale_y);
-                    if (scale < 1) {
-                        var tw, th;
-                        if (scale > 0 && container_id.style.width && container_id.style.height) {
-                            tw = Math.floor(img_w[activePart][activeApp] * scale); // target image width
-                            th = Math.floor(img_h[activePart][activeApp] * scale); // target image height
-                        }
-                        else if (scale_x > 0 && scale_y > 0) {
-                            tw = Math.floor(img_w[activePart][activeApp] * scale_x); // target image width
-                            th = Math.floor(img_h[activePart][activeApp] * scale_y); // target image width
-                        }
-                        else {
-                            tw = img_w[activePart][activeApp];
-                            th = img_h[activePart][activeApp];
-                        }
-                        canvas[2].width = tw;
-                        canvas[2].height = th;
-                        canvas[2].style.width = tw + "px";
-                        canvas[2].style.height = th + "px";
-                        ctx[2].drawImage(canvas[1], 0, 0, tw, th);
-                    }
-                }
-                else if (canvas[1] != null && canvas[1].width > 0 && canvas[1].height > 0) {
-                    canvas[2].width = canvas[1].width;
-                    canvas[2].height = canvas[1].height;
-                    canvas[2].style.width = canvas[1].width + "px";
-                    canvas[2].style.height = canvas[1].height + "px";
-                    if (ctx[2]) ctx[2].drawImage(canvas[1], 0, 0, canvas[1].width, canvas[1].height);
-                }
-            }
-        }
-
-        function adjustImageToCanvas() {
-            log('adjustImageToCanvas = ' + scaleImage + ' sender = ' + activePart + ' app = ' + activeApp);
-            if (scaleImage && container_id && (activePart != -1) && (activeApp != -1)) {
-                var scale_x, scale_y;
-                if (img_w[activePart][activeApp]) {
-                    scale_x = parseInt(container_id.style.width || container_id.offsetWidth, 10) / img_w[activePart][activeApp];
-                }
-                else {
-                    scale_x = 1;
-                }
-                if (img_h[activePart][activeApp]) {
-                    scale_y = parseInt(container_id.style.height || container_id.offsetHeight, 10) / img_h[activePart][activeApp];
-                }
-                else {
-                    scale_y = 1;
-                }
-                scale = (scale_x < scale_y ? scale_x : scale_y);
-                if (scale < 1) {
-                    var tw, th;
-                    if (scale > 0 && container_id.style.width && container_id.style.height) {
-                        tw = Math.floor(img_w[activePart][activeApp] * scale); // target image width
-                        th = Math.floor(img_h[activePart][activeApp] * scale); // target image height
-                    }
-                    else if (scale_x > 0 && scale_y > 0) {
-                        tw = Math.floor(img_w[activePart][activeApp] * scale_x); // target image width
-                        th = Math.floor(img_h[activePart][activeApp] * scale_y); // target image width
-                    }
-                    else {
-                        tw = img_w[activePart][activeApp];
-                        th = img_h[activePart][activeApp];
-                    }
-                    canvas[2].width = tw;
-                    canvas[2].height = th;
-                    canvas[2].style.width = tw + "px";
-                    canvas[2].style.height = th + "px";
-                    ctx[2].drawImage(canvas[1], 0, 0, tw, th);
-                }
-            }
-        }
-
-        function requestControl() {
-            if (activePart == -1 || have_control[activePart]) return;
-            log('request control l=' + sender_name_len + ' act=' + activePart);
-
-            // Disable Request Control button and different style?
-            var arrayMsg = new ArrayBuffer(36 + 1 + (sender_name_len << 1));
-            var dmsg = new Uint8Array(arrayMsg);
-            var t_seq = inno_seq++;
-            dmsg[INNO_HDR_FLAGS] = 0xf0;
-            dmsg[INNO_HDR_MSG_TYPE] = 133; // REQUEST_CONTROL
-            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
-            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
-            dmsg[INNO_HDR_APPL_ID] = 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 0] = (sender_id >> 8) & 0xff;
-            dmsg[INNO_HDR_SENDER_ID + 1] = sender_id & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 0] = (activePart >> 8) & 0xff;
-            dmsg[INNO_HDR_RECEIVER_ID + 1] = activePart & 0xff;
-            dmsg[INNO_HDR_LENGTH + 4] = (sender_name_len << 1);
-            var nstr = sender_name;
-            var ind_a = INNO_HDR_LENGTH + 5;
-            for (var i = 0; i < sender_name_len; i++) {
-                var c = nstr.charCodeAt(i);
-                //log('name = ' + c);
-                dmsg[ind_a + 0] = c & 0xff;
-                dmsg[ind_a + 1] = (c >> 8) & 0xff;
-                ind_a = ind_a + 2;
-            }
-            if (dataChannel) dataChannel.send(arrayMsg);
-            else if (jsonChannel) jsonChannel.send(arrayMsg);
         }
 
         function readMsgCb(blob, length, params) {
             var msg = params[0];
             var imageRes = blob;
             var rx_sender = params[13];
+            var rx_app = params[INDEX_APP_ID];
             var index = INNO_HDR_SEQ_NUM + 2;  // INNO_HDR_SEQ_NUM+2;
             //log("message " + msg + " sender " + rx_sender);
-            if (msg == 8) {  // DUMMY_MSG
-                if (rx_apps[rx_sender][params[INDEX_APP_ID]] == 0) {
-                    console.log('New application received ' + params[INDEX_APP_ID] + ' from ' + rx_sender);
-                    rx_apps[rx_sender][params[INDEX_APP_ID]] = 1;
-                    if ((app_name[rx_sender][params[INDEX_APP_ID]] != ("app_" + rx_sender + "_" + params[INDEX_APP_ID])) && (app_name[rx_sender][params[INDEX_APP_ID]] != "")) {
-                        if (onCreateApp && (rx_tabs[rx_sender][params[INDEX_APP_ID]] == 0)) {
-                            onCreateApp(rx_sender, params[INDEX_APP_ID], app_name[rx_sender][params[INDEX_APP_ID]]);
-                            rx_tabs[rx_sender][params[INDEX_APP_ID]] = 1;
-                        }
-                    }
-                    requestNewPicture(params[INDEX_APP_ID], rx_sender);
-                    requestAppName(params[INDEX_APP_ID], rx_sender);
-                    sendOwnName(params[INDEX_APP_ID], rx_sender);
-                }
-                else if (rx_apps[rx_sender][params[INDEX_APP_ID]] && (rx_tabs[rx_sender][params[INDEX_APP_ID]] == 0)) {
-                    if (onCreateApp) {
-                        if ((app_name[rx_sender][params[INDEX_APP_ID]] != ("app_" + rx_sender + "_" + params[INDEX_APP_ID])) && (app_name[rx_sender][params[INDEX_APP_ID]] != "")) {
-                            onCreateApp(rx_sender, params[INDEX_APP_ID], app_name[rx_sender][params[INDEX_APP_ID]]);
-                            rx_tabs[rx_sender][params[INDEX_APP_ID]] = 1;
-                        }
-                        else {
-                            requestAppName(params[INDEX_APP_ID], rx_sender);
-                        }
-                    }
-                }
+            if (msg == DUMMY_MSG) {
+                if (app_name == null) main.requestAppName(rx_sender, rx_app);
             }
-            else if (msg == 9) {   // NEW_PICTURE
-                console.log('readMsgCb NEW_PICTURE');
+            else if (msg == DUMMY_MSG_RX) {
+                if (sender_name == null) main.requestAppName(rx_sender, 0xff);
+            }
+            else if (msg == SEND_NAME) {
+                console.log('AppSharing: NAME from ' + rx_sender + ' for app=' + rx_app + ' l=' + imageRes[index]);
+                var result = "";
+                for (var i = index + 1; i < (imageRes[index] + (index + 1)) ; i++) {
+                    if (imageRes[i]) result += String.fromCharCode(imageRes[i]);
+                }
+                if (result !== "") {
+                    sender_name = result;
+                    if (onUpdateParticipant) onUpdateParticipant(sender_id, sender_name);
+                }
+                console.log('AppSharing: NAME(' + rx_sender + ', ' + sender_name + ')');
+            }
+            else if (msg == NEW_PICTURE || msg == SEND_APP_NAME) {
+                console.log('AppSharing: NEW_PICTURE||SEND_APP_NAME from ' + rx_sender + ' for app=' + rx_app);
                 if (imageRes[index] == 0) {
                     var result = "";
                     for (var i = index + 2; i < (imageRes[index + 1] + (index + 2)) ; i++) {
                         if (imageRes[i]) result += String.fromCharCode(imageRes[i]);
                     }
-                    remote_part = result;
+                    sender_name = result;
                     index += (2 + imageRes[index + 1]);
+                    if (sender_name !== "") {
+                        if (onUpdateParticipant) onUpdateParticipant(sender_id, sender_name);
+                    }
                 }
                 if (index < length) {
                     if (imageRes[index] == 1) {
-                        app_name[rx_sender][params[INDEX_APP_ID]] = "";
+                        app_name = "";
                         for (var i = index + 2; i < (imageRes[index + 1] + (index + 2)) ; i++) {
-                            if (imageRes[i]) app_name[rx_sender][params[INDEX_APP_ID]] += String.fromCharCode(imageRes[i]);
+                            if (imageRes[i]) app_name += String.fromCharCode(imageRes[i]);
                         }
-                        if (onCreateApp) {
-                            onCreateApp(rx_sender, params[INDEX_APP_ID], app_name[rx_sender][params[INDEX_APP_ID]]);
-                            rx_tabs[rx_sender][params[INDEX_APP_ID]] = 1;
-                        }
+                        if (onUpdateApp) onUpdateApp(rx_sender, rx_app, app_name);
+                        if (app_name.indexOf("Desktop") == 0) cursor_offset = true;
                     }
                 }
-                console.log('readMsgCb NEW_PICTURE(' + rx_sender + ', ' + app_name[rx_sender][params[INDEX_APP_ID]] + ') seq=' + params[14] + ' remote = ' + remote_part);
+                console.log('AppSharing: Sender-App Info(' + rx_sender + ', ' + app_name + ')');
             }
-            else if (msg == 10) {   // STOP_SHARING
-                console.log('readMsgCb STOP_SHARING app=' + params[INDEX_APP_ID] + ' active=' + activeApp + ' sender=' + params[13] + ' target=' + params[15]);
-                if (onRemoveApp) onRemoveApp(rx_sender, params[INDEX_APP_ID]);
-                if (imageData[rx_sender][params[INDEX_APP_ID]]) imageData[rx_sender][params[INDEX_APP_ID]] = null;
-                rx_apps[rx_sender][params[INDEX_APP_ID]] = 0;
-                rx_tabs[rx_sender][params[INDEX_APP_ID]] = 0;
-                img_w[rx_sender][params[INDEX_APP_ID]] = 0;
-                img_h[rx_sender][params[INDEX_APP_ID]] = 0;
-                app_name[rx_sender][params[INDEX_APP_ID]] = "app_" + rx_sender + "_" + params[INDEX_APP_ID];
-                have_control[rx_sender] = false;
+            else if (msg == STOP_SHARING) {
+                console.log('AppSharing: STOP_SHARING app=' + rx_app + ' sender=' + params[13] + ' target=' + params[15]);
+                if (onRemoveApp) onRemoveApp(rx_sender, app_id);
+                if (image_data) image_data = null;
+                img_w = 0;
+                img_h = 0;
+                app_name = "app_" + rx_sender + "_" + rx_app;
+                have_control = false;
 
-                if ((activePart == rx_sender) && (activeApp == params[INDEX_APP_ID])) {
-                    ctx[2].clearRect(0, 0, canvas[2].width, canvas[2].height);
-
-                    activeApp = -1;
-                    activePart = -1;
-                    for (var i = 0; (i < 256 && (activeApp == -1)) ; i++) {
-                        for (var j = 0; j < 256 ; j++) {
-                            if (rx_apps[j][i]) {
-                                activePart = j;
-                                activeApp = i;
-                                if (imageData[activePart][activeApp]) {
-                                    canvas[1].width = img_w[activePart][activeApp];
-                                    canvas[1].height = img_h[activePart][activeApp];
-                                    canvas[1].style.width = img_w[activePart][activeApp] + "px";
-                                    canvas[1].style.height = img_h[rx_sender][activeApp] + "px";
-                                    ctx[1].putImageData(imageData[activePart][activeApp], 0, 0);
-
-                                    if (scaleImage && container_id) {
-                                        var scale_x, scale_y;
-                                        if (img_w[activePart][activeApp]) {
-                                            scale_x = parseInt(container_id.style.width || container_id.offsetWidth, 10) / img_w[activePart][activeApp];
-                                        }
-                                        else {
-                                            scale_x = 1;
-                                        }
-                                        if (img_h[activePart][activeApp]) {
-                                            scale_y = parseInt(container_id.style.height || container_id.offsetHeight, 10) / img_h[activePart][activeApp];
-                                        }
-                                        else {
-                                            scale_y = 1;
-                                        }
-                                        scale = (scale_x < scale_y ? scale_x : scale_y);
-                                        if (scale < 1) {
-                                            var tw, th;
-                                            if (scale > 0 && container_id.style.width && container_id.style.height) {
-                                                tw = Math.floor(img_w[activePart][activeApp] * scale); // target image width
-                                                th = Math.floor(img_h[activePart][activeApp] * scale); // target image height
-                                            }
-                                            else if (scale_x > 0 && scale_y > 0) {
-                                                tw = Math.floor(img_w[activePart][activeApp] * scale_x); // target image width
-                                                th = Math.floor(img_h[activePart][activeApp] * scale_y); // target image width
-                                            }
-                                            else {
-                                                tw = img_w[activePart][activeApp];
-                                                th = img_h[activePart][activeApp];
-                                            }
-                                            canvas[2].width = tw;
-                                            canvas[2].height = th;
-                                            canvas[2].style.width = tw + "px";
-                                            canvas[2].style.height = th + "px";
-                                            ctx[2].drawImage(canvas[1], 0, 0, tw, th);
-                                        }
-                                        else {
-                                            canvas[2].width = img_w[activePart][activeApp];
-                                            canvas[2].height = img_h[activePart][activeApp];
-                                            canvas[2].style.width = img_w[activePart][activeApp] + "px";
-                                            canvas[2].style.height = img_h[activePart][activeApp] + "px";
-                                            ctx[2].drawImage(canvas[1], 0, 0, img_w[activePart][activeApp], img_h[activePart][activeApp]);
-                                        }
-                                    }
-                                    else {
-                                        canvas[2].width = img_w[activePart][activeApp];
-                                        canvas[2].height = img_h[activePart][activeApp];
-                                        canvas[2].style.width = img_w[activePart][activeApp] + "px";
-                                        canvas[2].style.height = img_h[activePart][activeApp] + "px";
-                                        ctx[2].drawImage(canvas[1], 0, 0, img_w[activePart][activeApp], img_h[activePart][activeApp]);
-                                    }
-                                }
+                ctx_id[2].clearRect(0, 0, canvas_id[2].width, canvas_id[2].height);
+            }
+            else if (msg == SEND_MOUSE_TYPE) {
+                //log("message " + msg + " pos " + params[1] + "x" + params[2] + " mouse:" + mouse_type + " x:" + m_offset_x + " y:" + m_offset_y);
+                if (have_control) {
+                    var myCanvas = null;
+                    if (container_id) {
+                        for (i = 0; i < container_id.childNodes.length; i++) {
+                            if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
+                                myCanvas = container_id.childNodes[i];
                                 break;
-                            }
-                        }
-                    }
-                }
-                else if (activeApp != -1 && params[13] == 0xffff) {
-                    console.log('message from conference interface! t=' + params[15]);
-                    if (params[15] < 256) {
-                        for (var j = 0; j < 256; j++) {
-                            if (imageData[params[15]][j]) imageData[params[15]][j] = null;
-                            rx_apps[params[15]][j] = 0;
-                            rx_tabs[params[15]][j] = 0;
-                            img_w[params[15]][j] = 0;
-                            img_h[params[15]][j] = 0;
-                            app_name[params[15]][j] = "app_" + params[15] + "_" + j;
-                            if (onRemoveApp) onRemoveApp(params[15], j);
-                        }
-                        have_control[params[15]] = false;
-                    }
-                    if (params[15] == activePart) {
-                        ctx[2].clearRect(0, 0, canvas[2].width, canvas[2].height);
-                        activeApp = -1;
-                    }
-                }
-            }
-            else if (msg == 12) {   // SEND_MOUSE_TYPE
-                if (activePart == -1) return;
-                //log("message " + msg + " pos " + params[1] + "x" + params[2] + " mouse:" + mouse_type + " x:" + m_offset_x + " y:" + m_offset_y + " sender:" + activePart);
-                if (have_control[activePart]) {
-                    if (myCanvas == null) {
-                        if (container_id) {
-                            for (i = 0; i < container_id.childNodes.length; i++) {
-                                if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                                    myCanvas = container_id.childNodes[i];
-                                    break;
-                                }
                             }
                         }
                     }
@@ -1440,183 +1260,204 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                         }
                     }
                 }
-                else if ((activePart == rx_sender) && (mouse_element != null)) {
+                else if (mouse_element != null) {
                     if (mouse_type != params[14]) {
                         switch (params[14]) {
                             case CURSOR_IDC_ARROW:
-                                m_offset_x = 5;
-                                m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
+                                m_offset_x = 0;
+                                m_offset_y = 0;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_HAND:
-                                m_offset_x = 0;
-                                m_offset_y = 5;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -24px; width:24px; height:24px; ");
+                                m_offset_x = cursor_offset ? -8 : -13;
+                                m_offset_y = 0;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -24px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_WAIT:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -96px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -96px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_APPSTARTING:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -48px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -48px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_IBEAM:
-                                m_offset_x = 5;
-                                m_offset_y = 4;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -72px; width:24px; height:24px; ");
+                                m_offset_x = cursor_offset ? -8 : -13;
+                                m_offset_y = -8;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_CROSS:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -144px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -144px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_HELP:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -24px -120px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -24px -120px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_NO:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -24px -48px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -24px -48px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_SIZEALL:
                                 m_offset_x = -5;
                                 m_offset_y = -5;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px 0px; width:24px; height:24px; ");
-                                break;
-                            case CURSOR_IDC_SIZENESW:
-                                m_offset_x = -5;
-                                m_offset_y = -5;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px 0px; width:24px; height:24px; ");
-                                break;
-                            case CURSOR_IDC_SIZENS:
-                                m_offset_x = -5;
-                                m_offset_y = -5;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -48px 0px; width:24px; height:24px; ");
-                                break;
-                            case CURSOR_IDC_SIZENWSE:
-                                m_offset_x = -5;
-                                m_offset_y = -5;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -96px 0px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px 0px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_SIZEWE:
-                                m_offset_x = -5;
-                                m_offset_y = -5;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -24px 0px; width:24px; height:24px; ");
+                                m_offset_x = cursor_offset ? -15 : -20;
+                                m_offset_y = -18;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -24px 0px; width:24px; height:24px;");
+                                break;
+                            case CURSOR_IDC_SIZENS:
+                                m_offset_x = -cursor_offset ? -15 : -20;
+                                m_offset_y = -18;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -48px 0px; width:24px; height:24px;");
+                                break;
+                            case CURSOR_IDC_SIZENESW:
+                                m_offset_x = cursor_offset ? -15 : -20;
+                                m_offset_y = -18;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px 0px; width:24px; height:24px;");
+                                break;
+                            case CURSOR_IDC_SIZENWSE:
+                                m_offset_x = cursor_offset ? -15 : -20;
+                                m_offset_y = -18;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -96px 0px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_UPARROW:
-                                m_offset_x = 5;
-                                m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -120px 0px; width:24px; height:24px; ");
+                                m_offset_x = cursor_offset ? -15 : -20;
+                                m_offset_y = -18;
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -120px 0px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_VSPLIT:
                                 m_offset_x = 8;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -48px -72px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -48px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_HSPLIT:
                                 m_offset_x = 5;
                                 m_offset_y = 9;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_H1SPLIT:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_H2SPLIT:
                                 m_offset_x = 5;
                                 m_offset_y = 3;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_V2SPLIT:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -48px -72px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: -48px -72px; width:24px; height:24px;");
                                 break;
                             default:
                                 m_offset_x = 5;
                                 m_offset_y = 6;
-                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
+                                mouse_element.setAttribute("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px;");
                                 break;
                         }
                         mouse_type = params[14];
                     }
                     var scale_x = 1, scale_y = 1;
-                    if (scaleImage && container_id) {
-                        if (img_w[rx_sender][activeApp]) {
-                            scale_x = parseInt(container_id.style.width || container_id.offsetWidth, 10) / img_w[rx_sender][activeApp];
+                    if (img_w && img_h && full_screen_width && full_screen_height) {
+                        var display_w, display_h;
+                        if (img_w >= img_h) {
+                            display_w = Math.min(img_w, full_screen_width);
+                            display_h = (img_h * display_w) / img_w;
+                            if (display_h > full_screen_height) {
+                                display_w = (display_w * full_screen_height) / display_h;
+                                display_h = full_screen_height;
+                            }
                         }
-                        if (img_h[rx_sender][activeApp]) {
-                            scale_y = parseInt(container_id.style.height || container_id.offsetHeight, 10) / img_h[rx_sender][activeApp];
+                        else {
+                            display_h = Math.min(img_h, full_screen_height);
+                            display_w = (img_w * display_h) / img_h;
+                            if (display_w > full_screen_width) {
+                                display_h = (display_h * full_screen_width) / display_w;
+                                display_w = full_screen_width;
+                            }
                         }
+                        scale_x = display_w / img_w;
+                        scale_y = display_h / img_h;
                     }
-                    mouse_element.style.left = ((params[1] + m_offset_x) * scale_x) + "px";
-                    mouse_element.style.top = ((params[2] + m_offset_y) * scale_y) + "px";
+                    var offX = 0;
+                    if (full_screen_width > display_w) offX = (full_screen_width - display_w) >> 1;
+                    mouse_element.style.left = (((params[1] + m_offset_x) * scale_x) + offX) + "px";
+                    mouse_element.style.top = (((params[2] + m_offset_y) * scale_y) + 32) + "px";  // 32 is the header size for the appName
                 }
             }
         }
 
-        function redrawCanvas(rx_sender, params) {
-            //console.log("redraw Canvas for " + rx_sender + " appId=" + activeApp);
+        function redrawCanvas(width, height) {
+            var c_w, c_h;
 
-            ctx[1].putImageData(imageData[rx_sender][activeApp], 0, 0);
-            if (scaleImage && container_id) {
-                var scale_x, scale_y;
-                if (img_w[rx_sender][activeApp])
-                    scale_x = parseInt(container_id.style.width || container_id.offsetWidth, 10) / img_w[rx_sender][activeApp];
-                else
-                    scale_x = 1;
-                if (img_h[rx_sender][activeApp])
-                    scale_y = parseInt(container_id.style.height || container_id.offsetHeight, 10) / img_h[rx_sender][activeApp];
-                else
-                    scale_y = 1;
-                scale = (scale_x < scale_y ? scale_x : scale_y);
-                if (scale < 1) {
-                    var tw, th;
-                    if (scale > 0 && container_id.style.width && container_id.style.height) {
-                        tw = Math.floor(img_w[rx_sender][activeApp] * scale); // target image width
-                        th = Math.floor(img_h[rx_sender][activeApp] * scale); // target image height
-                    }
-                    else if (scale_x > 0 && scale_y > 0) {
-                        tw = Math.floor(img_w[rx_sender][activeApp] * scale_x); // target image width
-                        th = Math.floor(img_h[rx_sender][activeApp] * scale_y); // target image width
+            if (full_screen) {
+                c_w = full_screen_width;
+                c_h = full_screen_height;
+            }
+            else {
+                if (container_id.style.width != "100%") c_w = parseInt(container_id.style.width || container_id.offsetWidth, 10);
+                else c_w = parseInt(container_id.offsetWidth, 10);
+
+                if (container_id.style.height != "100%") c_h = parseInt(container_id.style.height || container_id.offsetHeight, 10);
+                else c_h = parseInt(container_id.offsetHeight, 10);
+            }
+
+            ctx_id[1].putImageData(image_data, 0, 0);
+
+            if (container_id) {
+                var display_w = c_w, display_h = c_h;
+                if (img_w && img_h && c_w && c_h) {
+                    if (img_w >= img_h) {
+                        display_w = Math.min(img_w, c_w);
+                        display_h = (img_h * display_w) / img_w;
+                        if (display_h > c_h) {
+                            display_w = (display_w * c_h) / display_h;
+                            display_h = c_h;
+                        }
                     }
                     else {
-                        tw = img_w[rx_sender][activeApp];
-                        th = img_h[rx_sender][activeApp];
+                        display_h = Math.min(img_h, c_h);
+                        display_w = (img_w * display_h) / img_h;
+                        if (display_w > c_w) {
+                            display_h = (display_h * c_w) / display_w;
+                            display_w = c_w;
+                        }
                     }
-                    canvas[2].width = tw;
-                    canvas[2].height = th;
-                    canvas[2].style.width = tw + "px";
-                    canvas[2].style.height = th + "px";
-                    ctx[2].drawImage(canvas[1], 0, 0, tw, th);
+                    display_w = Math.floor(display_w);
+                    display_h = Math.floor(display_h);
+                    canvas_id[2].width = display_w;
+                    canvas_id[2].height = display_h;
+                    canvas_id[2].style.width = display_w + "px";
+                    canvas_id[2].style.height = display_h + "px";
+                    ctx_id[2].drawImage(canvas_id[1], 0, 0, display_w, display_h);
                 }
                 else {
-                    canvas[2].width = params[5];
-                    canvas[2].height = params[6];
-                    canvas[2].style.width = params[5] + "px";
-                    canvas[2].style.height = params[6] + "px";
-                    ctx[2].drawImage(canvas[1], 0, 0, params[5], params[6]);
+                    console.log('AppSharing: dimensions not defined ' + img_w + ',' + img_h + ' ' + c_w + ',' + c_h);
                 }
             }
             else {
-                ctx[2].drawImage(canvas[1], 0, 0, params[5], params[6]);
+                ctx_id[2].drawImage(canvas_id[1], 0, 0, c_w, c_h);
             }
         }
 
         function readPngCb(blob, params) {
             var rx_sender = params[13];
-            var img_data = imageData[rx_sender][params[INDEX_APP_ID]].data;
+            var rx_app = params[INDEX_APP_ID];
+            var img_data = image_data.data;
             var imageRes = blob;
             var index = INNO_HDR_LENGTH + 4;  // + INNO_HDR_PKT_LEN
             if (params[9] == PNG_COMP) { // PNG
                 if (imageRes[index + 1] != 80 || imageRes[index + 2] != 78 || imageRes[index + 3] != 71) {   // PNG
-                    console.log('Unknown PNG format...' + imageRes[index + 1] + imageRes[index + 2] + imageRes[index + 3]);
+                    console.log('AppSharing: Unknown PNG format...' + imageRes[index + 1] + imageRes[index + 2] + imageRes[index + 3]);
                 }
                 else {
                     var png = new innovaphone.applicationSharing.PNG(imageRes, index);
@@ -1642,289 +1483,439 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 j.parse(imageRes, index);
                 for (var l = 0; l < (params[11] + 1) ; l++) {
                     var offset = (params[2] * params[5] + (l * params[3] + params[1])) * 4;
-                    j.copyToImageDataOffset(imageData[rx_sender][params[10]], offset, params[3], params[4]);
+                    j.copyToImageDataOffset(image_data, offset, params[3], params[4]);
                 }
             }
 
-            //console.log("END_BIT_IMG rx " + rx_sender + " activePart " + activePart + " params[8] " + params[8] + " params[INDEX_APP_ID]=" + params[INDEX_APP_ID] + " activeApp=" + activeApp);
+            //console.log("AppSharing: END_BIT_IMG rx " + rx_sender + " params[8] " + params[8] + " rx_app=" + rx_app);
 
-            if ((rx_sender == activePart) && (params[INDEX_APP_ID] == activeApp)) {
-                if (params[8] & END_BIT_IMG) redrawCanvas(rx_sender, params);
+            if (params[8] & END_BIT_IMG) redrawCanvas(params[5], params[6]);
+        }
+
+        this.getContainerWidth = function () {
+            if (container_id) parseInt(container_id.style.width || container_id.offsetWidth, 10);
+            else return getWidth();
+        }
+
+        this.getContainerHeight = function () {
+            if (container_id) parseInt(container_id.style.height || container_id.offsetHeight, 10);
+            else return getHeight();
+        }
+
+        this.getAppId = function () {
+            return app_id;
+        }
+
+        this.getAppName = function () {
+            return app_name;
+        }
+
+        this.getSenderId = function () {
+            return sender_id;
+        }
+
+        this.getSenderName = function () {
+            return sender_name;
+        }
+
+        this.setFullScreenMode = function(container, width, height, mode) {
+            full_screen = mode;
+            if (full_screen) {
+                full_screen_width = width;
+                full_screen_height = height - 35;
+                mouse_element = document.createElement("div");
+                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
+                mouse_type = -1;
+                if(!have_control) container.appendChild(mouse_element);
+                this.adjustImageToCanvas(width, height);
             }
+            else {
+                full_screen_width = 0;
+                full_screen_height = 0;
+                if (mouse_element) {
+                    if (!have_control) container_id.removeChild(mouse_element);
+                    mouse_element = null;
+                }
+                mouse_type = -1;
+                scale_image = true;
+            }
+            this.setContainer(container);
+        }
+
+        this.setContainer = function (container) {
+            console.log('AppSharing: [' + sender_id + ',' + app_id + '] new=' + container + ' old=' + container_id);
+            if (container != null) {
+                if (container == container_id) {  // after a renegotiation container remains equal...
+                    var myCanvas = null;
+                    for (i = 0; i < container_id.childNodes.length; i++) {
+                        if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
+                            myCanvas = container_id.childNodes[i];
+                            break;
+                        }
+                    }
+                    if (myCanvas != null) {
+                        container_id.removeChild(myCanvas);
+                        console.log('AppSharing: set: canvas removed for container!');
+                    }
+                }
+                container_id = container;
+                if (full_screen) {
+                    canvas_id[2].setAttribute("style", "margin-right: auto; margin-left: auto; display: block; visibility: visible;");
+                    console.log("AppSharing: init application sharing display dim = " + full_screen_width + "x" + full_screen_height + ' scale = ' + scale_image);
+                }
+                else {
+                    canvas_id[2].setAttribute("style", "margin-right: auto; margin-left: auto; display: block; visibility: visible; width: 100%; height: 100px;");
+                    console.log("AppSharing: init application sharing display dim = " + (container_id.style.width || container_id.offsetWidth) + "x" + (container_id.style.height || container_id.offsetHeight) + ' scale = ' + scale_image);
+                }
+                container_id.appendChild(canvas_id[2]);
+            }
+        }
+
+        this.getContainer = function () {
+            return container_id;
+        }
+
+        this.haveControl = function () {
+            return have_control;
+        }
+
+        this.setDataChannel = function (dataChannel) {
+            data_channel = dataChannel;
+        }
+
+        this.setRemoveFunction = function (removeFunc) {
+            onRemoveApp = removeFunc;
+        }
+
+        this.setRemoteControlFunction = function (remoteControlFunc) {
+            onRemoteControl = remoteControlFunc;
+        }
+
+        this.setRequestRemoteControlFunction = function (requestRemoteControlFunc) {
+            onRequestRemoteControl = requestRemoteControlFunc;
+        }
+
+        this.setUpdateFunction = function (updateFunc) {
+            onUpdateApp = updateFunc;
+            if (app_name != null) onUpdateApp(sender_id, app_id, app_name);
+        }
+
+        this.setUpdateParticipantFunction = function (updateFunc) {
+            onUpdateParticipant = updateFunc;
+            if (sender_name != null) onUpdateParticipant(sender_id, sender_name);
+        }
+
+        this.setResizeFunction = function (resizeFunc) {
+            onResizeApp = resizeFunc;
+        }
+
+    }
+
+    // Constructor
+    function _AppSharing(displayname) {
+        var inno_seq = 0;
+        var sender_changed = false;
+
+        var appContainers = []; // list of _Application 
+
+        var sender_name = displayname;
+        var sender_name_len = sender_name.length;
+        var dataChannel = null;
+        var onCreateApp = null;
+        var onUpdateApp = null;
+        var onRemoveApp = null;
+        var onResizeApp = null;  
+        var onRemoteControl = null;
+        var onUpdateParticipant = null;
+        var onRequestRemoteControl = null;
+        var num_packets_rx = 0;
+        var num_packets_proc = 0;
+
+        self.getInnoSeq = function () {
+            return ++inno_seq;
+        }
+
+        function sendOwnName(dest_id) {
+            if (sender_name_len == 0) {
+                console.log('AppSharing: sender name is empty');
+                return;
+            }
+            console.log('AppSharing: Send display name (' + sender_name + ')');
+            var arrayMsgS = new ArrayBuffer(36 + 1 + (sender_name_len << 1));
+            var dmsg = new Uint8Array(arrayMsgS);
+            var t_seq = this.getInnoSeq();
+            dmsg[INNO_HDR_FLAGS] = 0xf0;
+            dmsg[INNO_HDR_MSG_TYPE] = SEND_NAME;
+            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+            dmsg[INNO_HDR_APPL_ID] = 0xff;
+            dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+            dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+            dmsg[INNO_HDR_RECEIVER_ID + 0] = (dest_id >> 8) & 0xff;
+            dmsg[INNO_HDR_RECEIVER_ID + 1] = dest_id & 0xff;
+            dmsg[INNO_HDR_LENGTH + 4] = (sender_name_len << 1);
+            var nstr = sender_name;
+            var ind_a = INNO_HDR_LENGTH + 5;
+            for (var i = 0; i < sender_name_len; i++) {
+                var c = nstr.charCodeAt(i);
+                //log('name = ' + c);
+                dmsg[ind_a + 0] = c & 0xff;
+                dmsg[ind_a + 1] = (c >> 8) & 0xff;
+                ind_a = ind_a + 2;
+            }
+            if (dataChannel) dataChannel.send(arrayMsgS);
+            else console.log('AppSharing: sendOwnName failed, no dataChannel available');
+        }
+
+        self.requestAppName = function (dest, app) {
+            var arrayMsg = new ArrayBuffer(36);
+            var dmsg = new Uint8Array(arrayMsg);
+            var t_seq = this.getInnoSeq();
+            dmsg[INNO_HDR_FLAGS] = 0xf0;
+            dmsg[INNO_HDR_MSG_TYPE] = REQUEST_NAME;
+            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+            dmsg[INNO_HDR_APPL_ID] = app;
+            dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+            dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+            dmsg[INNO_HDR_RECEIVER_ID + 0] = (dest >> 8) & 0xff;
+            dmsg[INNO_HDR_RECEIVER_ID + 1] = dest & 0xff;
+            if (dataChannel) dataChannel.send(arrayMsg);
+            else console.log('AppSharing: requestAppName failed, no dataChannel available');
+        }
+
+        self.requestNewPicture = function(dest, app) {
+            var arrayMsg = new ArrayBuffer(36);
+            var dmsg = new Uint8Array(arrayMsg);
+            var t_seq = this.getInnoSeq();
+            dmsg[INNO_HDR_FLAGS] = 0xf0;
+            dmsg[INNO_HDR_MSG_TYPE] = REQ_NEW_PIC;
+            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+            dmsg[INNO_HDR_APPL_ID] = app;
+            dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+            dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+            dmsg[INNO_HDR_RECEIVER_ID + 0] = (dest >> 8) & 0xff;
+            dmsg[INNO_HDR_RECEIVER_ID + 1] = dest & 0xff;
+            if (dataChannel) dataChannel.send(arrayMsg);
+            else console.log('AppSharing: requestNewPicture failed, no dataChannel available');
+        }
+
+        function sharingEvent(type, data) {
+            //console.log('sharingEvent ' + type + ' data ' + data);
+            switch (type) {
+                case 'init':
+                    init(null);
+                    jsonChannel = data;
+                    break;
+                case 'setAppContainer':
+                    setAppContainer(data);
+                    break;
+                case 'setFullScreenMode':
+                    setFullScreenMode(data);
+                    break;
+                case 'newParticipantCallback':
+                    onUpdateParticipant = data;
+                    if (onUpdateParticipant) {
+                        for (var i = 0; i < appContainers.length; i++) {
+                            appContainers[i].setUpdateParticipantFunction(onUpdateParticipant);
+                        }
+                    }
+                    break;
+                case 'updateAppCallback':
+                    onUpdateApp = data;
+                    if (onUpdateApp) {
+                        for (var i = 0; i < appContainers.length; i++) {
+                            appContainers[i].setUpdateFunction(onUpdateApp);
+                        }
+                    }
+                    break;
+                case 'createAppCallback':
+                    onCreateApp = data;
+                    if (onCreateApp) {
+                        for (var i = 0; i < appContainers.length; i++) {
+                            if(appContainers[i].getAppId() != 0xff) onCreateApp(appContainers[i].getSenderId(), appContainers[i].getAppId(), appContainers[i].getAppName());
+                        }
+                    }
+                    break;
+                case 'remoteControlCallback':
+                    onRemoteControl = data;
+                    if (onRemoteControl) {
+                        for (var i = 0; i < appContainers.length; i++) {
+                            appContainers[i].setRemoteControlFunction(onRemoteControl);
+                        }
+                    }
+                    break;
+                case 'onRequestRemoteControl':
+                    onRequestRemoteControl = data;
+                    if (onRequestRemoteControl) {
+                        for (var i = 0; i < appContainers.length; i++) {
+                            appContainers[i].setRequestRemoteControlFunction(onRequestRemoteControl);
+                        }
+                    }
+                    break;
+                case 'removeAppCallback':
+                    onRemoveApp = data;
+                    if (onRemoveApp) {
+                        for (var i = 0; i < appContainers.length; i++) {
+                            appContainers[i].setRemoveFunction(onRemoveApp);
+                        }
+                    }
+                    break;
+                case 'resizeAppCallback':
+                    onResizeApp = data;
+                    if (onResizeApp) {
+                        for (var i = 0; i < appContainers.length; i++) {
+                            appContainers[i].setResizeFunction(onResizeApp);
+                        }
+                    }
+                    break;
+                case 'setname':
+                    setOwnName(data);
+                    break;
+                case 'fitToElement':
+                    fitToElement(data);
+                    break;
+                case 'adjustImageToCanvas':
+                    adjustImageToCanvas(data);
+                    break;
+                case 'requestControl':
+                    requestControl(data);
+                    break;
+                default:
+                    console.log('AppSharing: unknown event received: ' + type);
+            }
+            //log('sharingEvent -> ' + type);
+        }
+
+        function setOwnName(data) {
+            sender_name = data;
+            if (sender_name) sender_name_len = sender_name.length;
+            else sender_name_len = 0;
+            if (sender_name_len > 0) {
+                for (var i = 0; i < appContainers.length; i++) {
+                    sendOwnName(appContainers[i].getSenderId());
+                }
+            }
+        }
+
+        function fitToElement(data) {
+            console.log('AppSharing: fitToElement app=' + data.app + ' sender=' + data.sender + ' cont=' + data.container);
+            for (var i = 0; i < appContainers.length; i++) {
+                if (appContainers[i].getSenderId() == data.sender && appContainers[i].getAppId() == data.app) {
+                    appContainers[i].fitToElement();
+                    break;
+                }
+            }
+        }
+
+        function adjustImageToCanvas(data) {
+            console.log('AppSharing: adjustImageToCanvas sender = ' + data.sender + ' app = ' + data.id);
+            for (var i = 0; i < appContainers.length; i++) {
+                if (appContainers[i].getSenderId() == data.sender && appContainers[i].getAppId() == data.id) {
+                    appContainers[i].adjustImageToCanvas(data.width, data.height);
+                    break;
+                }
+            }
+        }
+
+        function requestControl(data) {
+            var foundSender = 0;
+            for (var i = 0; i < appContainers.length; i++) {
+                if (appContainers[i].getSenderId() == data.sender && appContainers[i].getAppId() == data.id) {
+                    if (appContainers[i].haveControl()) return;
+                    foundSender = 1;
+                    break;
+                }
+            }
+            if (!foundSender) return;
+
+            console.log('AppSharing: request control l=' + sender_name_len + ' sender=' + data.sender);
+
+            // Disable Request Control button and different style?
+            var arrayMsg = new ArrayBuffer(36 + 1 + (sender_name_len << 1));
+            var dmsg = new Uint8Array(arrayMsg);
+            var t_seq = this.getInnoSeq();
+            dmsg[INNO_HDR_FLAGS] = 0xf0;
+            dmsg[INNO_HDR_MSG_TYPE] = REQUEST_CONTROL;
+            dmsg[INNO_HDR_SEQ + 0] = (t_seq >> 8) & 0xff;
+            dmsg[INNO_HDR_SEQ + 1] = t_seq & 0xff;
+            dmsg[INNO_HDR_APPL_ID] = 0xff;
+            dmsg[INNO_HDR_SENDER_ID + 0] = 0;
+            dmsg[INNO_HDR_SENDER_ID + 1] = 0;
+            dmsg[INNO_HDR_RECEIVER_ID + 0] = (data.sender >> 8) & 0xff;
+            dmsg[INNO_HDR_RECEIVER_ID + 1] = data.sender & 0xff;
+            dmsg[INNO_HDR_LENGTH + 4] = (sender_name_len << 1);
+            var nstr = sender_name;
+            var ind_a = INNO_HDR_LENGTH + 5;
+            for (var i = 0; i < sender_name_len; i++) {
+                var c = nstr.charCodeAt(i);
+                //log('name = ' + c);
+                dmsg[ind_a + 0] = c & 0xff;
+                dmsg[ind_a + 1] = (c >> 8) & 0xff;
+                ind_a = ind_a + 2;
+            }
+            if (dataChannel) dataChannel.send(arrayMsg);
         }
 
         // public
         var close = function () {
-            log('close app sharing');
+            console.log('AppSharing: Close app sharing containers=' + appContainers.length);
             dataChannel = null;
-            sender_changed = false;
-            if (ctx[2] != null) ctx[2].clearRect(0, 0, canvas[2].width, canvas[2].height);
-            activeApp = -1;
-            activePart = -1;
-            for (var i = 0; i < 256; i++) {
-                for (var j = 0; j < 256; j++) {
-                    if (onRemoveApp && (rx_tabs[i][j] == 1)) onRemoveApp(i, j);
-                    imageData[i][j] = null;
-                    rx_apps[i][j] = 0;
-                    rx_tabs[i][j] = 0;
-                    img_w[i][j] = 0;
-                    img_h[i][j] = 0;
-                    app_name[i][j] = "app_" + i + "_" + j;
-                }
-                have_control[i] = false;
-            }
+            appContainers = [];
         }
 
         var init = function (data_channel) {
             dataChannel = data_channel;
-            log('Init application Sharing. Prefix=' + innovaphone.applicationSharing.PathPrefix);
-            for (var i = 0; i < 256; i++) {
-                for (var j = 0; j < 256; j++) {
-                    imageData[i][j] = null;
-                    rx_apps[i][j] = 0;
-                    rx_tabs[i][j] = 0;
-                    img_w[i][j] = 0;
-                    img_h[i][j] = 0;
-                    app_name[i][j] = "app_" + i + "_" + j;
-                }
+            for (var i = 0; i < appContainers.length; i++) {
+                appContainers[i].setDataChannel(dataChannel);
             }
-            if (ctx[2] != null && canvas[2] != null) {
-                ctx[2].clearRect(0, 0, canvas[2].width, canvas[2].height);
-            }
-            for (var i = 0; i < 3; i++) {
-                if (canvas[i] == null) continue;
-                canvas[i].width = getWidth() + "px";
-                canvas[i].height = (getHeight() - 30) + "px";
-                canvas[i].style.width = getWidth() + "px";
-                canvas[i].style.height = (getHeight() - 30) + "px";
-            }
-            if (canvas[2].style.setProperty) {
-                canvas[2].style.setProperty("display", "block", null);
-                canvas[2].style.setProperty("visibility", "visible", null);
-            }
-            else {
-                canvas[2].style.setAttribute("display", "block");
-                canvas[2].style.setAttribute("visibility", "visible");
-            }
-            dataChannel = data_channel;
-            if (dataChannel) {
-                log('Application Sharing initialised! s = ' + activePart + ' a = ' + activeApp);
-            }
-            else
-                log('Application Sharing initialised without dataChanel!');
-            if (container_id != null) {
-                var myCanvas = null;
-                log('Canvas container already defined!');
-                for (i = 0; i < container_id.childNodes.length; i++) {
-                    if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                        myCanvas = container_id.childNodes[i];
-                        break;
-                    }
-                }
-                if (myCanvas != null) {
-                    container_id.removeChild(myCanvas);
-                    log('init: canvas removed for container!');
-                }
-                canvas[2].setAttribute("style", "display: block; visibility: visible;");
-                if (mouse_element == null) {
-                    mouse_element = document.createElement("div");
-                    mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
-                    mouse_type = -1;
-                }
-                container_id.appendChild(mouse_element);
-                container_id.appendChild(canvas[2]);
-                if ((activePart >= 0) && (activeApp >= 0) && (imageData[activePart][activeApp])) {
-                    canvas[2].width = img_w[activePart][activeApp];
-                    canvas[2].height = img_h[activePart][activeApp];
-                    canvas[2].style.width = img_w[activePart][activeApp] + "px";
-                    canvas[2].style.height = img_h[activePart][activeApp] + "px";
-                    ctx[2].drawImage(canvas[1], 0, 0, img_w[activePart][activeApp], img_h[activePart][activeApp]);
+            if (dataChannel) console.log('AppSharing: Application Sharing initialised!');
+            else console.log('AppSharing: Application Sharing initialised without dataChanel!');
+        }
+
+        var setFullScreenMode = function (data) {
+            console.log('AppSharing: setFullScreenMode for sender ' + data.sender + " with id " + data.id + " and container " + data.container + " mode " + data.mode);
+            for (var i = 0; i < appContainers.length; i++) {
+                if (appContainers[i].getSenderId() == data.sender && appContainers[i].getAppId() == data.id) {
+                    appContainers[i].setFullScreenMode(data.container, data.width, data.height, data.mode);
                 }
             }
         }
 
-        var setContainer = function (containerId) {
-            log('setContainer: ' + containerId);
-            if (containerId != null) {
-                if (containerId == container_id) {  // after a renegotiation container remains equal...
-                    var myCanvas = null;
-                    for (i = 0; i < container_id.childNodes.length; i++) {
-                        if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                            myCanvas = container_id.childNodes[i];
-                            break;
-                        }
+        var setAppContainer = function (data) {
+            console.log('AppSharing: setAppContainer for sender ' + data.sender + " with id " + data.id + " and container " + data.container);
+            for (var i = 0; i < appContainers.length; i++) {
+                if (appContainers[i].getSenderId() == data.sender && appContainers[i].getAppId() == data.id) {
+                    if (data.container != null) appContainers[i].setContainer(data.container);
+                    else {
+                        appContainers.splice(i, 1);
+                        console.log('AppSharing: application for sender ' + data.sender + " and id " + data.id + " removed!" + " apps=" + appContainers.length);
                     }
-                    if (myCanvas != null) {
-                        container_id.removeChild(myCanvas);
-                        log('set: canvas removed for container!');
-                    }
-                }
-                container_id = containerId;
-                if (canvas[2] != null) {
-                    canvas[2].setAttribute("style", "display: block; visibility: visible;");
-                    if ((activePart >= 0) && (activeApp >= 0) && (imageData[activePart][activeApp])) {
-                        canvas[2].width = img_w[activePart][activeApp];
-                        canvas[2].height = img_h[activePart][activeApp];
-                        canvas[2].style.width = img_w[activePart][activeApp] + "px";
-                        canvas[2].style.height = img_h[activePart][activeApp] + "px";
-                        ctx[2].drawImage(canvas[1], 0, 0, img_w[activePart][activeApp], img_h[activePart][activeApp]);
-                    }
-                    if (mouse_element == null) {
-                        mouse_element = document.createElement("div");
-                        mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
-                        mouse_type = -1;
-                    }
-                    container_id.appendChild(mouse_element);
-                    container_id.appendChild(canvas[2]);
-                }
-                log("init application sharing display activePart = " + activePart + " dim = " + (containerId.style.width || containerId.offsetWidth) + "x" + (containerId.style.height || container_id.offsetHeight) + ' scale = ' + scaleImage);
-            }
-            else {
-                if (container_id) {
-                    var myCanvas = null;
-                    for (i = 0; i < container_id.childNodes.length; i++) {
-                        if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                            myCanvas = container_id.childNodes[i];
-                            break;
-                        }
-                    }
-                    if (myCanvas != null) {
-                        container_id.removeChild(myCanvas);
-                        log('unset: canvas removed for container!');
-                    }
-                    container_id = null;
-                    for (var i = 0; i < 256; i++) {
-                        for (var j = 0; j < 256; j++) {
-                            rx_tabs[i][j] = 0;
-                        }
-                    }
+                    break;
                 }
             }
         }
 
         var recv = function (appData) {
             /*if (((num_packets_rx++) & 0x7f) == 0x40) {
-                log('Data received:' + num_packets_rx);
+                console.log('AppSharing: Data received:' + num_packets_rx);
             }*/
             if (appData instanceof ArrayBuffer) {
                 var uint8View = new Uint8Array(appData);
                 var rx_sender = (uint8View[INNO_HDR_SENDER_ID] << 8 | uint8View[INNO_HDR_SENDER_ID + 1]);
                 if (rx_sender == 0xffff) {
                     var rx_target = (uint8View[INNO_HDR_RECEIVER_ID] << 8 | uint8View[INNO_HDR_RECEIVER_ID + 1]);
-                    log('message from conference interface! t=' + rx_target);
-                    if (activeApp != -1) {
-                        if (rx_target < 256) {
-                            for (var j = 0; j < 256; j++) {
-                                if (imageData[rx_target][j]) imageData[rx_target][j] = null;
-                                rx_apps[rx_target][j] = 0;
-                                rx_tabs[rx_target][j] = 0;
-                                img_w[rx_target][j] = 0;
-                                img_h[rx_target][j] = 0;
-                                app_name[rx_target][j] = "app_" + rx_target + "_" + j;
-                                if (onRemoveApp) onRemoveApp(rx_target, j);
-                            }
-                            have_control[rx_target] = false;
-                        }
-                        if (rx_target == activePart) {
-                            ctx[2].clearRect(0, 0, canvas[2].width, canvas[2].height);
-                            activeApp = -1;
+                    console.log('AppSharing: message from conference interface! t=' + rx_target);
+                    for (var i = appContainers.length - 1; i >= 0; i--) {
+                        if (appContainers[i].getSenderId() == rx_target) {
+                            if (onRemoveApp) onRemoveApp(appContainers[i].getSenderId(), appContainers[i].getAppId());
+                            appContainers.splice(i, 1);
                         }
                     }
                     return;
                 }
-                if (rx_sender > 255) return;
-                if (activePart == -1) {
-                    activePart = rx_sender;
-                }
                 processingNode(uint8View);
-            }
-        }
-
-        function mousewheel_l(e) {
-            if ((activePart == -1) || !have_control[activePart])
-                if (!e) var e = window.event;
-            if (mouseWheel(e) == false) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.cancelBubble = false;
-            }
-        }
-
-        function mousewheel_a(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            if (!e) var e = window.event;
-            if (mouseWheel(e) == false) {
-                e.returnValue = false;
-                e.cancelBubble = true;
-            }
-        }
-
-        function keyup_l(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('keyup_l');
-
-            if (!e) var e = window.event;
-            if (keyUp(e) == false) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.cancelBubble = false;
-            }
-        }
-
-        function keyup_a(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('keyup_a');
-
-            if (!e) var e = window.event;
-            if (keyUp(e) == false) {
-                e.returnValue = false;
-                e.cancelBubble = true;
-            }
-        }
-
-        function keydown_l(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('keydown_l');
-
-            if (!e) var e = window.event;
-            if (keyDown(e) == false) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.cancelBubble = false;
-            }
-        }
-
-        function keydown_a(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('keydown_a');
-
-            if (!e) var e = window.event;
-            if (keyDown(e) == false) {
-                e.returnValue = false;
-                e.cancelBubble = true;
-            }
-        }
-
-        function keypress_l(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('keypress_l');
-
-            if (!e) var e = window.event;
-            if (keyPress(e, 'keypress_l') == false) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.cancelBubble = false;
-            }
-        }
-
-        function keypress_a(e) {
-            if ((activePart == -1) || !have_control[activePart]) return;
-            //log('keypress_a');
-
-            if (!e) var e = window.event;
-            if (keyPress(e, 'keypress_a') == false) {
-                e.returnValue = false;
-                e.cancelBubble = true;
             }
         }
 
@@ -1949,268 +1940,62 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             params[15] = uint8View[INNO_HDR_RECEIVER_ID] << 8 | uint8View[INNO_HDR_RECEIVER_ID + 1];
 
             var rx_sender = params[13];
+            var rx_app = params[INDEX_APP_ID];
 
-            if (params[0] == BLOCK_MSG || params[0] == BLOCK_MSG_256 || params[0] == PLAIN_MSG) {
-                //log('Image ' + params[1] + 'x' + params[2] + ' ' + params[3] + 'x' + params[4] + ' ' + params[5] + 'x' + params[6]);
-                //log('Image ' + uint8View[INNO_HDR_X_DIM] + ' ' + uint8View[INNO_HDR_X_DIM + 1] + ' ' + uint8View[INNO_HDR_Y_DIM] + ' ' + uint8View[INNO_HDR_Y_DIM + 1]);
-                if (rx_apps[rx_sender][params[INDEX_APP_ID]] == 0) {
-                    console.log('New application received ' + params[INDEX_APP_ID] + ' sender = ' + rx_sender + ' act = ' + activePart);
-                    rx_apps[rx_sender][params[INDEX_APP_ID]] = 1;
+            if(params[0] != DUMMY_MSG) console.log('AppSharing: received from ' + rx_sender + ' app=' + rx_app + ' and msg=' + params[0] + ' seq=' + (uint8View[INNO_HDR_SEQ] << 8 | uint8View[INNO_HDR_SEQ + 1]) + ' for=' + params[15]);
 
-                    requestNewPicture(params[INDEX_APP_ID], rx_sender);
-                    requestAppName(params[INDEX_APP_ID], rx_sender);
-                    sendOwnName(params[INDEX_APP_ID], rx_sender);
-                }
-                if ((params[5] != img_w[rx_sender][params[INDEX_APP_ID]]) || (params[6] != img_h[rx_sender][params[INDEX_APP_ID]])) {
-                    console.log('dimensions changed(' + rx_sender + ', ' + params[INDEX_APP_ID] + ') ' + params[5] + 'x' + params[6] + ' active app = ' + activeApp + ' active sender = ' + activePart);
-                    if (imageData[rx_sender][params[INDEX_APP_ID]]) imageData[rx_sender][params[INDEX_APP_ID]] = null;
-                    imageData[rx_sender][params[INDEX_APP_ID]] = ctx[0].createImageData(params[5], params[6]);
-                    img_w[rx_sender][params[INDEX_APP_ID]] = params[5];
-                    img_h[rx_sender][params[INDEX_APP_ID]] = params[6];
-                    if ((activePart == rx_sender) && ((activeApp == -1) || (params[INDEX_APP_ID] == activeApp))) {
-                        canvas[0].width = params[5];
-                        canvas[0].height = params[6];
-                        canvas[0].style.width = params[5] + "px";
-                        canvas[0].style.height = params[6] + "px";
+            if (params[0] == DISCARD_MSG || params[0] == REQ_NEW_PIC || params[0] == SEQ_LOST || (params[0] >= LBUTTONDOWN && params[0] <= KEYPRESSED_UP)) {
+                return;
+            }
+            if (params[0] == REQUEST_NAME) {
+                sendOwnName(rx_sender);
+                return;
+            } 
 
-                        canvas[1].width = params[5];
-                        canvas[1].height = params[6];
-                        canvas[1].style.width = params[5] + "px";
-                        canvas[1].style.height = params[6] + "px";
-
-                        if (scaleImage && container_id) {
-                            var scale_x, scale_y;
-                            if (params[5]) {
-                                scale_x = parseInt(container_id.style.width || container_id.offsetWidth, 10) / params[5];
-                            }
-                            else {
-                                scale_x = 1;
-                            }
-                            if (params[6]) {
-                                scale_y = parseInt(container_id.style.height || container_id.offsetHeight, 10) / params[6];
-                            }
-                            else {
-                                scale_y = 1;
-                            }
-                            scale = (scale_x < scale_y ? scale_x : scale_y);
-                            if (scale < 1) {
-                                var tw, th;
-                                if (scale > 0 && container_id.style.width && container_id.style.height) {
-                                    tw = Math.floor(params[5] * scale); // target image width
-                                    th = Math.floor(params[6] * scale); // target image height
-                                }
-                                else if (scale_x > 0 && scale_y > 0) {
-                                    tw = Math.floor(params[5] * scale_x); // target image width
-                                    th = Math.floor(params[6] * scale_y); // target image width
-                                }
-                                else {
-                                    tw = params[5];
-                                    th = params[6];
-                                }
-                                canvas[2].width = tw;
-                                canvas[2].height = th;
-                                canvas[2].style.width = tw + "px";
-                                canvas[2].style.height = th + "px";
-                            }
-                            else {
-                                canvas[2].width = params[5];
-                                canvas[2].height = params[6];
-                                canvas[2].style.width = params[5] + "px";
-                                canvas[2].style.height = params[6] + "px";
-                            }
-                            ctx[2].drawImage(canvas[1], 0, 0, canvas[2].width, canvas[2].height);
-                        }
-                        else {
-                            canvas[2].width = params[5];
-                            canvas[2].height = params[6];
-                            canvas[2].style.width = params[5] + "px";
-                            canvas[2].style.height = params[6] + "px";
-                        }
-
-                        activeApp = params[INDEX_APP_ID];
-                        log('activeApp = ' + activeApp);
-
-                        if (onResizeApp) onResizeApp();
-                    }
-                }
-                //log('Coordinates (' + params[1] + ',' + params[2] + '),(' + params[3] + ',' + params[4] + '),(' + params[5] + ',' + params[6] + ') ' + params[7]);
-                if (params[0] == PLAIN_MSG) {
-                    //log('PLAIN Message ' + params[1] + 'x' + params[2] + ' ' + params[3] + 'x' + params[4]);
-                    var raw_value = params[12];
-                    var offset = (params[2] * params[5] + params[1]) * 4;
-                    var img_data = imageData[rx_sender][params[INDEX_APP_ID]].data;
-                    for (var i = 0; i < params[4]; i++) {
-                        var n_offset = offset + (i * params[5] * 4);
-                        for (var j = 0; j < (params[3] * 4) ; j += 4) {
-                            // i+3 is alpha (the fourth element)
-                            img_data[n_offset + j + 0] = (raw_value >> 16) & 0xff;
-                            img_data[n_offset + j + 1] = (raw_value >> 8) & 0xff;
-                            img_data[n_offset + j + 2] = (raw_value >> 0) & 0xff;
-                            img_data[n_offset + j + 3] = 0xff;        // alpha
-                        }
-                    }
-                    if (params[8] & END_BIT_IMG) redrawCanvas(rx_sender, params);
+            for (var i = 0; i < appContainers.length; i++) {
+                if (appContainers[i].getSenderId() == rx_sender && appContainers[i].getAppId() == rx_app) {
+                    appContainers[i].processMessage(uint8View, uint8View.length, params);
                     return;
                 }
-                readPngCb(uint8View, params);
             }
-            else if (params[0] == 131) {   // GIVE_CONTROL
-                log('got control from ' + rx_sender);
-                var has_anyone_control = false;
-                for (var i = 0; i < 256; i++) {
-                    if (have_control[i] == true) {
-                        log(i + ' has already control!');
-                        has_anyone_control = true;
-                        break;
+            if (params[0] == TAKE_CONTROL || params[0] == GIVE_CONTROL) {
+                for (var i = 0; i < appContainers.length; i++) {
+                    if (appContainers[i].getSenderId() == rx_sender) {
+                        appContainers[i].processMessage(uint8View, uint8View.length, params);
                     }
                 }
-                if (has_anyone_control == false || rx_sender == activePart) {
-                    if (container_id) {
-                        for (i = 0; i < container_id.childNodes.length; i++) {
-                            if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                                var myCanvas = container_id.childNodes[i];
-                                myCanvas.style["cursor"] = "default";
-                                break;
-                            }
+                return;
+            }
+            if (rx_app == 0xff) {
+                if (params[0] == SEND_NAME || params[0] == DUMMY_MSG_RX) {
+                    for (var i = 0; i < appContainers.length; i++) {
+                        if (appContainers[i].getSenderId() == rx_sender) {
+                            appContainers[i].processMessage(uint8View, uint8View.length, params);
+                            return;
                         }
                     }
-                    var doc = canvas[2].ownerDocument;
-                    var win = null;
-                    if (doc) {
-                        win = doc.defaultView || doc.parentWindow;
-                    }
-                    else {
-                        doc = container_id.ownerDocument;
-                        if (doc) {
-                            win = doc.defaultView || doc.parentWindow;
-                        }
-                    }
-                    if (mouse_element) {
-                        container_id.removeChild(mouse_element);
-                        mouse_element = null;
-                        mouse_type = -1;
-                    }
-                    if (canvas[2].addEventListener) {
-                        log('control addEventListener');
-                        canvas[2].addEventListener("mousedown", mouseDownHandle, false);
-                        canvas[2].addEventListener("mousemove", mouseMoveHandle, false);
-                        canvas[2].addEventListener("mouseup", mouseUpHandle, false);
-                        canvas[2].addEventListener("dblclick", mouseDoubleClickHandle, false);
-                        canvas[2].addEventListener("DOMMouseScroll", domMouseScroll, false);
-                        canvas[2].addEventListener('mousewheel', mousewheel_l, false);
-                        if (win) {
-                            win.addEventListener('keypress', keypress_l, false);
-                            win.addEventListener('keydown', keydown_l, false);
-                            win.addEventListener('keyup', keyup_l, false);
-                        }
-                    }
-                    else if (canvas[2].attachEvent) {
-                        log('control attachEvent');
-                        canvas[2].attachEvent("onmousedown", mouseDownHandle, false);
-                        canvas[2].attachEvent("onmousemove", mouseMoveHandle, false);
-                        canvas[2].attachEvent("onmouseup", mouseUpHandle, false);
-                        canvas[2].attachEvent("ondblclick", mouseDoubleClickHandle, false);
-                        canvas[2].attachEvent('mousewheel', mousewheel_a, false);
-                        canvas[2].attachEvent('onmousewheel', mousewheel_a, false);
-                        if (win) {
-                            win.attachEvent('keypress', keypress_a, false);
-                            win.attachEvent('keydown', keydown_a, false);
-                            win.attachEvent('keyup', keyup_a, false);
-                            win.attachEvent('onkeypress', keypress_a, false);
-                            win.attachEvent('onkeydown', keydown_a, false);
-                            win.attachEvent('onkeyup', keyup_a, false);
-                        }
-                    }
+                    var app = new _Application(this, rx_sender, rx_app, null, onUpdateParticipant, onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, dataChannel);
+                    appContainers.push(app);
+                    app.processMessage(uint8View, uint8View.length, params);
                 }
-                have_control[rx_sender] = true;
+                return;
             }
-            else if (params[0] == 132) {   // TAKE_CONTROL
-                log('control removed from ' + rx_sender);
-                have_control[rx_sender] = false;
-                var has_anyone_control = false;
-                for (var i = 0; i < 256; i++) {
-                    if (have_control[i] == true) {
-                        log(i + ' still has control!');
-                        has_anyone_control = true;
-                        break;
-                    }
-                }
-                if (has_anyone_control == false) {
-                    if (container_id) {
-                        for (i = 0; i < container_id.childNodes.length; i++) {
-                            if (container_id.childNodes[i].nodeName == 'CANVAS' || container_id.childNodes[i].nodeName == 'canvas') {
-                                var myCanvas = container_id.childNodes[i];
-                                myCanvas.style["cursor"] = "default";
-                                break;
-                            }
-                        }
-                    }
-                    var doc = canvas[2].ownerDocument;
-                    var win = null;
-                    if (doc) {
-                        win = doc.defaultView || doc.parentWindow;
-                    }
-                    else {
-                        doc = container_id.ownerDocument;
-                        if (doc) {
-                            win = doc.defaultView || doc.parentWindow;
-                        }
-                    }
-                    if (canvas[2].removeEventListener) {
-                        canvas[2].removeEventListener("mousedown", mouseDownHandle, false);
-                        canvas[2].removeEventListener("mousemove", mouseMoveHandle, false);
-                        canvas[2].removeEventListener("mouseup", mouseUpHandle, false);
-                        canvas[2].removeEventListener("dblclick", mouseDoubleClickHandle, false);
-                        canvas[2].removeEventListener("DOMMouseScroll", domMouseScroll, false);
-                        canvas[2].removeEventListener('mousewheel', mousewheel_l, false);
-                        if (win) {
-                            win.removeEventListener('keypress', keypress_l, false);
-                            win.removeEventListener('keydown', keydown_l, false);
-                            win.removeEventListener('keyup', keyup_l, false);
-                        }
-                    }
-                    else if (canvas[2].removeEvent) {
-                        canvas[2].removeEvent("onmousedown", mouseDownHandle, false);
-                        canvas[2].removeEvent("onmousemove", mouseMoveHandle, false);
-                        canvas[2].removeEvent("onmouseup", mouseUpHandle, false);
-                        canvas[2].removeEvent("ondblclick", mouseDoubleClickHandle, false);
-                        canvas[2].removeEvent('onmousewheel', mousewheel_a, false);
-                        canvas[2].removeEvent('mousewheel', mousewheel_a, false);
-                        if (win) {
-                            win.removeEvent('keypress', keypress_a, false);
-                            win.removeEvent('keydown', keydown_a, false);
-                            win.removeEvent('keyup', keyup_a, false);
-                            win.removeEvent('onkeypress', keypress_a, false);
-                            win.removeEvent('onkeydown', keydown_a, false);
-                            win.removeEvent('onkeyup', keyup_a, false);
-                        }
-                    }
-                    if (mouse_element == null) {
-                        log('control removed ' + mouse_element);
-                        myCanvas = null;
-                        mouse_element = document.createElement("div");
-                        mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
-                        mouse_type = -1;
-                        container_id.appendChild(mouse_element);
-                    }
-                }
-            }
-            else if (params[0] == 135) {   // REQUEST_NAME
-                //log('sendOwnName (' + rx_sender + ') = ' + params[0]);
-                sendOwnName(0xff, rx_sender);
-            }
-            else {   // MSG
-                //log('readMsgCb');
-                readMsgCb(uint8View, uint8View.length, params);
-            }
-        }
+            self.requestNewPicture(rx_sender, rx_app);
+            self.requestAppName(rx_sender, rx_app);
+            sendOwnName(rx_sender);
 
-        this.requestControl = function () {
-            requestControl();
-        }
+            // Dummy Message does not add an application, has to be another message, like data or sender/app name
+            if (params[0] != 8) {
+                var app = new _Application(this, rx_sender, rx_app, null, onUpdateParticipant, onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, dataChannel);
+                appContainers.push(app);
 
-        this.fitToElement = function (remScaleImage) {
-            fitToElement(remScaleImage);
+                console.log('AppSharing: onCreateApp for ' + rx_sender + ' app=' + rx_app + ' and msg=' + params[0]);
+
+                // onCreateApp must be called first to avoid processMessage calling onUpdate if the first message is the application name
+                // and the app must be added before to the list because onCreateApp calls setAppContainer directly
+                onCreateApp(rx_sender, rx_app, null);
+                app.processMessage(uint8View, uint8View.length, params);
+            }
         }
 
         this.close = function () {

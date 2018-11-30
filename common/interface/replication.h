@@ -42,6 +42,7 @@ public:
     virtual void ReplicatorStopped() = 0;
 
     virtual void ReplicatorUpdate(class json_io & msg, word base, bool initial) {};
+    virtual void ReplicatorStart(class json_io & msg, word base, char * & tmp) {};
 };
 
 class IReplicatorArray {

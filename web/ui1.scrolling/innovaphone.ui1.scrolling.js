@@ -7,7 +7,7 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
     var init = true;
     this.createNode("div", style, null, cl);
     var that = this;
-    if (navigator.platform.startsWith("Win") && (!("WebkitAppearance" in document.documentElement.style) || navigator.appVersion.indexOf("Edge") != -1)) {
+    if (navigator.platform.startsWith("Win") && !innovaphone.ui1.lib.browser.webkit) {
         var bars = this.container;
         if (!width) width = 8;
         if (!color) color = "red";
@@ -55,6 +55,7 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         this.container.addEventListener("scroll", onScrollX);
         this.container.style.overflowX = mx == -1 ? "hidden" : "auto";
         this.container.style.overflowY = my == -1 ? "hidden" : "auto";
+        this.container.style.overflowScrolling = this.container.style.WebkitOverflowScrolling = "touch";
         var content = this.add(new innovaphone.ui1.Div(cstyle));
 
         content.container.style.boxSizing = "border-box";
@@ -67,8 +68,8 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         this.onScroll = null;
         this.setScrollTop = function (top) { this.container.scrollTop = top; }
         this.getScrollTop = function () { return this.container.scrollTop; }
-        this.setScrollBottom = function (bottom) { this.container.scrollTop = content.container.offsetHeight - bottom};
-        this.getScrollBottom = function () { return content.container.offsetHeight - this.container.scrollTop };
+        this.setScrollBottom = function (bottom) { this.container.scrollTop = content.container.offsetHeight - this.container.clientHeight - bottom };
+        this.getScrollBottom = function () { return content.container.offsetHeight - this.container.clientHeight - this.container.scrollTop };
         this.scrollToBottom = function () { if (content.container.offsetHeight > this.container.offsetHeight) this.container.scrollTop = content.container.offsetHeight - this.container.clientHeight; };
         this.isScrollBottom = function () {  return (this.container.scrollTop == (content.container.offsetHeight - this.container.clientHeight)); };
         this.isScrollTop = function () { return (this.container.scrollTop == 0); };
@@ -89,7 +90,7 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         var x = sizer.container.offsetWidth ? sizer.container.offsetWidth : inner.container.scrollWidth;
         var y = sizer.container.offsetHeight ? sizer.container.offsetHeight : inner.container.scrollHeight;
         //console.log("sizer=" + sizer.container.offsetWidth + "x" + sizer.container.offsetHeight + " x=" + x + " y=" + y);
-        if (!bars.offsetWidth || !bars.offsetHeight) return;
+        //if (!bars.offsetWidth || !bars.offsetHeight) return;
         if (content.container.offsetWidth && content.container.offsetWidth > x) x = content.container.offsetWidth;
         if (content.container.offsetHeight && content.container.offsetHeight > y) y = content.container.offsetHeight;
         if (my > 0) bars.style.height = Math.min(y + (x > mx ? width : 0), my) + "px";

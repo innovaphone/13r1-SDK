@@ -3,15 +3,17 @@
 
 -include $(OUTDIR)/dep/*.dep
 
-WEBSRCLIST = $(subst $(APPWEBPATH)/,,$(STARTHTMLS)) $(subst $(APPWEBPATH)/,,$(APPWEBSRC)) $(WEBSRC)
+WEBSRCLIST_NOZIP = $(subst $(APPWEBPATH)/,,$(STARTHTMLS)) $(subst $(APPWEBPATH)/,,$(APPWEBSRC_NOZIP))
+WEBSRCLIST_ZIP = $(subst $(APPWEBPATH)/,,$(APPWEBSRC_ZIP)) $(WEBSRC)
 
 $(OUTDIR)/obj/innovaphone.manifest: $(STARTHTMLS) $(APPWEBSRC)
 	echo ^<!-- innovaphone.manifest >$(OUTDIR)/obj/innovaphone.manifest
 	echo { >>$(OUTDIR)/obj/innovaphone.manifest
 	echo "files": >>$(OUTDIR)/obj/innovaphone.manifest
 	echo [ >>$(OUTDIR)/obj/innovaphone.manifest
-	echo "$(firstword $(WEBSRCLIST))">>$(OUTDIR)/obj/innovaphone.manifest
-	$(foreach webfile,$(wordlist 2,$(words $(WEBSRCLIST)),$(WEBSRCLIST)),echo ,"$(webfile)">>$(OUTDIR)/obj/innovaphone.manifest &)
+	echo "$(firstword $(WEBSRCLIST_NOZIP))">>$(OUTDIR)/obj/innovaphone.manifest
+	$(foreach webfile,$(wordlist 2,$(words $(WEBSRCLIST_NOZIP)),$(WEBSRCLIST_NOZIP)),echo ,"$(webfile)">>$(OUTDIR)/obj/innovaphone.manifest &)
+	$(foreach webfile,$(WEBSRCLIST_ZIP),echo ,"$(webfile)|gzip">>$(OUTDIR)/obj/innovaphone.manifest &)
 	echo ] >>$(OUTDIR)/obj/innovaphone.manifest
 	echo } >>$(OUTDIR)/obj/innovaphone.manifest
 	echo --^> >>$(OUTDIR)/obj/innovaphone.manifest

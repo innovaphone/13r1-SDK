@@ -1,6 +1,6 @@
 
 WEBSRC += \
-	web/countries/innovaphone.config.js
+	web/config/innovaphone.config.js
 
 $(OUTDIR)/obj/config_httpdata.cpp: $(IP_SRC)/web/config/config.mak $(IP_SRC)/web/config/*.js 
 		$(IP_SRC)/exe/httpfiles $(HTTPFILES-FLAGS) -d $(IP_SRC) -o $(OUTDIR)/obj/config_httpdata.cpp \

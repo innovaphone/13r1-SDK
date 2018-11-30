@@ -21,6 +21,7 @@ class URinger {
 public:
     virtual void RingerList(void * context) = 0;
     virtual void RingtoneList(void * context) = 0;
+    virtual void NotificationToneList(void * context) = 0;
     virtual void CloseRingerComplete() = 0;
 };
 
@@ -44,6 +45,12 @@ public:
     virtual const char * RingtoneIdent(unsigned ringtoneNumber) = 0;
     virtual void RingtoneStart(const char *deviceId, enum RingerDeviceMode deviceMode, const char *ident) = 0;
     virtual void RingtoneStop(const char *deviceId) = 0;
+
+    virtual void QueryNotificationTones(void * context) = 0;
+    virtual unsigned NotificationToneCount() = 0;
+    virtual const char * NotificationToneTitle(unsigned ringtoneNumber) = 0;
+    virtual const char * NotificationToneIdent(unsigned ringtoneNumber) = 0;
+    virtual void NotificationTonePlay(const char *deviceId, enum RingerDeviceMode deviceMode, const char *ident) = 0;
 
     virtual void Close() = 0; 
 };

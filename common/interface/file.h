@@ -10,6 +10,7 @@ public:
     static class IFileWrite * OpenWriteFile(const char * fileName, bool append, class IInstanceLog * log);
     static class IFileRead * OpenReadFile(const char * fileName, class IInstanceLog * log);
     static class IDirectory * OpenDirectory(const char * directoryPath, class IInstanceLog * log);
+    static class IElfBinary * OpenElfBinary(const char * bin, class IInstanceLog * log);
     static bool ReadWholeFile(const char * filename, char * readBuffer, size_t size, class IInstanceLog * log);
     static bool WriteWholeFile(const char * filename, const char * writeBuffer, size_t size, class IInstanceLog * log);
     static bool ScanFile(class IInstanceLog * log, const char * filename, const char * format, ...);
@@ -59,5 +60,21 @@ public:
     virtual ~IDirectoryEntry() {};
     virtual const char * GetName() const = 0;
     virtual bool IsFile() const = 0;
+};
+
+typedef enum {
+    ELF_UNKOWN,
+    ELF_ARM,
+    ELF_X86_64
+} elf_architecture_t;
+
+class IElfBinary {
+public:
+    virtual ~IElfBinary(){};
+    virtual bool IsOpen() = 0;
+    virtual bool IsElfBinary() = 0;
+    virtual bool IsExecutable() = 0;
+    virtual elf_architecture_t GetArchitecture() = 0;
+    virtual bool Close() = 0;
 };
 

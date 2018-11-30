@@ -16,14 +16,14 @@ public:
 };
 
 class LocalAddresses {
-    public:
-        istd::list <class LocalAddr> localAddresses;
+public:
+    istd::list <class LocalAddr> localAddresses;
 
-        ~LocalAddresses() {
-            while(this->localAddresses.front()) {
-                delete this->localAddresses.front();
-            }
-       }
+    ~LocalAddresses() {
+        while(this->localAddresses.front()) {
+            delete this->localAddresses.front();
+        }
+    }
 };
 
 class INetwork {

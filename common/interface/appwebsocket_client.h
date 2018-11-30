@@ -17,6 +17,7 @@ public:
     virtual ~IAppWebsocketClient() {};
 
     virtual void Connect(const char * websocketUri, const char * password, const char * app, const char * domain, const char * sip, const char * guid, const char * dn) = 0;
+    virtual void Connect(const char * websocketUri, const char * app, class IAppWebsocketAuthenticator * authenticator) = 0;
     virtual void MessageComplete() = 0;
     virtual void MessageSend(class json_io & msg, char * buffer) = 0;
     virtual void MessageSendText(const char * buffer) = 0;
@@ -25,8 +26,8 @@ public:
 
 class UAppWebsocketClient {
 public:
-    virtual void AppWebsocketClientConnectComplete(class AppWebsocketClient * appWebsocketClient) = 0;
-    virtual void AppWebsocketClientMessage(class AppWebsocketClient * appWebsocketClient, class json_io & msg, word base, const char * mt, const char * src) = 0;
-    virtual void AppWebsocketClientSendResult(class AppWebsocketClient * appWebsocketClient) = 0;
-    virtual void AppWebsocketClientClosed(class AppWebsocketClient * appWebsocketClient) = 0;
+    virtual void AppWebsocketClientConnectComplete(class IAppWebsocketClient * appWebsocketClient) = 0;
+    virtual void AppWebsocketClientMessage(class IAppWebsocketClient * appWebsocketClient, class json_io & msg, word base, const char * mt, const char * src) = 0;
+    virtual void AppWebsocketClientSendResult(class IAppWebsocketClient * appWebsocketClient) = 0;
+    virtual void AppWebsocketClientClosed(class IAppWebsocketClient * appWebsocketClient) = 0;
 };

@@ -55,7 +55,7 @@ class AppUpdate : public istd::listElement<AppUpdate> {
     istd::list<AppUpdatesFilterY> * filters;
 
 public:
-    AppUpdate(istd::list<AppUpdatesFilterY> & filters, class btree * & usersTree, const char * sip = 0);
+    AppUpdate(class AppUpdatesFilters & filters, const char * sip = 0);
     virtual ~AppUpdate();
 };
 
@@ -128,7 +128,15 @@ public:
     const char * GetUser() { return user ? user->sip : 0; };
 };
 
-template <class U> class AppUpdatesFilters;
+class AppUpdatesFilters {
+public:
+    AppUpdatesFilters() {
+        usersTree = 0;
+    }
+    istd::list<AppUpdatesFilterY> list;
+    class btree * usersTree;
+};
+
 template <class U> class AppUpdatesFilter : public AppUpdatesFilterY {
     bool Test(class AppUpdate * update) { return Test((U *)update); };
     void Send(class AppUpdate * update) { Send((U *)update); };
@@ -136,16 +144,7 @@ template <class U> class AppUpdatesFilter : public AppUpdatesFilterY {
     virtual void Send(U * update) = 0;
 
 public:
-    AppUpdatesFilter(AppUpdatesFilters<U> & filters, class AppUpdatesSession * session, const char * src, const char * sip = 0) : AppUpdatesFilterY(filters.list, filters.usersTree, session, src, sip) { };
+    AppUpdatesFilter(AppUpdatesFilters & filters, class AppUpdatesSession * session, const char * src, const char * sip = 0) : AppUpdatesFilterY(filters.list, filters.usersTree, session, src, sip) { };
     virtual ~AppUpdatesFilter() {};
-};
-
-template <class U> class AppUpdatesFilters {
-public:
-    AppUpdatesFilters() {
-        usersTree = 0;
-    }
-    istd::list<AppUpdatesFilterY> list;
-    class btree * usersTree;
 };
 

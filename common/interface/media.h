@@ -4,6 +4,22 @@
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
+#define DEFAULT_MTU            1292
+#define ETH_HEADER_LEN         14
+#define IP_HEADER_LEN          20
+#define UDP_HEADER_LEN          8
+#define RTP_HEADER_LEN         12
+#define RTCP_HEADER_LEN         8
+#define RTP_H264_HEADER_LEN     2
+#define TURN_HEADER_LEN         4
+#define TURN_PADDING_LEN        3
+#define SRTP_PADDING_LEN        3
+#define SRTP_AUTH_LEN          10
+#define TURN_HEADER_LEN         4
+#define TURN_PADDING_LEN        3
+#define DTLS_HEADER_DATA_LEN   13
+#define SCTP_HEADER_DATA_LEN   28
+
 class IMediaProvider * CreateMediaProvider();
 
 class IMediaProvider {
@@ -61,6 +77,12 @@ enum MediaType {
     WEBM_VP8_CONTAINER,
     WEBM_VP9_CONTAINER,
     APPSHARING_CONTAINER,
+};
+
+enum ConnectionType {
+    REMOTE_RTP = 0,
+    LOCAL_WEBCAM_WEBRTC,
+    LOCAL_REMOTE_WEBRTC,
 };
 
 #define CoderMediaType(c) (((c) < ((int) VideoCoder::H264)) ? MediaType::AUDIO : (((c) < ((int) AppSharingCoder::JRFB)) ? MediaType::VIDEO : MediaType::APPSHARING))
@@ -328,7 +350,7 @@ public:
     virtual void ChannelClosed(class IAudioIoChannel *audioIoChannel) = 0;
     virtual void ChannelDestroyed(class IAudioIoChannel *audioIoChannel) = 0;
 
-    virtual void Close() = 0;
+    virtual void Close(class UAudioIo * user) = 0;
 };
 
 class UAudioIo {
@@ -348,7 +370,7 @@ public:
     static unsigned AvailableCoderCount();
     static enum VideoCoder AvailableCoder(unsigned coderNumber);
     virtual ~IVideoIoChannel() {};
-    virtual void Initialize(void * context, const char * channelId, enum VideoCoder coder) = 0;
+    virtual void Initialize(void * context, const char * channelId, enum VideoCoder coder, ConnectionType connType) = 0;
 };
 
 class IVideoIo : public IDeviceIo {
@@ -360,6 +382,7 @@ public:
     virtual void RemoveLocalContainer(void * container, enum MediaType coder) = 0;
     virtual void AddRemoteContainer(void * context, void * container, const char * channelId, enum MediaType coder) = 0;
     virtual void RemoveRemoteContainer(void * container, enum MediaType coder) = 0;
+    virtual void StartVideoEncoder(void * context, const char * channelId, int codec) = 0;
     virtual void Close() = 0;
 };
 
@@ -394,6 +417,7 @@ public:
     virtual void UnsubscribeApplications() = 0;
     virtual void ShareApplication(unsigned int id) = 0;
     virtual void UnshareApplication(unsigned int id) = 0;
+    virtual void UnshareAllApplications() = 0;
     virtual void GiveControlToUser(unsigned int userId) = 0;
     virtual void RemoveControlFromUser(unsigned int userId) = 0;
     virtual void AddRemoteContainer(void * context, void * container, const char * channelId, enum MediaType coder) = 0;
@@ -498,12 +522,13 @@ public:
     virtual void Close() = 0;
     virtual const char * GetWebcamId() = 0;
     virtual const char * GetWebcamName() = 0;
+    virtual void FullIntraRequest() {};
 };
 
 class UWebcam {
 public:
     virtual void WebcamVideoFormat(class IWebcam * const webcam, const struct VideoFrameFormat * format) = 0;
-    virtual void WebcamSample(class IWebcam * const webcam, void * buf, int len, dword timestamp, dword duration, const struct VideoFrameFormat * format) = 0;
+    virtual void WebcamSample(class IWebcam * const webcam, const void * buf, int len, dword timestamp, dword duration, const struct VideoFrameFormat * format) = 0;
 };
 
 class IWebcamProvider {
@@ -528,7 +553,7 @@ public:
     static class IMediaEncoder * Create(class IIoMux * const iomux, class UMediaEncoder * const user, class IInstanceLog * log, enum VideoCoder coder);
     virtual ~IMediaEncoder() {};
     virtual bool Initialize(struct VideoFrameFormat * const format) = 0;
-    virtual void Encode(void * buf, int len, dword timestamp, dword duration, const struct VideoFrameFormat * f) = 0;
+    virtual void Encode(const void * buf, int len, dword timestamp, dword duration, const struct VideoFrameFormat * f) = 0;
     virtual bool FullIntraRequest() = 0;
     virtual void Close() = 0;
 };
@@ -536,7 +561,7 @@ public:
 class UMediaEncoder
 {
 public:
-    virtual void EncodeResult(class IMediaEncoder * encoder, void * buf, int len, dword timestamp, dword duration) = 0;
+    virtual void EncodeResult(class IMediaEncoder * encoder, const void * buf, int len, dword timestamp, dword duration) = 0;
     virtual void MediaEncoderCloseResult(class IMediaEncoder * encoder) = 0;
 };
 
@@ -545,13 +570,13 @@ class IMediaDecoder
 public:
     static class IMediaDecoder * Create(class IIoMux * const iomux, class UMediaDecoder * const user, class IInstanceLog * log, enum VideoCoder coder);
     virtual ~IMediaDecoder() {};
-    virtual void Decode(void *buf, int len, dword timestamp) = 0;
+    virtual void Decode(const void *buf, int len, dword timestamp) = 0;
     virtual void Close() = 0;
 };
 
 class UMediaDecoder
 {
 public:
-    virtual void DecodeResult(class IMediaDecoder * decoder, void * buf, int len, dword timestamp, dword duration, struct VideoFrameFormat * f) = 0;
+    virtual void DecodeResult(class IMediaDecoder * decoder, const void * buf, int len, dword timestamp, dword duration, struct VideoFrameFormat * f) = 0;
     virtual void MediaDecoderCloseResult(class IMediaDecoder * decoder) = 0;
 };

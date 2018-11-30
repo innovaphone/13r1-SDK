@@ -179,7 +179,7 @@ public:
     static word unicode_to_xml(const word * buffer, word length, char * out);
     static word xml_packet_to_str(char * buffer, class packet * data);
     static word xml_packet_to_latin1(char * buffer, class packet * data);
-    static word xml_to_str(char * buffer, const char * in);
+    static word xml_to_str(char * buffer, const char * in, word in_len = 65535);
     static word xml_to_latin1(char * buffer, const char * in, bool latin1);
     static class packet * str_packet_to_xml_packet(class packet * data);
     static class packet * latin1_packet_to_xml_packet(class packet * data);

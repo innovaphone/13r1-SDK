@@ -8,7 +8,7 @@ innovaphone.ui.Anchor = innovaphone.ui.Anchor || (function () {
         if (!container) {
             container = document.createElement("span");
         }
-
+        
         if (left == undefined && top == undefined) {
             container.style.position = "relative";
         }
@@ -65,7 +65,16 @@ innovaphone.ui.Anchor = innovaphone.ui.Anchor || (function () {
         }
 
         this.setTarget = function (target) {
-            anchor.target = target;
+            if (target) {
+                anchor.target = target;
+            }
+            else {
+                anchor.removeAttribute("target");
+            }
+        }
+
+        this.setDownload = function (download) {
+            anchor.setAttribute("download", download);
         }
 
         this.setOnClick = function (onClick) {

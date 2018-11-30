@@ -19,6 +19,8 @@
 
 #define DAV_DEPTH_INFINITY          0xffffffff
 
+class WebdavLock;
+
 class UWebdavNotification 
 {
 public:
@@ -31,41 +33,10 @@ class WebdavNotification : public istd::listElement < WebdavNotification >
 {
 public:
     class UWebdavNotification * webdavNotification;
-    const char * appName;
-    WebdavNotification(class UWebdavNotification * notification, const char * appName)
-    {
-        if (notification) this->webdavNotification = notification;
-        else webdavNotification = 0;
-        if (appName) this->appName = _strdup(appName);
-        else appName = 0;
-    }
-    ~WebdavNotification()
-    {
-        if (this->appName) delete this->appName;
-    }
-};
-
-class WebdavLock : public istd::listElement<WebdavLock> {
-public:
-    bool write;         // type
-    bool exclusive;     // scope
-    size_t timeout;
-    size_t expires;
-    const char * owner;
-    const char * owner_href;
-    const char * token;
-    const char * resource;
-
-    ~WebdavLock() {
-        if (owner) delete owner; 
-        owner = 0;
-        if (owner_href) delete owner_href; 
-        owner_href = 0;
-        if (token) delete token; 
-        token = 0;
-        if (resource) delete resource; 
-        resource = 0;
-    }
+    char * appName;
+    WebdavNotification(class UWebdavNotification * notification, const char * appName);
+    virtual ~WebdavNotification();
+    
 };
 
 class UWebdavService {
@@ -119,6 +90,9 @@ class WebdavService : public UTask {
     class WebdavLock * LockLookup(const char * resource);
     class WebdavLock * LockLookup(const char * resource, const char * token);
 
+    void CloseComplete(class UWebdavServiceTask * task);
+    
+
 public:
     WebdavService(class UWebdavService * service, class IDbFiles * dbFiles, class IDatabase * database, class IInstanceLog * const log, const char * webserverPath, const char * rootFolder = 0);
     virtual ~WebdavService();
@@ -128,7 +102,6 @@ public:
     void Start();
     void RegisterforNotification(class UWebdavNotification * notification, const char * appName);
     void DeregisterforNotification(class UWebdavNotification * notification);
-    void CloseComplete(class UWebdavServiceTask * task);
     void Close();
 };
 
@@ -158,7 +131,7 @@ public:
 
     void Cancel(wsr_cancel_type_t type);
     void Send(const void * data, size_t len);
-    void SetTransferInfo(wsr_type_t resourceType, size_t dataSize);
+    void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, const char * filename);
     void Close() override;
 };
 
@@ -300,33 +273,6 @@ public:
     char * GetPath() { return path ? path : 0; }
 };
 
-
-
-class WebdavServicePost : public UTask, public UWebserverPost {
-
-    // UTask
-    void TaskComplete(class ITask * const task) override;
-    void TaskFailed(class ITask * const task) override;
-    void TaskProgress(class ITask * const task, dword progress) override;
-
-    // UWebserverPost
-    void WebserverPostRequestAcceptComplete(IWebserverPost * const webserverPost) override;
-    void WebserverPostRecvResult(IWebserverPost * const webserverPost, void * buffer, size_t len) override;
-    void WebserverPostCloseComplete(IWebserverPost * const webserverPost) override;
-
-    class WebdavService * webdavservice;
-    class IWebserverPost * webserverpost;
-    ulong64 id;
-    bool pathinfocalled;
-    char * path;
-    class IDbFilesPut * filespost;
-    class IDbFilesPathInfo * pathinfo;
-    size_t dataSize;
-
-public:
-    WebdavServicePost(class WebdavService * webdavservice, char * path, size_t dataSize);
-    ~WebdavServicePost();
-};
 
 //**********************************************************************************************************//
 //************************************** Propfind Requests *************************************************//
@@ -533,7 +479,7 @@ public:
 };
 
 //**********************************************************************************************************//
-//************************************** MkCol Requests ******************************************************//
+//************************************** MkCol Requests ****************************************************//
 //**********************************************************************************************************//
 
 
@@ -617,53 +563,6 @@ public:
     
     class WebdavService * GetWebdavService(){ return webdavservice ? webdavservice : 0; }
     char * GetPath() { return path ? path : 0; }
-};
-
-
-enum CopyStates
-{
-    COPYPATHREQUESTSOURCE = 0,
-    COPYPATHREQUESTDESTINATION,
-    COPYWRITETODESTINATION
-};
-
-class WebdavServiceCopy : public UTask, public UWebserverCopy {
-
-    // UTask
-    void TaskComplete(class ITask * const task) override;
-    void TaskFailed(class ITask * const task) override;
-    void TaskProgress(class ITask * const task, dword progress) override;
-
-    // UWebserverPost
-    void WebserverCopyRequestAcceptComplete(IWebserverCopy * const webserverCopy) override;
-    void WebserverCopySendResult(IWebserverCopy * const webserverCopy) override;
-    void WebserverCopyCloseComplete(IWebserverCopy * const webserverCopy) override;
-
-    class WebdavService * webdavservice;
-    class IWebserverCopy * webservercopy;
-    ulong64 id;
-    char * path;
-    char * destination;
-    char * filename;
-    const char * host;
-    dword depth;
-    bool overwrite;
-    bool iscollection;
-    class IDbFilesPut * filesput;
-    class IDbFilesList * fileslist;
-    class IDbFilesPathInfo * srcpathinfo;
-    class IDbFilesPathInfo * dstpathinfo;
-    size_t dataSize;
-    unsigned state;
-
-    dword GetDepthHeader();
-    const char * GetDestinationHeader();
-    const char * GetHostHeader();
-    bool GetOverwriteHeader();
-
-public:
-    WebdavServiceCopy(class WebdavService * webdavservice, char * path, size_t dataSize);
-    ~WebdavServiceCopy();
 };
 
 //**********************************************************************************************************//
@@ -761,14 +660,26 @@ public:
     ~WebdavServiceOptions();
 };
 
-
+class WebdavLock : public istd::listElement<WebdavLock> {
+public:
+    bool write;         // type
+    bool exclusive;     // scope
+    size_t timeout;
+    size_t expires;
+    const char * owner;
+    const char * owner_href;
+    const char * token;
+    const char * resource;
+    WebdavLock();
+    ~WebdavLock();
+};
 
 class WebdavServiceLock : public UWebserverLock {
     void WebserverLockRequestAcceptComplete(IWebserverLock * const webserverLock) override;
     void WebserverLockSendResult(IWebserverLock * const webserverLock) override;
     void WebserverLockCloseComplete(IWebserverLock * const webserverLock) override;
     void WebserverLockRecvResult(IWebserverLock * const webserverLock, void * buffer, size_t len) override;
-    void * WebserverLockRecvBuffer(size_t len);
+    void * WebserverLockRecvBuffer(size_t len) override;
     void WebserverLockRecvCanceled(IWebserverLock * const webserverLock, void * buffer) override;
     class WebdavService * webdavservice;
     class IWebserverLock * webserverLock;

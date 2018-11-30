@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>database</title>
-    <link rel="stylesheet" href="../../docu/innovaphone.doc.css" type="text/css" />
+    <link rel="stylesheet" href="../../web/doc/innovaphone.doc.css" type="text/css" />
 </head>
 
 <body>
@@ -277,6 +277,9 @@
         <dt>void SetParam(dword idx, bool value)</dt>
         <dd>
         </dd>
+        <dt>void SetParam(dword idx, double value)</dt>
+        <dd>
+        </dd>
         <dt>void SetParam(dword idx, const char * value)</dt>
         <dd>
             Set the parameter at index idx to the given value.
@@ -308,6 +311,9 @@
         <dd>
         </dd>
         <dt>void SetParam(dword idx, bool * value)</dt>
+        <dd>
+        </dd>
+        <dt>void SetParam(dword idx, double * value)</dt>
         <dd>
             Same as the above versions, so with the difference that they will accept
             a pointer instead of the direct value.
@@ -423,12 +429,12 @@
         True will be returned if the value of the field is 1, t or true (case insensitiv).
         </dd>
 
-        <dt>float GetFloatValue(const char * columnName)</dt>
+        <dt>double GetDoubleValue(const char * columnName)</dt>
         <dd>
         </dd>
-        <dt>float GetFloatValue(int column)</dt>
+        <dt>double GetDoubleValue(int column)</dt>
         <dd>
-            Return the value of the field as float.
+            Return the value of the field as double.
         </dd>
 
         <dt>const char * GetStringValue(const char * columnName)</dt>

@@ -62,6 +62,9 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         timeout = TIMEOUT_MIN;
         console.log("opened " + ws.url + " location " + location.href);
         state = states.OPENED;
+        if (instance.checkBuild) {
+            send({ mt: "CheckBuild", url: location.href });
+        }
         send({ mt: "AppChallenge" });
     }
 
@@ -81,7 +84,6 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     if (obj.ok) {
                         state = states.CONNECTED;
                         instance.onconnected(domain, user, dn, obj.domain);
-                        if (instance.checkBuild) send({ mt: "CheckBuild", url: location.href });
                     }
                     break;
                 case "CheckBuildResult":
@@ -120,7 +122,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                 console.log(app + ": AppLogin(" + obj.sip + "@" + obj.domain + ", guid=" + obj.guid + ", dn=" + obj.dn + ", app=" + obj.app + ")");
                 if (app == obj.pbxObj) login(obj);
                 else delete obj.key;
-                instance.login = obj;
+                instance.logindata = obj;
             }
             else {
                 instance.onFromPBX(obj);
@@ -256,6 +258,14 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     }
     this.send = function (message) {
         if (state == states.CONNECTED) send(message);
+    }
+    this.sendSrc = function (message, result, obj) {
+        var src = new instance.Src(function (m) {
+            src.close();
+            result(m, src.obj);
+        });
+        src.obj = obj;
+        src.send(message);
     }
     this.close = function (error) {
         close(error);

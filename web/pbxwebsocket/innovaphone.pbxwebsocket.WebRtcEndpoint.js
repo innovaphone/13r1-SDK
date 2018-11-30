@@ -221,6 +221,9 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                                 }
                             }
                         }
+                        else if (line.substring(0, 6) == "a=mid:") {
+                            mi.mid = line.substr(6);
+                        }
                         else if (line == "a=recvonly") {
                             mi.direction = "recvonly";
                         }
@@ -272,6 +275,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                 }
                 if (add) {
                     result += mi.text;
+                    if (!mi.mid) result += "a=mid:" + mi.type + "\n";
                     // Firefox 55 needs a=setup for DTLS-SRTP (RFC 5763)
                     if (mi.text.indexOf("a=setup") == -1) {
                         result += "a=setup:actpass\n";
@@ -292,6 +296,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                 for (var j = 0; j < answerMediaInfoLen; j++) {
                     if (mediaInfo[j].type == offer.mediaInfo[i].type) {
                         result += mediaInfo[j].text;
+                        if (!mediaInfo[j].mid && offer.mediaInfo[i].mid) result += "a=mid:" + offer.mediaInfo[i].mid + "\n";
                         found = true;
                         break;
                     }
@@ -311,6 +316,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                         }
                     }
                     result += rtpmaps;
+                    if (offer.mediaInfo[i].mid) result += "\na=mid:" + offer.mediaInfo[i].mid;
                     result += "\na=inactive\n";
                 }
             }
@@ -409,7 +415,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                 peerConnection.onsignalingstatechange = undefined;
                 peerConnection.onnegotiationneeded = undefined;
                 peerConnection.onicecandidate = undefined;
-                peerConnection.onaddstream = undefined;
+                peerConnection.ontrack = undefined;
                 peerConnection = null;
             }
             if (audio) {
@@ -476,7 +482,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                             createAudioTag();
                             localStream = stream;
                             if (onStream) onStream(id, "local", stream);
-                            peerConnection = new PeerConnection({ "iceServers": iceServers, rtcpMuxPolicy: "negotiate" }, { optional: [{ RtpDataChannels: false }] });
+                            peerConnection = new PeerConnection({ "iceServers": iceServers }, { optional: [{ RtpDataChannels: false }] });
                             if (lastMedia && lastMedia.sharing) {
                                 log("create data channel");
                                 // offer data channel
@@ -509,16 +515,16 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                                     }
                                 }
                             }
-                            peerConnection.onaddstream = function (event) {
-                                if (event.stream) {
+                            peerConnection.ontrack = function (event) {
+                                if (event.streams && event.streams.length) {
                                     log("remote stream added");
-                                    remoteStream = event.stream;
-                                    audio.src = window.URL.createObjectURL(remoteStream);
+                                    remoteStream = event.streams[0];
+                                    audio.srcObject = remoteStream;
                                     if (onStream) onStream(id, "remote", remoteStream);
                                 }
                             }
 
-                            peerConnection.addStream(localStream);
+                            localStream.getTracks().forEach(function (track) { peerConnection.addTrack(track, stream); });
                             peerConnection.createOffer(
                                 function (offer) {
                                     log("preliminary offer complete, start gathering candidates");
@@ -582,7 +588,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                             if (onStream) onStream(id, "local", stream);
                             log("create answer");
                             createAudioTag();
-                            peerConnection = new PeerConnection({ "iceServers": iceServers, rtcpMuxPolicy: "negotiate" }, { optional: [{ RtpDataChannels: false }] });
+                            peerConnection = new PeerConnection({ "iceServers": iceServers }, { optional: [{ RtpDataChannels: false }] });
                             if (sigOffer.media.sharing) {
                                 log("create data channel");
                                 dataChannel = peerConnection.createDataChannel(defaultDataChannelLabel, defaultDataChannelOptions);
@@ -624,16 +630,16 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                                     }
                                 }
                             }
-                            peerConnection.onaddstream = function (event) {
-                                if (event.stream) {
+                            peerConnection.ontrack = function (event) {
+                                if (event.streams && event.streams.length) {
                                     log("remote stream added");
-                                    remoteStream = event.stream;
-                                    audio.src = window.URL.createObjectURL(remoteStream);
+                                    remoteStream = event.streams[0];
+                                    audio.srcObject = remoteStream;
                                     if (onStream) onStream(id, "remote", remoteStream);
                                 }
                             }
 
-                            peerConnection.addStream(localStream);
+                            localStream.getTracks().forEach(function (track) { peerConnection.addTrack(track, stream); });
                             var normalizedOffer = sigOffer.createNormalizedOffer();
                             log("normalized offer:\n" + normalizedOffer);
                             var description = new SessionDescription({ "type": "offer", "sdp": normalizedOffer });
@@ -1051,7 +1057,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                     for (var i = 0; i < len; i++) {
                         log("start local video playback");
                         localVideo[i].autoplay = true;
-                        localVideo[i].src = window.URL.createObjectURL(stream);
+                        localVideo[i].srcObject = stream;
                     }
                 }
                 else if (type == "remote") {
@@ -1061,7 +1067,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                     for (var i = 0; i < len; i++) {
                         log("start remote video playback");
                         remoteVideo[i].autoplay = true;
-                        remoteVideo[i].src = window.URL.createObjectURL(stream);
+                        remoteVideo[i].srcObject = stream;
                     }
                 }
             }
@@ -1142,7 +1148,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                 if (localVideoStream) {
                     log("start local video playback");
                     local.autoplay = true;
-                    local.src = window.URL.createObjectURL(localVideoStream);
+                    local.srcObject = localVideoStream;
                 }
             }
             if (remote) {
@@ -1151,7 +1157,7 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
                 if (remoteVideoStream) {
                     log("start remote video playback");
                     remote.autoplay = true;
-                    remote.src = window.URL.createObjectURL(remoteVideoStream);
+                    remote.srcObject = remoteVideoStream;
                 }
             }
         }

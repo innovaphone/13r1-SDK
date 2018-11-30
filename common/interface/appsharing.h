@@ -6,13 +6,18 @@
 
 enum MessageType {
     DATA_MSG = 0,
+    DATA_MSG_256 = 1,
+    PLAIN_DATA_MSG = 2,
+    EQUAL_DATA_MSG = 3,
+    CLIPBOARD_DATA = 4,
     PALETTE_MSG = 7,
     DUMMY_MSG,
     NEW_PICTURE,
     STOP_SHARING,
     SEND_NAME,
     SEND_MOUSE_TYPE,
-// Messages only intended for the an specific sender
+    SEND_APP_NAME,
+    // Messages only intended for the an specific sender
     SEQ_LOST = 128,
     CONFIRM_SEQ,
     REQ_NEW_PIC,
@@ -22,6 +27,8 @@ enum MessageType {
     SEND_ID_WEB,
     REQUEST_NAME,
     DUMMY_MSG_RX,
+    ACTIVE_SENDER,
+    NO_ACTIVE_SENDER,
     LBUTTONDOWN = 192,
     LBUTTONUP,
     LBUTTONDOWNDBLCLK,
@@ -36,6 +43,7 @@ enum MessageType {
     KEYPRESSED_UP,
 // Used by Keyboard hook
     STOP_HOOK = 228,
+    STOP_HOOK_THREAD,
 // Used by the PBX, dummy_msg not useful here, a new app would be created!
     DISCARD_MSG = 254
 };

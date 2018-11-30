@@ -48,7 +48,7 @@ innovaphone.ui.Error = innovaphone.ui.Error || (function () {
             errorText.style.verticalAlign = "middle";
             errorText.style.whiteSpace = "normal";
             errorText.style.wordWrap = "break-word";
-            errorText.innerHTML = errorMsg + "<br>(0x" + errorCode.toString(16) + ")";
+            errorText.innerHTML = errorCode ? errorMsg + "<br>(0x" + errorCode.toString(16) + ")" : errorMsg;
             innovaphone.lib.addClass(errorText, "ijs-error-text");
 
             errorInner.appendChild(errorImg);

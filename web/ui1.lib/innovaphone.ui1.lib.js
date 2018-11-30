@@ -1,4 +1,6 @@
 
+/// <reference path="~/sdk/web/lib1/innovaphone.lib1.js" />
+
 var innovaphone = innovaphone || {};
 innovaphone.ui1 = innovaphone.ui1 || {};
 
@@ -48,7 +50,7 @@ innovaphone.ui1.nodePrototype = {
 
     addEvent: function (type, handler, obj) {
         this.events = this.events || [];
-        this.events.push(new this.Listener(this.container, type, handler, obj))
+        this.events.push(new this.Listener(this.container, type, handler, obj === undefined ? this : obj));
         return this;
     },
 
@@ -72,6 +74,10 @@ innovaphone.ui1.nodePrototype = {
 
     remClass: function (className) {
         this.container.classList.remove(className);
+    },
+
+    hasClass: function (className) {
+        return this.container.classList.contains(className);
     },
 
     addTranslation: function (languages, id, property, args) {
@@ -103,7 +109,15 @@ innovaphone.ui1.nodePrototype = {
     },
 
     createNode: function (type, style, content, cl) {
-        if (type == "body") this.container = document.body;
+        if (type == "body") {
+            this.container = document.body;
+            this.container.addEventListener("dragover", function (e) {
+                e = e || event;
+                e.stopPropagation();
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "none";
+            });
+        }
         else this.container = document.createElement(type);
         if (style) this.container.setAttribute("style", style);
         if (content) {
@@ -115,7 +129,8 @@ innovaphone.ui1.nodePrototype = {
     },
 
     testId: function (id) {
-        this.container.setAttribute("id", "test-" + id);
+        if (id) this.container.setAttribute("id", "test-" + id);
+        else this.container.removeAttribute("id");
         return this;
     }
 }
@@ -144,9 +159,10 @@ innovaphone.ui1.Input = innovaphone.ui1.Input || function (style, value, placeHo
         this.container.setAttribute("type", type);
     }
 
-    function changed() {
+    function changed(noTrim) {
         if (type == "checkbox") return that.container.checked != originalValue;
-        else return that.container.value != originalValue;
+        else if (type == "password" || noTrim) return that.container.value != originalValue;
+        else return that.container.value.trim() != originalValue;
     }
 
     function setValue(value, overrideOriginalValue) {
@@ -155,16 +171,22 @@ innovaphone.ui1.Input = innovaphone.ui1.Input || function (style, value, placeHo
         if (overrideOriginalValue) {
             originalValue = value;
         }
+        return that;
     }
 
-    function getValue() {
+    function getValue(noTrim) {
         switch (type) {
             case "checkbox":
                 return that.container.checked;
             case "number":
                 if (!that.container.value || that.container.value.length == 0) return 0;
                 else return parseInt(that.container.value);
+            case "password":
+                return that.container.value;
             default:
+                if (!noTrim && that.container.value != that.container.value.trim()) {
+                    that.container.value = that.container.value.trim();
+                }
                 return that.container.value;
         }
     }
@@ -192,13 +214,24 @@ innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, c
     that.setDisabled = function (value) { that.container.disabled = value ? true : false; draw() }
     that.setTooltip = function (value) { that.container.setAttribute("title", value) }
     var box = that.createNode("div", "display:flex;align-items:center;justify-content:center;width:20px;height:20px;" + style, null, cl);
-    that.addEvent("click", function (e) {
+    box.container.tabIndex = "0";
+
+    function click(e) {
         if (!that.container.disabled) {
             that.container.checked = that.container.checked ? false : true;
             draw();
             // call user's "change" handler (if any)
-            var onchange = that.events.find(function (v) { return v.type == "change" && v.handler });
+            var onchange = that.events.find(function (v) { return (v.type == "change") && v.handler });
             if (onchange) onchange.handler(e);
+        }
+    }
+
+    that.addEvent("click", function (e) {
+        click(e);
+    });
+    that.addEvent("keydown", function (e) {
+        if (e.keyCode == innovaphone.lib1.keyCodes.space) {
+            click(e);
         }
     });
     that.setValue(value);
@@ -238,6 +271,27 @@ innovaphone.ui1.CssVariables.prototype = {
 innovaphone.ui1.lib = innovaphone.ui1.lib || (function () {
 
     var isTouch = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0));
+    var browser = getBrowserInfo();
+    browser.touch = isTouch;
+
+    function getBrowserInfo() {
+        var ua = window.navigator.userAgent;
+        if (ua.indexOf("myApps/") != -1) {
+            if (ua.indexOf("Windows") != -1) return { name: "myApps for Windows", webkit: true };
+            if (ua.indexOf("Android") != -1) return { name: "myApps for Android", webkit: true };
+            if (ua.indexOf("iOS") != -1) return { name: "myApps for iOS", webkit: true };
+            if (ua.indexOf("macOS") != -1) return { name: "myApps for macOS", webkit: true };
+            return {};
+        }
+        else if (ua.indexOf("OPR/") != -1 || ua.indexOf("Opera/") != -1) return { name: "Opera", webkit: true };
+        else if (ua.indexOf("Edge/") != -1) return { name: "Edge", webkit: false };
+        else if (ua.indexOf("Firefox/") != -1) return { name: "Firefox", webkit: false };
+        else if (ua.indexOf("Chromium/") != -1) return { name: "Chromium", webkit: true };
+        else if (ua.indexOf("Chrome/") != -1) return { name: "Chrome", webkit: true };
+        else if (ua.indexOf("Safari/") != -1) return { name: "Safari", webkit: true };
+        else if (ua.indexOf("Trident/") != -1) return { name: "Internet Explorer", webkit: false };
+        return {};
+    }
 
     var keyCodes = {
         arrowDown: 40,
@@ -255,6 +309,7 @@ innovaphone.ui1.lib = innovaphone.ui1.lib || (function () {
     };
 
     return {
+        browser: browser,
         isTouch: isTouch,
         keyCodes: keyCodes
     }

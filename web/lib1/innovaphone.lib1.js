@@ -1,5 +1,9 @@
 
-String.prototype.trim = function () { return this.replace(/^\s+|\s+$/g, ''); };
+if (!String.prototype.trim) {
+    String.prototype.trim = function () {
+        return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
 
 String.prototype.insert = function (index, string) {
     if (index > 0)
@@ -71,7 +75,6 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         var xmlReq = new window.XMLHttpRequest();
         if (xmlReq) {
             xmlReq.open("GET", url, funcComplete ? true : false);
-            xmlReq.setRequestHeader("Connection", "close");
             xmlReq.send(null);
             if (funcComplete) {
                 xmlReq.onreadystatechange = function () {
@@ -271,26 +274,30 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
             logins = [],
             currentSrc = 0;
 
-        try {
-            if ((typeof(window.parent.console) != "undefined") && window.parent.console.custom) {
-                window.console = window.parent.console;
+        if (navigator.userAgent.includes("myApps")) {
+            try {
+                if ((typeof(window.parent.console) != "undefined") && window.parent.console.custom) {
+                    window.console = window.parent.console;
+                }
             }
-        }
-        catch (e) {
+            catch (e) {
+            }
         }
         start.lang = (navigator.language || "en").split("-")[0].toLowerCase();
         start.scheme = "dark";
         start.args = {};
+        start.margs = {};
         start.apis = {};
         start.onapiupdate = onapiupdate;
         start.onlangchanged = new Event(start);
         start.onschemechanged = new Event(start);
         start.onargschanged = new Event(start);
+        start.onmenustatechanged = new Event(start);
         start.postClientMessage = function (obj) {
             window.parent.postMessage(JSON.stringify(obj), "*");
         };
-        start.show = function () {
-            start.postClientMessage({ mt: "Action", type: "ShowApp" });
+        start.show = function (value) {
+            start.postClientMessage({ mt: "Action", type: "ShowApp", value: value });
         };
         start.close = function () {
             start.postClientMessage({ mt: "Action", type: "CloseApp" });
@@ -306,6 +313,12 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         };
         start.finishActivity = function () {
             start.postClientMessage({ mt: "Action", type: "FinishActivity" });
+        };
+        start.setMenuState = function (val) {
+            start.postClientMessage({ mt: "SetMenuState", value: val });
+        };
+        start.setColor = function (val) {
+            start.postClientMessage({ mt: "SetColor", value: val });
         };
         start.provideApi = function (api) {
             return new (function (api) {
@@ -330,6 +343,14 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                 this.onupdate = new Event(this);
                 this.onmessage = new Event(this);
                 this.send = function (msg, provider, src, title) { start.postClientMessage({ mt: "ApiRequest", api: api, provider: provider, src: src, title: title, msg: msg }); }
+                this.sendSrc = function (message, provider, result, obj) {
+                    var src = new that.Src(function (m) {
+                        src.close();
+                        result(m, src.obj);
+                    });
+                    src.obj = obj;
+                    src.send(message, provider);
+                }
 
                 function update() {
                     var newModel = start.apis[api] || {};
@@ -516,6 +537,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                     case "ChannelMessage":
                         onchannelmessage.notify(obj);
                         break;
+                    case "SetMenuState":
+                        start.onmenustatechanged.notify(obj.value);
+                        break;
                     case "getLogin":
                         logins.push(e.source);
                         (parent ? parent : opener).postMessage(e.data, "*");
@@ -545,11 +569,15 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
             else if (argname == "name") {
                 start.name = value;
             }
+            else if (argname == "url") {
+                start.url = value;
+            }
             else {
-                start.args[argname] = value;
+                if (!start.args[argname]) start.args[argname] = value;
+                (start.margs[argname] = start.margs[argname] || []).push(value);
             }
         }
-        start.url = location.href;
+        start.url = start.url || location.href;
         start.url = start.url.slice(0, start.url.search(".htm"));
         start.url = start.url.slice(0, start.url.lastIndexOf("/"));
         start.url = start.url.replace("http", "ws");

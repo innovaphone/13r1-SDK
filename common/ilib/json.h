@@ -88,6 +88,7 @@ public:
     void add_ulong64(word base, const char * name, ulong64 c, char * & tmp);
 #if !defined(PLATFORM_NO_IPADDR)
     void add_ip(word base, const char * name, const IPaddr & a, char * & tmp);
+    void add_guid(word base, const char * name, OS_GUID * guid, char * & tmp);
 #endif
     void add_printf(word base, const char * name, char * & tmp, const char * format, ...);
     void add_hexstring(word base, const char * name, const byte * hex, word hex_len, char * & tmp);
@@ -112,6 +113,7 @@ public:
 #if !defined(PLATFORM_NO_IPADDR)
     IPaddr get_ip(word base, const char * name, bool * present=0);
     IPaddr get_ip(word base, word & last, bool * present=0);
+    OS_GUID get_guid(word base, const char * name, bool * present = 0);
 #endif
     bool get_bool(word base, const char * name, bool * present=0);
     bool get_bool(word base, word & last, bool * present=0);

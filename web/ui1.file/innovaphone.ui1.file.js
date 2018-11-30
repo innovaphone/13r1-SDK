@@ -4,8 +4,9 @@
 var innovaphone = innovaphone || {};
 innovaphone.ui1 = innovaphone.ui1 || {};
 
-innovaphone.ui1.File = innovaphone.ui1.File || function (style, content, cl, update, multiple, accept) {
+innovaphone.ui1.File = innovaphone.ui1.File || function (style, content, cl, update, multiple, accept, path, color) {
     this.createNode("div", style, content, cl);
+    if (path) this.add(new innovaphone.ui1.SvgInline("position:absolute; left:0px; top:1px; width:20px; height:20px; fill:" + color + "; cursor:pointer", "0 0 20 20", '<path d="' + path + '" style="fill-rule:evenodd"/>'));
 
     var inp = document.createElement('input');
     inp.type = 'file';

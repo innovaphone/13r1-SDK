@@ -67,9 +67,10 @@ public:
     virtual bool IsDebuggerPresent() { return false; };
     virtual void SetIIoMux(void * iomux) {};
     virtual void ReOpenLogFile() {};
-    virtual void SetLogging(bool on) {};
-    virtual void SetHexdump(bool on) {};
+    virtual void SetLogging(bool on) = 0;
+    virtual void SetHexdump(bool on) = 0;
     virtual void SetLogFileSize(off_t size) {};
+    virtual ulong64 IsCoreDumped() { return 0; };
 };
 
 extern IDebug * debug;  // Will be allocated automatically

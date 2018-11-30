@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone PBX System</title>
+    <link rel="stylesheet" href="../web/doc/innovaphone.doc.css" type="text/css" />
+</head>
+
+<body>
+    <h1>The innovaphone PBX system</h1>
+    <hr/>
+    <p>
+        The innovaphone PBX system consists of there major components
+        <dl>
+            <dt>The PBX</dt>
+            <dd>
+                The PBX authenticates users, registers Endpoints, provides UC signaling functions
+                and grants access to Apps.
+            </dd>
+            <dt>The myApps Client</dt>
+            <dd>
+                The myApps client is loaded from the PBX and starts Apps, which are loaded from the PBX
+                and also the App Platform. The myApps client provides the login for the user and some
+                basic features like presence information. All other features are provided by Apps
+            </dd>
+            <dt>The App Platform</dt>
+            <dd>
+                The App Platform hosts App Services, which provide Apps to the myApps client. All
+                backend serices for the Apps are implemented there.
+            </dd>
+        </dl>
+    </p>
+
+    <h2>AppWebsocket protocols</h2>
+    <p>
+        Starting from version 13 the PBX provides interfaces based on Websocket/JSON protocol. A common
+        structure is used for authentication an capability exchange. This is called AppWebsocket. Individual
+        messages are used for various functions.
+    </p>
+	<table>
+		<tr><td><b><a href="appwebsocket/AppWebsocket.htm">AppWebsocket</a></b></td>
+            <td>
+                The AppWebsocket protocol is the used for all communication between the myApps client,
+                the App Platform the PBX and the Apps. It is based on Websocket connection and JSON coded
+                messages. The AppWebsocket protocol itself defines the basic message structure and some
+                basic features like authentication, version control and capability exchange.
+                Other features are implemented individually by the instances which use
+                this protocol.
+            </td>
+        </tr>
+		<tr><td><b><a href="appwebsocket/Signal.htm">Signal</a></b></td>
+            <td>
+                This is the generic JSON signaling signaling protocol, which is mapped by the PBX to any standard
+                Voip Signaling like SIP or H.323
+            </td>
+        </tr>
+		<tr><td><b><a href="appwebsocket/PbxSignal.htm">PbxSignal</a></b></td>
+            <td>
+                Protocol to register to the PBX and do signaling with the JSON signaling protocol
+            </td>
+        </tr>
+		<tr><td><b><a href="appwebsocket/EpSignal.htm">EpSignal</a></b></td>
+            <td>
+                This protocol allows to attach to a device registered to the innovaphone PBX and intercept
+                all signaling to and from this device
+            </td>
+        </tr>
+		<tr><td><b><a href="appwebsocket/PbxMessages.htm">PbxMessages</a></b></td>
+            <td>
+                The protocol to retrieve stored chat messages
+            </td>
+        </tr>
+		<tr><td><b><a href="appwebsocket/myApps.htm">myApps</a></b></td>
+            <td>
+                The protocol the myApps client uses to communicate with the PBX
+            </td>
+        </tr>
+	</table>
+
+    <h2>CDRs</h2>
+    <p>
+        The PBX creates Call Details records, which may be delivered using several methods. These CDRs
+        are XML documents created for individual users/objects of the PBX describing a call as seen by
+        this user.
+    </p>
+	<table>
+		<tr><td><b><a href="pbx/cdr.htm">CDR</a></b></td>
+            <td>
+                The CDR formaat
+            </td>
+        </tr>
+	</table>
+
+    <h2>SOAP-API</h2>
+    <p>
+        The PBX provides an Api for call-control and administration features with the standard SOAP
+        protocol. With a wsdl file this SOAP API can be integrated in many development environment
+    </p>
+	<table>
+		<tr><td><b><a href="pbx/soap.htm">SOAP-API</a></b></td>
+            <td>
+                The SOAP-APi
+            </td>
+        </tr>
+	</table>
+</body>
+</html>

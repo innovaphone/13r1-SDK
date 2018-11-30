@@ -34,6 +34,8 @@
 NAMESPACE_BEGIN
 
 class uri_dissector {
+    bool is_ip(char * startPos);
+
 public:
 	char *scheme, *e_scheme;      /* e.g.: http */
 	char *hier, *e_hier;        /* hierarchy e.g.: // */

@@ -112,13 +112,13 @@ innovaphone.ui.Input = innovaphone.ui.Input || (function () {
                 defaultValue = input.value;
             }
         });
-        
+
         input.addEventListener("input", function () {
             updateClearX();
         });
 
-        input.addEventListener("keydown", function(event) {
-            if(event != undefined && event.keyCode == innovaphone.lib.keyCodes.escape) {
+        input.addEventListener("keydown", function (event) {
+            if (event != undefined && event.keyCode == innovaphone.lib.keyCodes.escape) {
                 if (input.value != defaultValue) {
                     event.preventDefault(); // consume this event to prevent e.g. the popup from closing
                     // blur() and focus() are a workaround for a Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=646811
@@ -135,7 +135,7 @@ innovaphone.ui.Input = innovaphone.ui.Input || (function () {
 
         input.spellcheck = false;
         input.style.fontFamily = "inherit";
-        input.style.fontSize =  "inherit";
+        input.style.fontSize = "inherit";
 
         if (type == undefined || type == "" || type == "text") {
             createClearX();
@@ -177,7 +177,17 @@ innovaphone.ui.Input = innovaphone.ui.Input || (function () {
         // public interface
         this.container = container;
         this.style = input.style;
-        this.value = function () { return input.value; };
+        this.value = function (noTrim) {
+            switch (input.type) {
+                case "checkbox": return input.value;
+                case "password": return input.value;
+                default:
+                    if (!noTrim && input.value != input.value.trim()) {
+                        input.value = input.value.trim();
+                    }
+                    return input.value;
+            }
+        };
 
         // do not use this.focus = input.focus; as this behaves strange
         // same for setSelectionRange/addEventListener
@@ -189,7 +199,7 @@ innovaphone.ui.Input = innovaphone.ui.Input || (function () {
             input.addEventListener(type, listener);
         }
 
-        this.focus = function () {  
+        this.focus = function () {
             input.focus();
         }
 
@@ -251,9 +261,10 @@ innovaphone.ui.Input = innovaphone.ui.Input || (function () {
             return input.type;
         }
 
-        this.hasChanged = function () {
+        this.hasChanged = function (noTrim) {
             if (input.type == "checkbox") return input.checked != originalValue;
-            else return input.value != originalValue;
+            else if (input.type == "password" || noTrim) return input.value != originalValue;
+            else return input.value.trim() != originalValue;
         }
 
         this.setWidth(defaultWidth);    // set a default width
@@ -284,7 +295,7 @@ innovaphone.ui.Input = innovaphone.ui.Input || (function () {
             return files;
         }
 
-        this.setMin = function(min) {
+        this.setMin = function (min) {
             input.min = min;
         }
 

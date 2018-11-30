@@ -16,9 +16,9 @@
 class UConfigContextApi {
 public:
     virtual ~UConfigContextApi() {}
-    virtual void SendConfig(class IJsonApiConnection * connection, const char * mt) = 0;
-    virtual void UpdateConfig(class IJsonApiConnection * connection, class json_io * json, dword base) = 0;
-    virtual void SendConfigItems(class IJsonApiConnection * connection) = 0;
+    virtual void SendConfig(class IJsonApiConnection * connection, const char * mt, const char * src) = 0;
+    virtual void UpdateConfig(class IJsonApiConnection * connection, class json_io * json, dword base, const char * src) = 0;
+    virtual void SendConfigItems(class IJsonApiConnection * connection, const char * src) = 0;
 };
 
 
@@ -36,13 +36,14 @@ public:
     IJsonApiConnection * GetConnection();
     void Message(class json_io & msg, word base, const char * mt, const char * src) override;
     void JsonApiConnectionClosed() override;
+    char * readSrc;
 };
 
 
 class ConfigContext : public UTask, public UJsonApiContext, public UConfigContextApi {
 private:
     friend class ConfigItem;
-    friend class TaskWriteConfigUnmanaged;
+    friend class TaskWriteConfigItems;
     friend class TaskWriteValue;
 
     class IDatabase * database;
@@ -57,10 +58,10 @@ private:
 
     void RegisterConfigItem(class ConfigItem * item);
 
-    void SendWriteConfigResult(class IJsonApiConnection * connection, const char * result);
-    void SendConfig(class IJsonApiConnection * connection, const char * mt) override;
-    void UpdateConfig(class IJsonApiConnection * connection, class json_io * json, dword base) override;
-    void SendConfigItems(class IJsonApiConnection * connection) override;
+    void SendWriteConfigResult(class IJsonApiConnection * connection, const char * src, const char * result);
+    void SendConfig(class IJsonApiConnection * connection, const char * mt, const char * src) override;
+    void UpdateConfig(class IJsonApiConnection * connection, class json_io * json, dword base, const char * src) override;
+    void SendConfigItems(class IJsonApiConnection * connection, const char * src) override;
 
     class JsonApi * CreateJsonApi(class IJsonApiConnection * connection, class json_io & msg, word base) override { return 0; };
     class JsonApi * JsonApiRequested(class IJsonApiConnection * connection) override;
@@ -72,6 +73,7 @@ protected:
     virtual bool CanReadConfig(IJsonApiConnection * const connection) { return true; }
     virtual bool CanWriteConfig(IJsonApiConnection * const connection) { return true; }
     class ITask * UpdateUnmanagedItems();
+    class ITask * UpdateManagedItems();
 
 public:
     ConfigContext(class IDatabase * database, class IInstanceLog * log);
@@ -89,7 +91,7 @@ private:
 
 protected:
     friend class TaskWriteConfig;
-    friend class TaskWriteConfigUnmanaged;
+    friend class TaskWriteConfigItems;
     friend class TaskInitConfig;
     friend class ConfigContext;
 
@@ -283,6 +285,8 @@ private:
     char * value;
     bool isPassword;
 
+    static const char * CryptKey();
+    
 protected:
     friend class ConfigContext;
     virtual void SetWriteValue(const char * value);
@@ -300,4 +304,6 @@ public:
     void SetValue(const char * value);
     bool HasDefaultValue() override;
     void Reset() override;
+    static void Encrypt(const char * seed, const char * password, char * out, size_t len);
+    static void Decrypt(const char * seed, const char * password, char * out, size_t len);
 };

@@ -22,7 +22,7 @@ class Httpfiles_unzip
     void ReadFile(char * path, char * name);
     class istd::list<Httpfiles_unzipItem> listItems;
 public:
-    Httpfiles_unzip(class IInstanceLog * log, const char * serviceID);
+    Httpfiles_unzip(class IInstanceLog * log, const char * appName);
     ~Httpfiles_unzip();
     
 };
