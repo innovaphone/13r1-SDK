@@ -130,7 +130,7 @@ typedef dword interrupt_mask;
 void dprintf(const char * format, ...);
 extern void outchar(char c);
 
-#define ASSERT(a, s) { if (!(a)) { debug->printf("ASSERT: %s (%s:%u)", s, __FUNCTION__, __LINE__); sync(); raise(SIGSEGV); abort(); } }
+#define ASSERT(a, s) { if (!(a)) { if(debug) { debug->printf("ASSERT: %s (%s:%u)", s, __FUNCTION__, __LINE__); } sync(); raise(SIGSEGV); abort(); } }
 #define ASSERT_NO_PRINTF(a) { if (!(a)) { sync(); raise(SIGSEGV); abort(); } }
 //extern void assert(unsigned line, const char * file, const char * why);
 

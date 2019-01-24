@@ -569,6 +569,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
             else if (argname == "name") {
                 start.name = value;
             }
+            else if (argname == "title") {
+                start.title = value;
+            }
             else if (argname == "url") {
                 start.url = value;
             }
@@ -620,13 +623,11 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         var that = this;
         this.current = lang;
         if (!texts[this.current]) this.current = "en";
-        this.texts = texts[this.current];
         this.onlangchanged = new Event(this);
         this.onnoderemoved = new Event(this);
 
         this.activate = function (newLang) {
             that.current = texts[newLang] ? newLang : "en";
-            that.texts = texts[that.current];
             that.onlangchanged.notify(that.current);
         };
 

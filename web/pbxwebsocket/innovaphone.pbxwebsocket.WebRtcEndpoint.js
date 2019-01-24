@@ -260,19 +260,6 @@ innovaphone.pbxwebsocket.WebRtc = innovaphone.pbxwebsocket.WebRtc || (function (
             for (var i = 0; i < mediaInfoLen; i++) {
                 var mi = mediaInfo[i];
                 var add = mi.profile == "UDP/TLS/RTP/SAVPF" || mi.profile == "RTP/SAVPF" || mi.profile == "DTLS/SCTP";
-                if (add && window.chrome && mi.type == "video") {
-                    // Remove m section without unsupported codecs for Chrome
-                    var hasVp8 = false;
-                    var formats = mi.formats;
-                    var formatsLen = formats.length;
-                    for (var j = 0; j < formatsLen; j++) {
-                        if (formats[j].rtpmap.substring(0, 3) == "VP8") {
-                            hasVp8 = true;
-                            break;
-                        }
-                    }
-                    if (!hasVp8) add = false;
-                }
                 if (add) {
                     result += mi.text;
                     if (!mi.mid) result += "a=mid:" + mi.type + "\n";

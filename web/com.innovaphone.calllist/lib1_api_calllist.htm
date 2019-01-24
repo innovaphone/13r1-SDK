@@ -49,7 +49,12 @@
                 <dd>Number of currently available entries that are to be returned immediately.</dd>
             </dl>
         </dd>
-        <dd>Example: <code>{ mt: "Subscribe", count: "20" }</code></dd>
+        <dd>Example:<pre>
+{
+    "mt": "Subscribe",
+    "count": 20
+}
+</pre></dd>
     </dl>
     <h3>Responses</h3>
     <dl>
@@ -64,7 +69,67 @@
                 <dd>Array of call list entries.</dd>
             </dl>
         </dd>
-        <dd>Example: <code>{ mt: "Update", entries: [{peer: "...", outbound: true, time: "..."}]}</code></dd>
+        <dd>
+            Example:<pre>
+{
+    "mt": "Update",
+    "entries": [
+        {
+          "cdr": 21173,
+          "sip": "tac",
+          "id": "c06ab5ee-cc1c-5c01-8a68-009033420759",
+          "dir": "o",
+          "node": "root",
+          "phys": "",
+          "cause": 0,
+          "time": 1545391345000,
+          "alert-duration": 12,
+          "call-duration": 0,
+          "conn-duration": 0,
+          "billing-duration": 0,
+          "call": "int",
+          "remote": {
+            "number": "40",
+            "sip": "rh",
+            "dn": "Ralf Hütter"
+          },
+          "status": "al"
+        },
+        {
+          "cdr": 20713,
+          "sip": "tac",
+          "id": "2d61b691-9c1b-5c01-ed7a-009033420759",
+          "dir": "i",
+          "node": "root",
+          "phys": "berlin",
+          "cause": 0,
+          "time": 1545313426000,
+          "alert-duration": 7,
+          "call-duration": 2814,
+          "conn-duration": 2814,
+          "billing-duration": 0,
+          "call": "int",
+          "remote": {
+            "number": "683",
+            "sip": "fs",
+            "dn": "Florian Schneider"
+          },
+          "status": "co"
+        },
+    ]
+}
+</pre>
+        </dd>
+        <dd>
+            Details:
+            <ul>
+                <li><b>dir</b>: "i" (inbound call) or "o" (outbound call)</li>
+                <li><b>time</b>: UTC timestamp</li>
+                <li><b>cause</b>: the decimal disconnect reason of the call (see Reference:ISDN_Cause_Codes)</li>
+                <li><b>call</b>: "int" (internal call) or "ext" (external call)</li>
+                <li><b>status</b>: "co" (connected), "al" (alert), "er" (error) or "bu" (busy)</li>
+            </ul>
+        </dd>
     </dl>
 </body>
 </html>

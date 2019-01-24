@@ -88,7 +88,10 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     break;
                 case "CheckBuildResult":
                     if (instance.checkBuild) {
-                        if (obj.url) location.href = obj.url;
+                        if (obj.url) {
+                            if (applicationCache) try { applicationCache.update(); } catch (err) { };
+                            location.href = obj.url;
+                        }
                         break;
                     }
                 default:

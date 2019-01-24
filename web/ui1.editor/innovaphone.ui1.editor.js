@@ -516,7 +516,7 @@ innovaphone.ui1.Editor = innovaphone.ui1.Editor || function (style, scrollWidth,
         s.selection.collapse(s.f, s.o - num);
     }
 
-    this.text = function (noempty) { return noempty && empty(content.container) ? null : content.container.innerHTML; }
+    this.text = function (noempty) { return noempty && empty(content.container) ? null : content.container.innerHTML.replace(/<br>/g, "<br/>"); }
     this.setText = function (html) { content.addHTML(html); if (onChanged) onChanged() };
     this.focus = function () { content.container.focus(); }
     this.blur = function () { content.container.blur(); }

@@ -57,6 +57,7 @@ public:
     virtual ~IPbxApi() {};
     <a href="#CreateSetPresence">virtual class ITask * CreateSetPresence(const char * guid, const char * sip, const char * contact, const char * activity, const char * note) = 0;</a>
     <a href="#CreatePresenceSubscription">virtual class IPbxApiPresenceSubscription * CreatePresenceSubscription(const char * sip, const char * num, const char * sourceSip = 0) = 0;</a>
+    <a href="#CreateGetNodeInfo">virtual class IPbxApiTaskGetNodeInfo * CreateGetNodeInfo(const char * pbx, const char * domain) = 0;</a>
 };</code></pre>
     <h3>Overview</h3>
     The interface of the PBX API. It provides functions to create several tasks that can be used to communicate with the PBX.
@@ -127,6 +128,29 @@ public:
         <h4>Return value</h4>
         An <a href="#IPbxApiPresenceSubscription">IPbxApiPresenceSubscription</a> object that implements the presence subscription.
     </dd>
+
+	<a name="CreateGetNodeInfo"><div class="fnhead">CreateGetNodeInfo</div></a>
+	<dd>
+		Creates an ITask that retrieves some node configuration info.
+		<h4>Parameters</h4>
+		<table style="margin-left:-12px">
+			<tr>
+                <td class="param">const char * <b>pbx</b></td>
+				<td>
+					The pbx argument as received within a PbxInfo message.
+				</td>
+			</tr>
+			<tr>
+                <td class="param">const char * <b>domain</b></td>
+				<td>
+					The domain argument as received within a PbxInfo message.
+				</td>
+			</tr>
+		</table>
+		<h4>Return value</h4>
+		An <a href="#IPbxApiTaskGetNodeInfo">IPbxApiTaskGetNodeInfo</a> object.
+	</dd>
+
 
     <a name="IPbxApiPresenceSubscription"><h2>IPbxApiPresenceSubscription</h2></a>
     <pre><code class="C++">class IPbxApiPresenceSubscription : public ITask {
@@ -248,5 +272,44 @@ public:
         <h4>Return value</h4>
         The next IPbxApiPresence object in the list or NULL if there is none.
     </dd>
+
+	<a name="IPbxApiTaskGetNodeInfo"><h2>IPbxApiTaskGetNodeInfo</h2></a>
+	<pre><code class="C++">class IPbxApiTaskGetNodeInfo : public ITask {
+public:
+	<a href="#GetName">virtual const char * GetName() = 0;</a>
+	<a href="#GetPrefixIntl">virtual const char * GetPrefixIntl() = 0;</a>
+	<a href="#GetPrefixNtl">virtual const char * GetPrefixNtl() = 0;</a>
+	<a href="#GetPrefixSubs">virtual const char * GetPrefixSubs() = 0;</a>
+	<a href="#GetCountryCode">virtual const char * GetCountryCode() = 0;</a>
+};</code></pre>
+	<h3>Overview</h3>
+	A PBX node's configuration can be read upon completion.
+	<h3>Public functions</h3>
+	<a name="GetName"><div class="fnhead">GetName</div></a>
+	<dd>
+		<h4>Return value</h4>
+		The node's name.
+	</dd>
+	<a name="GetPrefixIntl"><div class="fnhead">GetPrefixIntl</div></a>
+	<dd>
+		<h4>Return value</h4>
+		The node's prefix for international numbers.
+	</dd>
+	<a name="GetPrefixNtl"><div class="fnhead">GetPrefixNtl</div></a>
+	<dd>
+		<h4>Return value</h4>
+		The node's prefix for national numbers.
+	</dd>
+	<a name="GetPrefixSubs"><div class="fnhead">GetPrefixSubs</div></a>
+	<dd>
+		<h4>Return value</h4>
+		The node's prefix for subscriber numbers.
+	</dd>
+	<a name="GetCountryCode"><div class="fnhead">GetCountryCode</div></a>
+	<dd>
+		<h4>Return value</h4>
+		The node's configured country code, e.g. 49 for germany.
+	</dd>
+
 </body>
 </html>

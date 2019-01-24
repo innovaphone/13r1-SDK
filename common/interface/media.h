@@ -112,6 +112,32 @@ enum ConnectionType {
 #define CHANNEL_CANDIDATE_PRFLX     2
 #define CHANNEL_CANDIDATE_RELAY     3
 
+class MediaConfiguration {
+public:
+    MediaConfiguration(bool turnOnly, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx) {
+        this->turnOnly = turnOnly;
+        this->appSharingNumUpdates = appSharingNumUpdates;
+        this->appSharingCaptureTimer = appSharingCaptureTimer;
+        this->appSharingBitrate = appSharingBitrate;
+        this->appSharingJpegQuality = appSharingJpegQuality;
+        this->appSharingUpdateSum = appSharingUpdateSum;
+        this->appSharingWaitMsForAck = appSharingWaitMsForAck;
+        this->mediaDropPacketsTx = mediaDropPacketsTx;
+        this->mediaDropPacketsRx = mediaDropPacketsRx;
+    }
+    ~MediaConfiguration() {};
+
+    bool turnOnly;
+    int appSharingNumUpdates;
+    int appSharingCaptureTimer;
+    int appSharingBitrate;
+    int appSharingJpegQuality;
+    int appSharingUpdateSum;
+    int appSharingWaitMsForAck;
+    int mediaDropPacketsTx;
+    int mediaDropPacketsRx;
+};
+
 // Codecs: h264, vp8, FB
 class Codec: public istd::listElement<Codec> {
 public:
@@ -222,10 +248,10 @@ public:
 class IMedia {
 public:
     virtual ~IMedia() {};
-    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, byte * certificateFingerprint, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly) = 0;
+    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, byte * certificateFingerprint, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, int dropMediaTx, int dropMediaRx) = 0;
     virtual void Connect(class MediaConfig *remoteMediaConfig, bool iceControlling) = 0;
     virtual void RtpSend(const void * buf, size_t len, dword timestamp) = 0;
-    virtual void SctpSend(const void * buf, size_t len) = 0;
+    virtual void SctpSend(const void * buf, size_t len, unsigned num) = 0;
     virtual void Recv(void * buf, size_t len, bool recvPartial = false) = 0;
     virtual void Close() = 0;
 };
@@ -242,6 +268,7 @@ public:
     virtual void MediaSctpSendResult(IMedia * const media) {};
     virtual void MediaRtpRecvResult(IMedia * const media, void * buf, size_t len, dword timestamp) {};
     virtual void MediaSctpRecvResult(IMedia * const media, void * buf, size_t len) {};
+    virtual void MediaSctpRecvAck(IMedia * const media, unsigned num) {};
     virtual void MediaCloseComplete(IMedia * const media) {};
     virtual void MediaEventReceived(IMedia * const media, enum MediaEndpointEvent event) {};
 };
@@ -250,7 +277,7 @@ class IMediaEndpoint {
 public:
     virtual ~IMediaEndpoint() {};
     virtual void Recv(char * buf, int len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;
-    virtual void Send(char * buf, int len, dword timestamp) = 0;
+    virtual void Send(char * buf, int len, dword timestamp, unsigned num) = 0;
 };
 
 class UMediaEndpoint {
@@ -260,8 +287,9 @@ public:
     virtual void RtpSend(char * buf, int len, dword timestamp, bool marker = false) = 0;
     virtual void RtcpSend(char * buf, int len) = 0;
     virtual void SctpRecvResult(char * buf, int len) {};
+    virtual void SctpRecvAck(unsigned num) {};
     virtual void SctpSendResult() {};
-    virtual void SctpSend(char * buf, int len) = 0;
+    virtual void SctpSend(char * buf, int len, unsigned num) = 0;
 };
 
 class IMediaIoChannel {
@@ -271,6 +299,7 @@ public:
     virtual void RtpRecv(void * buf, size_t len, dword timestamp) = 0;
     virtual void RtpSendResult() {};
     virtual void SctpRecv(void * buf, size_t len) = 0;
+    virtual void SctpRecvAck(unsigned num) {};
     virtual void SctpSendResult() {};
     virtual void Close() = 0;
     virtual void EventRecv(enum MediaEndpointEvent event) = 0;
@@ -279,7 +308,7 @@ public:
 class UMediaIoChannel {
 public:
     virtual void MediaIoRtpSend(const void * buf, size_t len, dword timestamp) = 0;
-    virtual void MediaIoSctpSend(const void * buf, size_t len) = 0;
+    virtual void MediaIoSctpSend(const void * buf, size_t len, unsigned num) = 0;
     virtual void MediaIoCloseComplete(class IMediaIoChannel * const mediaIoChannel) = 0;
 };
 
@@ -409,17 +438,18 @@ public:
 
 class IAppSharingIo : public IDeviceIo {
 public:
-    static class IAppSharingIo * Create(class IIoMux * const iomux, class IInstanceLog * log);
+    static class IAppSharingIo * Create(class IIoMux * const iomux, class IInstanceLog * log, class MediaConfiguration * mediaConfiguration);
     virtual ~IAppSharingIo() {};
     virtual void Initialize(class UAppSharingIo * const user, class UDeviceIo * const deviceIoUser) = 0;
     virtual void SignalingMessage(void * context, void * buffer, int len) = 0;
     virtual void SubscribeApplications() = 0;
     virtual void UnsubscribeApplications() = 0;
-    virtual void ShareApplication(unsigned int id) = 0;
-    virtual void UnshareApplication(unsigned int id) = 0;
-    virtual void UnshareAllApplications() = 0;
-    virtual void GiveControlToUser(unsigned int userId) = 0;
-    virtual void RemoveControlFromUser(unsigned int userId) = 0;
+    virtual void ShareApplication(void * context, unsigned int id) = 0;
+    virtual void UnshareApplication(void * context, unsigned int id) = 0;
+    virtual void UnshareAllApplications(void * context) = 0;
+    virtual void GiveControlToUser(void * context, unsigned int sessionId) = 0;
+    virtual void RemoveControlFromUser(void * context, unsigned int sessionId) = 0;
+    virtual void RequestControlFromUser(void * context, unsigned int sessionId) = 0;
     virtual void AddRemoteContainer(void * context, void * container, const char * channelId, enum MediaType coder) = 0;
     virtual void RemoveRemoteContainer(void * container, enum MediaType coder) = 0;
     virtual void Close() = 0;

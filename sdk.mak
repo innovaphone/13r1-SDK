@@ -1,4 +1,9 @@
 
+LIBBUILD = $(file < sdk/build.txt)
+ifeq ($(LIBBUILD),)
+LIBBUILD = $(BUILD)
+endif
+
 -include sdk/sdk-lib.mak
 
 -include $(OUTDIR)/dep/*.dep
@@ -29,7 +34,7 @@ $(OUTDIR)/obj/%.o: $<
 	$(CC) -MMD -MF $(OUTDIR)/dep/$(basename $(notdir $@)).dep $(INCLUDES) $(CFLAGS) $(APP_CFLAGS) -o $@ $<
 
 $(OUTBIN)/$(OUT)/$(OUT): $(COMMONOBJS) $(APP_OBJS) $(LIB_SDK)
-	$(CC) $(LFLAGS) -o $@ $(COMMONOBJS) $(APP_OBJS) $(LIBS) -L $(OUTSDK) -lsdk
+	$(CC) $(LFLAGS) -o $@ $(COMMONOBJS) $(APP_OBJS) $(LIBS) -L $(OUTSDK) -lsdk-$(LIBBUILD)
 
 $(OUTBIN)/$(OUT)/$(OUT).debug: $(OUTBIN)/$(OUT)/$(OUT)
 	$(OBJCPY) --only-keep-debug $(OUTBIN)/$(OUT)/$(OUT) $@

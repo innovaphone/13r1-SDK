@@ -35,7 +35,7 @@ innovaphone.ui1.AutoCompleteInput = innovaphone.ui1.AutoCompleteInput || functio
     inputBox.container.autocorrect = "off";
     inputBox.container.autocapitalize = "off";
     inputBox.container.spellcheck = false;
-
+    
     function getCurrentValue() {
         var currentValue = inputBoxThis.value();
         var valueArray = currentValue.split(separator);
@@ -68,6 +68,10 @@ innovaphone.ui1.AutoCompleteInput = innovaphone.ui1.AutoCompleteInput || functio
         this.createNode("div", "", "");
         
         function init() {
+            textbox.onfocus = function (oEvent) {
+                onFocus();
+            }
+
             //assign the onkeyup event handler
             textbox.onkeyup = function (oEvent) {
 
@@ -99,6 +103,15 @@ innovaphone.ui1.AutoCompleteInput = innovaphone.ui1.AutoCompleteInput || functio
 
             //create the suggestions dropdown
             createDropDown();
+        }
+
+        function onFocus() {
+            var cValue = getCurrentValue().trim();
+            var cSuggestions = callBackOnChange(cValue.trim());
+            if (cSuggestions === null) {
+                return;
+            }
+            handleSuggestion(cSuggestions);
         }
 
         function autoSuggest(aSuggestions) {

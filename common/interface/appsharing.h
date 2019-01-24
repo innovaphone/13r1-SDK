@@ -4,32 +4,8 @@
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
-enum MessageType {
-    DATA_MSG = 0,
-    DATA_MSG_256 = 1,
-    PLAIN_DATA_MSG = 2,
-    EQUAL_DATA_MSG = 3,
-    CLIPBOARD_DATA = 4,
-    PALETTE_MSG = 7,
-    DUMMY_MSG,
-    NEW_PICTURE,
-    STOP_SHARING,
-    SEND_NAME,
-    SEND_MOUSE_TYPE,
-    SEND_APP_NAME,
-    // Messages only intended for the an specific sender
-    SEQ_LOST = 128,
-    CONFIRM_SEQ,
-    REQ_NEW_PIC,
-    GIVE_CONTROL,
-    TAKE_CONTROL,
-    REQUEST_CONTROL,
-    SEND_ID_WEB,
-    REQUEST_NAME,
-    DUMMY_MSG_RX,
-    ACTIVE_SENDER,
-    NO_ACTIVE_SENDER,
-    LBUTTONDOWN = 192,
+enum MessageMouseType {
+    LBUTTONDOWN = 0,
     LBUTTONUP,
     LBUTTONDOWNDBLCLK,
     RBUTTONDOWN,
@@ -40,12 +16,7 @@ enum MessageType {
     KEYPRESSED,
     KEYPRESSED_DOWN,
     KEYPRESSED_DOWN_UP,
-    KEYPRESSED_UP,
-// Used by Keyboard hook
-    STOP_HOOK = 228,
-    STOP_HOOK_THREAD,
-// Used by the PBX, dummy_msg not useful here, a new app would be created!
-    DISCARD_MSG = 254
+    KEYPRESSED_UP
 };
 
 enum MouseType {
@@ -65,16 +36,8 @@ enum MouseType {
 };
 
 enum CompressionType {
-    SAME_COLOR = 0,
-    PNG = 1,
+    PNG = 0,
     JPEG
-};
-
-enum BlockType {
-    BLOCK_MSG = 0,
-    BLOCK_MSG_256,
-    PLAIN_MSG,
-    EQUAL_MSG
 };
 
 #define JPEG_MIN_SIZE   4
@@ -103,152 +66,151 @@ typedef struct rgb_ {
     byte red;
 } rgb_t;
 
-#define INNO_HDR_FLAGS          0  // Offset 2
-#define INNO_HDR_SEQ            2  // Offset 2
-#define INNO_HDR_MSG_TYPE       4
-#define INNO_HDR_APPL_ID        5
-#define INNO_HDR_SENDER_ID      6
-#define INNO_HDR_X_COOR         8
-#define INNO_HDR_Y_COOR        10
-#define INNO_HDR_X_DIM         12
-#define INNO_HDR_Y_DIM         14
-#define INNO_HDR_X_SIZE        16
-#define INNO_HDR_Y_SIZE        18
-#define INNO_HDR_RAW_COLOR     20
-#define INNO_HDR_NUM_EQUAL     24
-#define INNO_HDR_CRC_PNG256    28  // next three cannot appear in the same message
-#define INNO_HDR_LENGTH        32  // basic header length
-
-// 1.Mouse events
-#define INNO_HDR_RECEIVER_ID   INNO_HDR_LENGTH+0
-#define INNO_HDR_MSG_VK        INNO_HDR_LENGTH+2
-#define ME_TOTAL_LENGTH        INNO_HDR_LENGTH+4
-
-// 2.Packet Lost, confirm sequence, ... other events
-//#define INNO_HDR_RECEIVER_ID   INNO_HDR_LENGTH+0
-#define INNO_HDR_SEQ_NUM       INNO_HDR_LENGTH+2
-#define OE_TOTAL_LENGTH        INNO_HDR_LENGTH+4
-// 2.1 Number of lost Packets
-#define INNO_HDR_NUM_LOST      INNO_HDR_LENGTH+4
-
-// 3.Data messages
-#define INNO_HDR_PKT_LEN       INNO_HDR_LENGTH
-
-// 4.Conference
-#define INNO_HDR_TARGET_ID     INNO_HDR_LENGTH
-
-#define MAX_HEADER_LEN         INNO_HDR_LENGTH+6   // INNO_HDR_NUM_LOST
-
 #define NUM_STANDARD_CURSORS      14
 #define NUM_NON_STANDARD_CURSORS  5
 
-class CompressedBlock {
-public:
-    CompressedBlock() {
-        this->buf = NULL;
-        this->len = 0;
-        this->first = false;
-        this->last = false;
-    };
-    ~CompressedBlock() { if(this->buf) free(this->buf); };
-
-    int coorX;
-    int coorY;
-    int dimX;
-    int dimY;
-    int picW;
-    int picH;
-    word seq;
-    enum CompressionType compressionType;
-    enum BlockType blockType;
-    int numEqBlocks;
-    unsigned char *buf;
-    int len;
-    int msg;
-    bool first;
-    bool last;
+enum AppSharingMessages {
+   CREATE_SESSION = 0x0,
+   CREATE_SESSION_ACK,
+   DELETE_SESSION,
+   DELETE_SESSION_ACK,
+   UPDATE_SESSION,
+   UPDATE_SESSION_ACK,
+   IMAGE_MESSAGE,
+   IMAGE_MESSAGE_ACK,
+   MOUSE_CURSOR,
+   MOUSE_MOVE,
+   INFO_MESSAGE,
+   INFO_MESSAGE_ACK,
 };
 
-class CompressedBlockNode : public istd::listElement<CompressedBlockNode> {
-    int userId;
-    int appId;
-    bool retransmissions;
-public:
-    CompressedBlockNode(class CompressedBlock *pCompBlock, int userId, int appId, bool retransmissions) {
-        this->pCompBlock = pCompBlock;
-        this->retransmissions = retransmissions;
-        this->appId = appId;
-        this->userId = userId;
-    };
-    ~CompressedBlockNode() {
-        if(pCompBlock) delete pCompBlock;
-    }
-
-    int GetUserId(void) { return userId; };
-    int GetAppId(void) { return appId; };
-    bool GetRetransmissions(void) { return retransmissions; };
-
-    class CompressedBlock *pCompBlock;
-};
-
-class UCanvas {
-public:
-    virtual bool IsDesktopShared() = 0;
-    virtual bool IsSharing(void) = 0;
-    virtual bool GetApplicationPosition(unsigned int appId, int * coorX, int * coorY) = 0;
-    virtual void SetWindowFront(unsigned int appId, int coorX, int coorY) = 0;
-    virtual void Event(void * buf, size_t len) = 0;
-    virtual void Send(void * buf, size_t len) = 0;
-    virtual void SendTo(void * buf, size_t len, unsigned short senderId) = 0;
-    virtual void Resend(unsigned short seq, unsigned short senderId) = 0;
-    virtual void CloseComplete(void) = 0;
-};
-
-class ICanvas {
-public:
-    static ICanvas * CreateCanvas(class IIoMux * const iomux, class UCanvas * const user, class IInstanceLog * const log);
-    virtual ~ICanvas() {};
-
-    virtual void PutBlock(unsigned int userId, unsigned int appId, class CompressedBlock * block) = 0;
-    virtual void DrawMouse(unsigned int userId, unsigned int appId, enum MouseType mouse, int coorX, int coorY) = 0;
-
-    virtual void Add(unsigned int userId, char * userName, unsigned int appId, char * appName, char * appDesc) = 0;
-    virtual void Update(unsigned int userId, char * userName, unsigned int appId, char * appName, char * appDesc) = 0;
-    virtual void Remove(unsigned int userId, unsigned int appId) = 0;
-
-    virtual void CloseCanvas(void) = 0;
-};
-
-class UFrameBuffer {
+class UImageBuffer {
 public:
     virtual void Add(unsigned int id, const char * name, const char * description, const char * icon,  const char * thumbnail, void * handle) {};
     virtual void Update(unsigned int id, const char * name, const char * description, const char * icon,  const char * thumbnail) {};
     virtual void Remove(unsigned int id) {};
-    virtual void Event(void * buf, size_t len) {};
-    virtual void HasData(unsigned int id) {};
+    virtual void MousePosition(int coorX, int coorY, int type, unsigned int appId) = 0;
     virtual void CloseComplete() {};
 };
 
 
-class IFrameBuffer {
+class IImageBuffer {
 public:
-    static IFrameBuffer * CreateFrameBuffer(class IIoMux * const iomux, class UFrameBuffer * const user, class IInstanceLog * const log);
+    static IImageBuffer * CreateImageBuffer(class IIoMux * const iomux, class UImageBuffer * const user, class IInstanceLog * const log, class MediaConfiguration * mediaConfiguration);
 
-    virtual ~IFrameBuffer() {};
-    virtual void Capture(unsigned int appId) = 0;  // MakeCapture, CreateDiffBlocks and CompressDiffBlocks
+    virtual ~IImageBuffer() {};
+    virtual void Capture(unsigned int appId, class IScreenBuffer * screenBuffer) = 0;  // MakeCapture, CreateDiffBlocks and CompressDiffBlocks
 
-    virtual class CompressedBlock * GetNextBlock(unsigned int appId, bool retransmissions) = 0;
-    virtual int GetNextBlockLen(unsigned int appId) = 0;
     virtual bool Mark(unsigned int appId, int coorX, int coorY, int dimX, int dimY) = 0;
     virtual void Clean(unsigned int appId) = 0;
+    virtual bool GetWindowPosition(byte appId, word * x, word * y) = 0;
 
     virtual void SubscribeApplications(void) = 0;
     virtual void UnsubscribeApplications(void) = 0;
 
-    virtual void SetWindowFront(unsigned int appId, int coorX, int coorY) = 0;
-    virtual bool GetApplicationPosition(unsigned int appId, int * coorX, int * coorY) = 0;
-    virtual void SetMousePosition(int coorX, int coorY) = 0;
-    virtual void RequestNewPicture(unsigned int appId) = 0;
+    virtual void CloseImageBuffer(void) = 0;
+};
 
-    virtual void CloseFrameBuffer(void) = 0;
+class IImage {
+public:
+    IImage(unsigned char *buf, int len) {
+        this->buf = buf;
+        this->len = len;
+        this->version = 0;
+        this->update = 0;
+        this->posX = 0; 
+        this->posY = 0;
+        this->dimX = 128;
+        this->dimY = 128;
+        this->type = CompressionType::JPEG;
+    };
+    ~IImage() { if(this->buf) free(this->buf); };
+
+    int x;
+    int y;
+    int posX;
+    int posY;
+    int dimX;
+    int dimY;
+    int version;
+    int update;
+    CompressionType type;
+    unsigned char *buf;
+    int len;
+};
+
+#define MAX_X_BLOCKS 30
+#define MAX_Y_BLOCKS 17
+
+class IScreenBuffer {
+public:
+    static IScreenBuffer * Create(class IInstanceLog * const log);
+    virtual ~IScreenBuffer() {}
+
+    // Stores a new version of a block or an update of an existing block
+    // Called by an image source (capture, unreliable network transmission)
+    // Drop blocks and updates with an older version
+    // Queue updates that need the block with the right version or previous updates
+    // Only trigger calls in IScreenSink for the consistent part of the current block
+    //virtual void Set(byte x, byte y, class IImage * image, byte version, byte update) = 0;
+    virtual void Set(class IImage * image) = 0;
+
+    // Returns the number of updates of the specified block
+    // Called by IScreenSink to get the image for displaying or network transmission
+    virtual byte GetNumUpdates(byte x, byte y) = 0;
+
+    // Returns the current version of the specified block
+    // Called by IScreenSink to get the image for displaying or network transmission
+    virtual class IImage * Get(byte x, byte y) = 0;
+
+    // Returns the specified update of the specified block
+    // Called by IScreenSink to get the image for displaying or network transmission
+    virtual class IImage * GetUpdate(byte x, byte y, byte update) = 0;
+
+    virtual void RegisterScreenSink(class IScreenSink * sink) = 0;
+    virtual void UnregisterScreenSink(class IScreenSink * sink) = 0;
+
+    virtual void UpdateAppResolution(int w, int h) = 0;
+};
+
+class IScreenSink {
+public:
+    static IScreenSink * Create(class IIoMux * const iomux, class UScreenSink * const user, class IScreenBuffer * const screenBuffer, byte sessionId, int bitrate, int waitingMsForAck, const char * appName, const char * appDesc, class IInstanceLog * const log);
+    virtual ~IScreenSink() {}
+
+    // Notification that a new version of a block is ready for displaying / transmission
+    // Senders should mark this block version in the local state
+    virtual void ImageAdded(byte x, byte y, byte version) {};
+
+    // Notification that a new update of a block is ready for displaying / transmission
+    // Senders should mark this update in the local state
+    virtual void ImageUpdated(byte x, byte y, byte update) {};
+
+    virtual void UpdateAppResolution(int w, int h) {};
+
+    virtual void Recv(void * buf, int len) {};
+    virtual void RecvAck(unsigned num) {};
+
+    virtual void Stop() {};
+};
+
+class UScreenSink {
+public:
+    virtual void SendSinkMessage(void * buf, size_t len, unsigned num) = 0;
+    virtual void ReceiveMessage(void * buf, size_t len) = 0;
+};
+
+class IRemoteControl {
+public:
+    static IRemoteControl * Create(class URemoteControl * const user, class IInstanceLog * const log);
+    virtual ~IRemoteControl() {}
+
+    virtual void SendCommand(const char * cmd, int len) = 0;
+    virtual void MouseMove(word coorX, word coorY, word posX, word posY) = 0;
+    virtual void Close() = 0;
+};
+
+class URemoteControl {
+public:
+    virtual void CloseComplete() = 0;
 };

@@ -44,7 +44,7 @@
         </dl>
     </p>
 
-	<a name="publish-manager-plugin"><h2>Publish a PBX Manager plugin</h2></a>
+	<h2><a name="publish-manager-plugin">Publish a PBX Manager plugin</a></h2>
 
     <p>
         To publish a PBX Manager Plugin the App Service adds a class AppInstancePlugin to the
@@ -77,7 +77,7 @@
         </dd>
         <dt>multiple Domain</dt>
         <dd>
-            If argument is true, the plugin is announce to all PBX Managers, regardless of the domain.
+            If argument is true, the plugin is announced to all PBX Managers, regardless of the domain.
             If false the Plugin is only announced if the domain of the instance matches the domain
             of the PBX Manager.
         </dd>
@@ -97,7 +97,7 @@
         </dl>
     </p>
 
-	<a name="plugin-javascript"><h2>Plugin Javascript</h2></a>
+	<h2><a name="plugin-javascript">Plugin Javascript</a></h2>
 
     <p>
         The PBX Manager loads the Javascript file and expects a constructor function
@@ -165,8 +165,44 @@
             PBX domain.
         </dd>
     </dl>
+    
+    <h3>Connect to the App instance</h3>
 
-    <a name="plugin-context"><h2>Plugin Context</h2></a>
+    <p>
+        The plugin can establish a AppWebsocket connection to the App instance. For authentication
+        the GetInstanceLogin message from the <a href="com.innovaphone.manager.htm">com.innovaphone.manager</a>
+        API can be used.
+    </p>
+    <pre><code class="json">    var managerApi = start.consumeApi("com.innovaphone.manager");
+    instance = new innovaphone.appwebsocket.Connection("ws" + item.uri.slice(4), "-", null, app.domain, instanceConnected, instanceMessage, null, null, instanceLogin);
+
+
+    function instanceLogin(app, challenge) {
+        managerApi.sendSrc({ mt: "GetInstanceLogin", path: item.uri.slice(item.uri.indexOf("/", 8) + 1, item.uri.lastIndexOf("/")), app: app, challenge: challenge }, item.ap, function (obj) {
+            instance.login(obj.msg);
+        });
+    }</code></pre>
+
+    <h3>Set the instance password</h3>
+
+    <p>
+        When the Manager plugin configures the first App object for an instance, it should reset the instance
+        password with a new randowm password. Use the function innovaphone.Manager.randomPwd(16) to generate such
+        a random password. The <a href="com.innovaphone.manager.htm">com.innovaphone.manager</a>
+        SetInstancePassword can be used for this purpose
+    </p>
+    <pre><code class="json">    var pwd = innovaphone.Manager.randomPwd(16);
+    managerApi.sendSrc({ mt: "SetInstancePassword", path: item.uri.slice(item.uri.indexOf("/", 8) + 1, item.uri.lastIndexOf("/")), pwd: pwd }, item.ap, function (obj) {
+        ...
+    });</code></pre>
+
+    <p>
+        If an additional App object shall be configured, the password stored in this App object can be copied
+        from an existing App object, which can be referenced with copyPwd in the UpdateObject message.
+    </p>
+    <pre><code class="json">src.send({ mt: "UpdateObject", api: "PbxAdminApi", copyPwd: copyPwd, cn: obj.title, guid: obj.guid, h323: obj.sip, pseudo: { type: "app", ... }, ... });</code></pre>
+
+    <h2><a name="plugin-context">Plugin Context</a></h2>
 
     <p>
         The following Javascript libries are loaded when the plugin is loaded:
@@ -181,7 +217,7 @@
         <li>innovaphone.appwebsocket.connection.js</li>
     </ul>
 
-    <a name="plugin-templates"><h2>Plugin Templates</h2></a>
+    <h2><a name="plugin-templates">Plugin Templates</a></h2>
 
     <p>
         In the template files replace &lt;company id&gt; by your company in all lower case,

@@ -15,7 +15,8 @@ typedef enum {
     SOCKET_BIND_FAILED,
     SOCKET_LISTEN_FAILED,
     SOCKET_ACCEPT_FAILED,
-    SOCKET_TLS_HANDSHAKE_FAILED
+    SOCKET_TLS_HANDSHAKE_FAILED,
+    SOCKET_ADDR_IN_USE
 } shutdownreason_t;
 
 typedef enum {

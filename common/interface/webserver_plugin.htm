@@ -557,7 +557,7 @@ public:
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">IWebrserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
+            <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">ws_request_type_t <b>requestType</b></td><td>The type of the request. See <a href="#ws_request_type_t">ws_request_type_t</a> for details.</td></tr>
             <tr><td class="param">char * <b>resourceName</b></td><td>The resource requested. The resource can include a relative path, with the given registeredPathForRequest as root. </td></tr>
             <tr><td class="param">char * <b>registeredPathForRequest</b></td><td>The registered path for that request.</td></tr>
@@ -594,7 +594,7 @@ public:
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">IWebrserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
+            <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">char * <b>resourceName</b></td><td>The resource requested. The resource can include a relative path, with the given registeredPathForRequest as root. </td></tr>
             <tr><td class="param">char * <b>registeredPathForRequest</b></td><td>The registered path for that request.</td></tr>
             <tr><td class="param">size_t <b>dataSize</b></td><td>The size of the data comming with the request. This data must be be read with IWebserverPassthrough::Recv() and includes the whole HTTP header of the request.</td></tr>
@@ -611,7 +611,7 @@ public:
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">IWebrserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
+            <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">const char * <b>path</b></td><td>The path for the request. However, even if it is called "path", it can include a filename, too. Depending on what had been passed to IWebserver::WebsocketListen(). </td></tr>
             <tr><td class="param">const char * <b>registeredPathForRequest</b></td><td>The registered path for that request.</td></tr>
             <tr><td class="param">const char * <b>host</b></td><td>The host of the request.</td></tr>
@@ -634,7 +634,7 @@ public:
 		
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">IWebrserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
+            <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">wsp_close_reason_t <b>reason</b></td><td>The reason why the plugin had been closed. See <a href="#wsp_close_reason_t ">wsp_close_reason_t </a> for more details. </td></tr>
             <tr><td class="param">bool <b>lastUser</b></td><td>If true, the user that receivces that callback is the last user, so that the instance can be deleted.</td></tr>
         </table>
@@ -651,7 +651,7 @@ public:
 		
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">IWebrserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
+            <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">byte * <b>certBuffer</b></td><td>The buffer with the certificate sent.</td></tr>
         </table>
 		
@@ -666,7 +666,7 @@ public:
 		
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">IWberserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
+            <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">const char * <b>pathName</b></td><td>The registered path name, the same as given to one of the listen functions. </td></tr>
             <tr><td class="param">wsp_path_type_t <b>pathType</b></td><td>The type of the registered path. The value depends on the called listen function. See <a href="#wsp_path_type_t">wsp_path_type_t</a> for more details.</td></tr>
         </table>
@@ -679,7 +679,7 @@ public:
 		
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">IWberserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
+            <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">dword <b>connectionID</b></td><td>The id of the connection that whants to authenticate. This ID must be given (together with the user name) to IWebserverPlugin::RequestUserPasswordResult() for answering the authentication request.</td></tr>
             <tr><td class="param">char * <b>resourceName</b></td><td>The resource the needs to authenticate. The resource can include a relative path, with the given registeredPathForRequest as root. </td></tr>
             <tr><td class="param">const char * <b>registeredPathForRequest</b></td><td>The registered path for the request.</td></tr>

@@ -31,7 +31,7 @@ innovaphone.Avatar = innovaphone.Avatar || function (start, user, domain, appdom
         }
         var p = providers.find(function (p) { return p.domain == d });
         if (p) {
-            return p.base + "?sip=" + sip + "&salt=" + p.salt + "&auth=" + encodeURIComponent(innovaphone.common.crypto.sha256(p.token + p.salt + sip)) + "&size=" + size + (dn ? ("&dn=" + dn) : "") + "&user=" + user + "&dom=@" + domain;
+            return p.base + "?sip=" + sip + "&salt=" + p.salt + "&auth=" + encodeURIComponent(innovaphone.common.crypto.sha256(p.token + p.salt + sip)) + "&size=" + size + (dn ? ("&dn=" + encodeURIComponent(dn)) : "") + "&user=" + user + "&dom=@" + domain;
         }
         else {
             return "";

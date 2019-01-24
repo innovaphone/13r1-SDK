@@ -2,8 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>innovaphone.lib1</title>
-    <link rel="stylesheet" href="../lib1/innovaphone.lib1.css" type="text/css" />
-    <link rel="stylesheet" href="../styles/innovaphone.Styles.css" type="text/css" />
     <link rel="stylesheet" href="../doc/innovaphone.doc.css" type="text/css" />
 </head>
 
@@ -64,6 +62,8 @@
         <dd>The websocket base URL to be used by the app.</dd>
         <dt>name</dt>
         <dd>The name of the app.</dd>
+        <dt>title</dt>
+        <dd>The display name of the app.</dd>
         <dt>args</dt>
         <dd>An object containing the URI parameters that have been passed to the app.</dd>
         <dt>margs</dt>
@@ -105,7 +105,7 @@
         <dt>finishActivity()</dt>
         <dd>Tells the client that the app has finished the activity that was started using startActivity(). The client will go back to the last app that was displayed before the activity.</dd>
         <dt>provideApi(api)</dt>
-        <dd>Tells the client that the app is providing a specific API (e.g. "com.innovaphone.phone"). Returns an object that encapsulates the handling of that API.</dd>
+        <dd>Tells the client that the app is providing a specific API (e.g. "com.innovaphone.phone"). The function should be called only after the app is connected and ready to receive API messages. Returns an object that encapsulates the handling of that API.</dd>
         <dt>consumeApi(api)</dt>
         <dd>Subscribes for a specific API (e.g. "com.innovaphone.phone"). Returns an object that encapsulates the handling of that API.</dd>
         <dt>openChannel(dst, args)</dt>
@@ -259,6 +259,9 @@ phoneApi.update({ calls: [] });
                 <dd>An object that contains static info provided by the app service of the provider. The format is defined by the API.</dd>
                 <dt>model</dt>
                 <dd>An object that contains dynamic info published by the app provider. The format is defined by the API.</dd>
+                <dt>restart</dt>
+                <dd>A counter that reflects how many times the API provider was restarted. This information can be used to detect restarts in order to renew subscriptions to that provider.
+                Note that the initial value is undefined and changes to 0 when the provider was started the first time. So a change to 0 does not indicate a restart.</dd>
             </dl>
         </dd>
         <dt>send(msg, provider, src, title)</dt>
@@ -303,7 +306,15 @@ phoneApi.update({ calls: [] });
     </p>
     <ul>
         <li><a href="../com.innovaphone.avatar/lib1_api_avatar.htm">com.innovaphone.avatar</a></li>
-        <li><a href="lib1_api_client.htm">com.innovaphone.client</a></li>
+        <li><a href="../com.innovaphone.calllist/lib1_api_calllist.htm">com.innovaphone.calllist</a></li>
+        <li><a href="../com.innovaphone.chat/com.innovaphone.chat.htm">com.innovaphone.chat</a></li>
+        <li><a href="../com.innovaphone.client/lib1_api_client.htm">com.innovaphone.client</a></li>
+        <li><a href="../com.innovaphone.devices/com.innovaphone.devices.htm">com.innovaphone.devices</a></li>
+        <li><a href="../com.innovaphone.devicesui/com.innovaphone.devicesui.htm">com.innovaphone.devicesui</a></li>
+        <li><a href="../com.innovaphone.discussion/com.innovaphone.discussion.htm">com.innovaphone.discussion</a></li>
+        <li><a href="../com.innovaphone.files/com.innovaphone.files.htm">com.innovaphone.files</a></li>
+        <li><a href="../com.innovaphone.launcher/com.innovaphone.launcher.htm">com.innovaphone.launcher</a></li>
+        <li><a href="../com.innovaphone.manager/lib1_api_manager.htm">com.innovaphone.manager</a></li>
         <li><a href="../com.innovaphone.phone/lib1_api_phone.htm">com.innovaphone.phone</a></li>
         <li><a href="../com.innovaphone.search/lib1_api_search.htm">com.innovaphone.search</a></li>
     </ul>

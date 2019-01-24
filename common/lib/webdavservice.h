@@ -42,6 +42,7 @@ public:
 class UWebdavService {
 public:
     virtual void WebdavServiceClosed() = 0;
+    virtual void WebdavServiceInitComplete(){}
 };
 
 class IWebdavServiceTask {
@@ -54,9 +55,10 @@ public:
     virtual void Close() = 0;
 };
 
-class WebdavService : public UTask {
+class WebdavService : public UTask, public UIoExec {
 
     // private Members
+    class IIoMux * iomux;
     class IDbFiles * dbFiles;
     class IDatabase * database;
     class IInstanceLog * log;
@@ -85,6 +87,8 @@ class WebdavService : public UTask {
     // UTask
     void TaskComplete(class ITask * const task) override;
     void TaskFailed(class ITask * const task) override;
+    // UIoExec
+    void IoExec(void * execContext) override;
 
     bool InsertLock(class WebdavLock * lock);
     class WebdavLock * LockLookup(const char * resource);
@@ -94,7 +98,7 @@ class WebdavService : public UTask {
     
 
 public:
-    WebdavService(class UWebdavService * service, class IDbFiles * dbFiles, class IDatabase * database, class IInstanceLog * const log, const char * webserverPath, const char * rootFolder = 0);
+    WebdavService(class IIoMux * const iomux, class UWebdavService * service, class IDbFiles * dbFiles, class IDatabase * database, class IInstanceLog * const log, const char * webserverPath, const char * rootFolder = 0);
     virtual ~WebdavService();
 
     bool WebRequestWebdavService(IWebserverPlugin * const webserverPlugin, ws_request_type_t requestType, char * resourceName, size_t dataSize);
@@ -132,6 +136,9 @@ public:
     void Cancel(wsr_cancel_type_t type);
     void Send(const void * data, size_t len);
     void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, const char * filename);
+    void SetTransferRange(size_t start, size_t end);
+    size_t GetRangeCount();
+    IWebserverGetRange* GetRange(size_t idx);
     void Close() override;
 };
 
@@ -152,7 +159,7 @@ public:
     virtual ~WebdavServiceGetDBFiles();
 
     void LookPath(char * path);
-    void GetFile(ulong64 id);
+    void GetFile(ulong64 id, unsigned int offset);
     void ReadFile();
     void Close() override;
 };
@@ -164,7 +171,8 @@ class WebdavServiceGet : public IWebdavServiceTask, public UWebdavServiceTask {
     char * path;
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
-
+    size_t requestedLength;
+    size_t sendedLength;
 public:
     WebdavServiceGet(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path);
     ~WebdavServiceGet();

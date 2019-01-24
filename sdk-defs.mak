@@ -25,7 +25,7 @@ endif
 
 ### x86_64 #############
 ifeq ($(MAKECMDGOALS),x86_64)
-SYSROOT := $(TOOLSDIR)/app-platform-libs/10006/x86_64
+SYSROOT := $(TOOLSDIR)/app-platform-libs/7/x86_64
 ifeq ($(DEBUG),1)
     OUTDIR = x86_64-debug
 else
@@ -55,7 +55,7 @@ endif
 
 ### arm #############
 ifeq ($(MAKECMDGOALS),arm)
-SYSROOT := $(TOOLSDIR)/app-platform-libs/10006/armel
+SYSROOT := $(TOOLSDIR)/app-platform-libs/7/armel
 ifeq ($(DEBUG),1)
     OUTDIR = arm-debug
 else

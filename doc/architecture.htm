@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>innovaphone App Platform</title>
+    <link rel="stylesheet" href="../web/doc/innovaphone.doc.css" type="text/css" />
+</head>
+
+<body>
+    <h1>Architectural overview</h1>
+    <p>
+        The innovaphone PBX system consists of there components
+        <table>
+            <tr>
+                <td><b><a href="#pbx">PBX</a></b></td>
+                <td>
+                    The PBX authenticates users, registers Endpoints, provides UC signaling functions
+                    and grants access to Apps.
+                </td>
+            </tr>
+            <tr>
+                <td><b><a href="#myapps">myApps Client</a></b></td>
+                <td>
+                    The myApps client is loaded from the PBX and starts Apps, which are loaded from the PBX
+                    and also the App Platform. The myApps client provides the login for the user and some
+                    basic features like presence information. All other features are provided by Apps
+                </td>
+            </tr>
+            <tr>
+                <td><b><a href="#ap">The App Platform</a></b></td>
+                <td>
+                    The App Platform hosts App Services, which provide Apps to the myApps client. All
+                    backend serices for the Apps are implemented there.
+                </td>
+            </tr>
+        </table>
+    </p>
+    <p>
+        Starting from version 13 the PBX provides interfaces based on <b>Websocket/JSON protocol</b>.
+        A common structure is used for authentication an capability exchange. This is called AppWebsocket.
+        Individual messages are used for various functions.
+        <table>
+            <tr>
+                <td><b><a href="appwebsocket/AppWebsocket.htm">AppWebsocket</a></b></td>
+                <td>
+                    The AppWebsocket protocol is the used for all communication between the myApps client,
+                    the App Platform the PBX and the Apps. It is based on Websocket connection and JSON coded
+                    messages. The AppWebsocket protocol itself defines the basic message structure and some
+                    basic features like authentication, version control and capability exchange.
+                    Other features are implemented individually by the instances which use
+                    this protocol.
+                </td>
+            </tr>
+            <tr>
+                <td><b><a href="appwebsocket/myApps.htm">myApps</a></b></td>
+                <td>
+                    The protocol the myApps client uses to communicate with the PBX
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <h2><a name="pbx">The PBX</a></h2>
+    <p>
+        PBX objects are used to link the different modules/components of a innovaphone PBX system. There are
+        different types used for different purposes
+    </p>
+
+    <h3>Table of content</h3>
+    <ul>
+        <li><a href="#pbxobj-ap">AP Object</a></li>
+        <li><a href="#pbxobj-app">App Object</a></li>
+    </ul>
+
+    <a name="pbxobj-ap"><h3>AP Object</h3></a>
+    <p>
+        The App Platform (AP) object is used to integrate an AP into a PBX. For this purpose a URL to the
+        respective App Platform Manager is stored in the AP object. A shared secret stored in the AP object
+        and in the App Platform Manager is used for authentication. There are two types of integration of an
+        AP:
+    </p>
+    <dl>
+        <dt>Integration as owner</dt>
+        <dd>
+            For integration as owner of the AP, the shared secret stored in the AP object must also be the
+            AP manager instance password, which allows opening of the AP manager. The PBX domain and the
+            intance domain must be identical in this case.
+        </dd>
+        <dt>Service Provider</dt>
+        <dd>
+            An AP may be used to publish services to other domains. To uses such services, an AP object
+            is created to link the AP. A shared secrect stored in the AP for this domain and in the AP
+            object is used for authentication.
+        </dd>
+    </dl>
+    <p>
+        The AP object provides the <a href="../web/com.innovaphone.manager/com.innovaphone.manager.htm">com.innovaphone.manager API</a> which is used by the PBX Manager to
+        access <a href="../web/com.innovaphone.manager/pbx_manager_plugin.htm">PBX Manager Plugins</a> provided by the AP, which can be used to configure access to
+        App Instances provided by the AP.
+    </p>
+    <p>
+        The PBX Manager Plugin APs is used to create the AP object to integrate a AP into the system.
+    </p>
+
+    <a name="pbxobj-app"><h3>App Object</h3></a>
+    <p>
+        An App Object is used to integrate an App Instance in the PBX. For this purpose a URL to the
+        respective App Instance is stored in the App object. A shared secret stored in the App object
+        and the App instance is used for authentication.
+    </p>
+    <p>
+        By configuration in the App object a permanent Websocket connection from the App object to the App
+        instance can be established. This is needed if the App instance needs to access PBX APIs. Which
+        PBX APIs are accessible by the App instance is also configured in the App object.
+    </p>
+
+    <h2><a name="ap">The App Platform</a></h2>
+
+    <p>
+        The innovaphone App Platform is a Linux based system, which may run on a innovaphone gateway
+        or in a virtualized PC environment. An App Platform manager allows to install, start, stop and
+        update innovaphone App Services.
+        <br />
+        For an App Service a abstract operating environment is provided, so that App Services can be
+        implemented completely operating system independet. For developing an innovaphone App no
+        Linux knowlege is needed.
+    </p>
+
+    <h3>Table of content</h3>
+    <ul>
+        <li><a href="#Manager">The App Platform Manager</a></li>
+        <li><a href="#Webserver">The App Platform Webserver</a></li>
+        <li><a href="#Database">The App Platform Database</a></li>
+        <li><a href="#AppService">The App Service</a></li>
+        <li><a href="#App">The App</a></li>
+    </ul>
+
+    <a name="Manager"><h3>The App Platform Manager</h3></a>
+    <p>
+        The manager is responsible for managing the App services and instances (see below).
+        There is the place where each service and instance can be stopped or started, Apps can be installed
+        and removed, backups can be created and restored, the logs of the apps cen be shows, the app itself
+        can be configured (Webserver path, database name, ...) and so on.
+        The manager is the place to go also to access the innovaphone App Store to download and install
+        new apps.
+        The manager	also creates a sandbox environment for each app for security reasons. So an app
+        can only access and modify their own data.
+    </p>
+
+    <a name="Webserver"><h3>The App Platform Webserver</h3></a>
+    <p>
+        The webserver is the entrance to the world for each app. An app will register itself to the webserver
+        buy using an plugin system of the SDK. When registering, the app will use a path which can be accessed
+        by a HTTP client. (The path will be defined in the App instance setting inside the Manager).
+        There are three types of access the app can register: HTTP, Websocket and Passthrough. HTTP means,
+        that under the path to register an client can access HTTP files. This files can
+        be static files (statically linked to the app) or dynamic files, the app will build up on runtime.
+        Registering as websocket means, that the app will receivie incomming websocket connections.
+        And Passthrough gives the full responsibility of the access to the app. So the App needs to know
+        what to to with the HTTP protocol, so it is recommended to use passthrough only, if you have to!
+    </p>
+
+    <a name="Database"><h3>The App Platform Database</h3></a>
+    <p>
+        Even if the SDK supports two database systems (mySQL and PostgreSQL), PostgreSQL is the database
+        used for the apps. So it is recommended to use it for your application, too.
+        The database is not only used for application related data, also the configuration as well as
+        files (only when created using  the IDbFiles interface) are stored inside the database.
+        Each App instance has it's own database and database connection, which will be shared between
+        all of the instances session (see below).
+        When creating a backup of an instance, the complete database for that instance will be saved
+        and restored, if you're going to restore the backup. This makes creating a Backup of the apps data easy.
+    </p>
+
+    <a name="AppService"><h3>The App Service</h3></a>
+    <p>
+        The App Service ia an in C++ written application running on the App Platform.
+        The SDK provides a set of interfaces for everything needed to created an app for the
+        innovaphone App Platform. This includes database access, include the app into
+        the webserver like a plugin, a HTTP client, sockets, file storage and so on.
+    <p>
+        It will be managed by the app manager, where an instance of that application will be set up.
+        Other instances can be created, too. Because of that mechanism, each App Service must have
+        a subclass of AppService. There, the AppService::CreateInstance()
+        must be implemented to return a new instance SubClass of AppInstance, each time the CreateInstance()
+        function will be called. And the AppInstance itself needs to create an instance of subclass
+        of AppSession each time an incomming websocket
+        request from a new UI session comes in. The procedure is as follows:
+    </p>
+    <p>
+        <ul>
+            <li>
+                The manager loads the app into the memory.
+            </li>
+            <li>
+                The app creates an AppService, which will report to the manager, that the app had been loaded.
+            </li>
+            <li>
+                The manager now sends a message to the app to create an instance of AppInstance.
+            </li>
+            <li>
+                The created AppInstance will start to listen to incoming websocket request.
+            </li>
+            <li>
+                If a websocket request for a new session comes in, the AppInstance will create an instance
+                of an AppSession and assigns the websocket connection to that instance.
+            </li>
+        </ul>
+    </p>
+    <p>
+        So finally, each app has only one AppService instance, which is the part of the app that communicates
+        with the Manager. It also is responsible to create the AppInstance, the manager calls to create
+        (depending how many app	instances had been configured). The AppInstance itself is responsible
+        for listening to incomming websocket requests and create a AppSession for each websocekt connection
+        that comes from an Apps JavaScript UI. That	AppSession is the core of the application, because it
+        handles the user input, sent from the UI to the session, returns results, reads and writes from and
+        to the database, etc.
+    </p>
+    <p>
+        The App Platform Manager can start multiple instances within an App Service, to support different
+        configurations or even different customers. The different Instances run within the same process
+        context.
+    </p>
+
+    <a name="App"><h3>The App</h3></a>
+    <p>
+        The App is the component, which runs in the myApps client. It is written in Javascript. Of course
+        an App typically needs an backend service to provide useful functionality, so the App is mostly just
+        the User Interface.
+    </p>
+    <p>
+        To create the UI, the SDK provides some JavaScript files that handles all of the App Service / App
+        communcation. This communication happens over the websocket connection, sending JSON messages
+        back an forth. So the AppSession needs to implement the messages it will receive from and send
+        to the UI, while the UI must handle the same messages, too. The SDK also provides some base and
+        extended JavaScript UI controls, as well as everything needed to localize the
+        app and use the themes of the innovaphone App Client. But the developer still needs knowledge
+        of JavaScript and HTML to create the UI.
+    </p>
+    <p>
+        The files for that UI will be linked as static files into the binary of the App Service.
+        Each request to one of those files will be handled automatically by the IWebserverPlugin,
+        so the App Service itself do't need to handled that by itself. The good side effect
+        of this is, that no one can change the files because there are not sotred seperatly on an hard disk.
+    </p>
+</body>
+
+</html>

@@ -40,6 +40,7 @@ launcherApi.send({ mt: "AddLocalNotification", title: title, text: null, acceptT
     <h4>Parameters</h4>
     <table style="margin-left:-12px">
         <tr><td class="param">string <b>src </b></td><td>A unique src for this notification. This src is also used to remove the notification later.</td></tr>
+        <tr><td class="param">string <b>type </b></td><td>The type of the notification ("Default", "PhoneCall" or "ChatMessage").</td></tr>
         <tr><td class="param">string <b>title </b></td><td>The title of the notification.</td></tr>
         <tr><td class="param">string <b>text </b></td><td>The text of the notification (e.g. chat message).</td></tr>
         <tr><td class="param">string <b>smallIcon </b></td><td>A smallIcon of the notification.</td></tr>
@@ -52,12 +53,13 @@ launcherApi.send({ mt: "AddLocalNotification", title: title, text: null, acceptT
     </table>
     
     <h4>Remarks</h4>
-    Basically you can establish four kinds of notifications with the *Title parameters:
+    Basically you can establish five kinds of notifications with the *Title parameters:
     <table style="margin-left:-12px">
-        <tr><td><b>chat</b> notification</td><td>set just replyTitle</td></tr>
-        <tr><td><b>call</b> notification</td><td>set just rejectTitle and acceptTitle (buttonTitle optional)</td></tr>
-        <tr><td><b>one button</b> notification</td><td>set buttonTitle</td></tr>
-        <tr><td><b>no button</b> notification</td><td>do not set any *Title</td></tr>
+        <tr><td><b>chat</b> notification</td><td>type:"ChatMessage", set replyTitle</td></tr>
+        <tr><td><b>call</b> notification</td><td>type:"PhoneCall", set rejectTitle and acceptTitle (buttonTitle optional)</td></tr>
+        <tr><td><b>one button</b> notification</td><td>type:"Default", set buttonTitle</td></tr>
+        <tr><td><b>two button</b> notification</td><td>type:"Default", set rejectTitle and acceptTitle</td></tr>
+        <tr><td><b>no button</b> notification</td><td>type:"Default", do not set any *Title</td></tr>
     </table>
     
     <a name="LocalNotificationClicked"><h2>LocalNotificationClicked callback</h2></a>

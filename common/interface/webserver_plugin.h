@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*/
 /* webserverplugin.h                                                         */
-/* copyright (c) innovaphone 2015                                            */
+/* copyright (c) innovaphone 2015 - 2019                                     */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
@@ -112,6 +112,7 @@ typedef enum {
     WSP_RESPONSE_WEBM,
     WSP_RESPONSE_PEM,
     WSP_RESPONSE_MOBILECONFIG,
+    WSP_RESPONSE_CACHE_MANIFEST,
 } wsr_type_t;
 
 
@@ -163,6 +164,7 @@ static const ws_type_sfx_t suffixes[] = {
     { "webm", WSP_RESPONSE_WEBM },
     { "pem", WSP_RESPONSE_PEM },
     { "mobileconfig", WSP_RESPONSE_MOBILECONFIG },
+    { "appcache", WSP_RESPONSE_CACHE_MANIFEST },
 };
 
 
