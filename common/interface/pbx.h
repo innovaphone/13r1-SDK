@@ -51,5 +51,6 @@ public:
     virtual const char * GetPrefixIntl() = 0;
     virtual const char * GetPrefixNtl() = 0;
     virtual const char * GetPrefixSubs() = 0;
+    virtual const char * GetAreaCode() = 0;
     virtual const char * GetCountryCode() = 0;
 };

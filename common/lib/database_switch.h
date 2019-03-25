@@ -24,21 +24,22 @@ public:
     IDatabase * GetDatabase();
 
     // IDatabase definitions
-    void Connect(const char * address, const char * dbname, const char * user, const char * password);
-    bool Connected();
-    void Shutdown();
-    size_t QueryPrint(char * buffer, size_t bufferSize, const char * sqlcmd, ...);
-    size_t QueryPrintV(char * buffer, size_t bufferSize, const char * sqlcmd, va_list argList);
-    void ExecSQL(UDatabase * const user, dword flags, const char * sqlcmd, ...);
-    void ExecSQLV(UDatabase * const user, dword flags, const char * sqlcmd, va_list argList);
-    void InsertSQL(UDatabase * const user, const char * sqlcmd, ...);
-    void InsertSQLV(UDatabase * const user, const char * sqlcmd, va_list argList);
-    void BeginTransaction(UDatabase * const user, const char * lockTableCmd = NULL);
-    void EndTransaction(UDatabase * const user, bool doRollback = false);
-    void PrepareStatement(UDatabase * user, const char * sqlcmd);
-    void ExecSQL(UDatabase * const user, dword flags, class IPreparedStatement * const statement);
-    void InsertSQL(UDatabase * const user, class IPreparedStatement * const statement);
-    const char * GetLastErrorMessage();
+    void Connect(const char * address, const char * dbname, const char * user, const char * password) override;
+    bool Connected() override;
+    void Shutdown() override;
+    size_t QueryPrint(char * buffer, size_t bufferSize, const char * sqlcmd, ...) override;
+    size_t QueryPrintV(char * buffer, size_t bufferSize, const char * sqlcmd, va_list argList) override;
+    void ExecSQL(UDatabase * const user, dword flags, const char * sqlcmd, ...) override;
+    void ExecSQLV(UDatabase * const user, dword flags, const char * sqlcmd, va_list argList) override;
+    void InsertSQL(UDatabase * const user, const char * sqlcmd, ...) override;
+    void InsertSQLV(UDatabase * const user, const char * sqlcmd, va_list argList) override;
+    void BeginTransaction(UDatabase * const user, const char * lockTableCmd = NULL) override;
+    void EndTransaction(UDatabase * const user, bool doRollback = false) override;
+    void PrepareStatement(UDatabase * user, const char * sqlcmd) override;
+    void ExecSQL(UDatabase * const user, dword flags, class IPreparedStatement * const statement) override;
+    void InsertSQL(UDatabase * const user, class IPreparedStatement * const statement) override;
+    size_t EscapeSearchLiterals(const char * value, char * buffer, size_t bufferSize) override;
+    const char * GetLastErrorMessage() override;
     void DataSetDeleted();
 };
 

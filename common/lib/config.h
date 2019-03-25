@@ -137,7 +137,7 @@ public:
     ConfigChoice(ConfigContext * context, const char * name, size_t defVal, const char ** options, bool unmanaged = false);
     virtual ~ConfigChoice();
 
-    int ValueIdx() const { return this->valueIdx; }
+    int ValueIdx() const { return (int)this->valueIdx; }
     const char * Value() const { return (this->valueIdx < this->optionsCount ? this->choiceValues[this->valueIdx] : NULL); }
     void SetValue(const char * option);
     void SetValueIdx(size_t valudIdx);

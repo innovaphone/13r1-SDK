@@ -119,7 +119,7 @@ public:
         This function can be called mupltiple times.
     </dd>
 
-    <a name="hash_final"><div class="fnhead">final</div></a>
+    <div id="hash_final" class="fnhead">final</div>
     <dd>
         Calculates the hash and copies the value to the given out buffer.
         
@@ -153,7 +153,7 @@ public:
         </table>
     </dd>
 
-    <a name="hash_size"><div class="fnhead">size</div></a>
+    <div id="hash_size" class="fnhead">size</div>
     <dd>
         <h4>Return value</h4>
         <table style="margin-left:-12px">
@@ -169,17 +169,17 @@ public:
     <h1>Data types</h1>
     <h2>Defines / Statics</h2>
     <table style="margin-left: 20px">
-        <tr><td><a name="HASH_SIZE_MD4"><b>HASH_SIZE_MD4</b></td><td>MD4 hashes use 16 bytes</td></tr>
-        <tr><td><a name="HASH_SIZE_MD5"><b>HASH_SIZE_MD5</b></td><td>MD5 hashes use 16 bytes</td></tr>
-        <tr><td><a name="HASH_SIZE_SHA1"><b>HASH_SIZE_SHA1</b></td><td>SHA1 hashes use 20 bytes</td></tr>
-        <tr><td><a name="HASH_SIZE_SHA224"><b>HASH_SIZE_SHA224</b></td><td>SHA224 hashes use 28 bytes</td></tr>
-        <tr><td><a name="HASH_SIZE_SHA256"><b>HASH_SIZE_SHA256</b></td><td>SHA256 hashes use 32 bytes</td></tr>
-        <tr><td><a name="HASH_SIZE_SHA384"><b>HASH_SIZE_SHA384</b></td><td>SHA384 hashes use 48 bytes</td></tr>
-        <tr><td><a name="HASH_SIZE_SHA512"><b>HASH_SIZE_SHA512</b></td><td>SHA512 hashes use 64 bytes</td></tr>
-        <tr><td><a name="HASH_SIZE_MAX"><b>HASH_SIZE_MAX</b></td><td>The maximum hash size produced by the library.</td></tr>
+        <tr><td id="HASH_SIZE_MD4"><b>HASH_SIZE_MD4</b></td><td>MD4 hashes use 16 bytes</td></tr>
+        <tr><td id="HASH_SIZE_MD5"><b>HASH_SIZE_MD5</b></td><td>MD5 hashes use 16 bytes</td></tr>
+        <tr><td id="HASH_SIZE_SHA1"><b>HASH_SIZE_SHA1</b></td><td>SHA1 hashes use 20 bytes</td></tr>
+        <tr><td id="HASH_SIZE_SHA224"><b>HASH_SIZE_SHA224</b></td><td>SHA224 hashes use 28 bytes</td></tr>
+        <tr><td id="HASH_SIZE_SHA256"><b>HASH_SIZE_SHA256</b></td><td>SHA256 hashes use 32 bytes</td></tr>
+        <tr><td id="HASH_SIZE_SHA384"><b>HASH_SIZE_SHA384</b></td><td>SHA384 hashes use 48 bytes</td></tr>
+        <tr><td id="HASH_SIZE_SHA512"><b>HASH_SIZE_SHA512</b></td><td>SHA512 hashes use 64 bytes</td></tr>
+        <tr><td id="HASH_SIZE_MAX"><b>HASH_SIZE_MAX</b></td><td>The maximum hash size produced by the library.</td></tr>
     </table>
 
-    <h2><a name="hash_t">hash_t</h2>
+    <h2 id="hash_t">hash_t</h2>
     <pre><code style="laguage-cpp">enum hash_t {
     HASH_UNDEFINED,
     HASH_MD4,
@@ -211,7 +211,7 @@ public:
     Please use the algorithms of the SHA2 family (SHA224, SHA256, SHA384 or SHA512).
 
     <h1> Code Example </h1>
-    <a name="Example_SHA256"><h2>Calculating a SHA256 hash</h2></a>
+    <h2 id="Example_SHA256">Calculating a SHA256 hash</h2>
     <pre class="sample"><code style="language-cpp">hash h;
 byte out[32];
 h.init(HASH_SHA256);

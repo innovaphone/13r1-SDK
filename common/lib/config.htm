@@ -17,20 +17,22 @@
 		from within a JavaScript App, the C++ config library communicates with the <a href="../../web/config/config.htm">JavaScript config library</a> using JSON messages. See the
 		JS config library documentation for more informations.
 	</p>
-	<p>
+    <p>
 		The usage of the config library is straight forward and only needs a couple of steps:
-		<ul>
-			<li>Create instance of ConfigContext.</li>
-			<li>Register the config library to the JSON API framework by passing the created instance to RegisterJsonApi(configContextInstance).</li>
-			<li>Create the database table used by the config lib by calling CreateInitTask(databaseObject) and exetuting the returned task (don't forget to free it,
-			    after the task is finished).</li>
-			<li>Add ConfigItem members to your class and initialize them passing the ConfigContext instance (see the description of the ConfigItems classes
-			    below).</li>
-		</ul>
+    </p>        
+    <ul>
+        <li>Create instance of ConfigContext.</li>
+        <li>Register the config library to the JSON API framework by passing the created instance to RegisterJsonApi(configContextInstance).</li>
+        <li>Create the database table used by the config lib by calling CreateInitTask(databaseObject) and exetuting the returned task (don't forget to free it,
+            after the task is finished).</li>
+        <li>Add ConfigItem members to your class and initialize them passing the ConfigContext instance (see the description of the ConfigItems classes
+            below).</li>
+    </ul>
+    <p>
         Now the appliction service and the JavaScript app only need to access the items or changed and save them (especially from the JavaScript side). ConfigContext and
         the JavaScript config library are handling all of the communication, so there is no need for an app to worry about that.
-    </p>
-	
+	</p>
+    
     <h2>File information</h2>
     <table style="margin-left:-12px">
         <tr><td><b>File</b></td><td>common/interface/socket.h<br><br></td></tr>
@@ -988,7 +990,7 @@ public:
 		are no config items), or filled with objects descriped in <a href="#ConfigItemObject">ConfigItemObject</a> providing the informations for an config item.
     </dd>
 
-    <a name="ConfigItemObject"><h3>ConfigItemObject</h3></a>
+    <h3 id="ConfigItemObject">ConfigItemObject</h3></a>
     <pre><code class="json">{
     "name": "ConfigItemName",
     "type": "TypeOfItem",

@@ -1,5 +1,5 @@
-/// <reference path="~/sdk/web/lib1/innovaphone.lib1.js" />
-/// <reference path="~/sdk/web/ui1.lib/innovaphone.ui1.lib.js" />
+/// <reference path="../lib1/innovaphone.lib1.js" />
+/// <reference path="../ui1.lib/innovaphone.ui1.lib.js" />
 
 innovaphone = innovaphone || {};
 innovaphone.ui1 = innovaphone.ui1 || {};

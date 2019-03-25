@@ -50,7 +50,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="GetLanguageId">GetLanguageId</a> (static function)</div>
+    <div class="fnhead" id="GetLanguageId">GetLanguageId</a> (static function)</div>
     <dl>
         <dd>
             This functions returns the array index (language id) of the lang parameter inside the languages array.
@@ -67,7 +67,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="ReplaceArgs">ReplaceArgs</a> (static function)</div>
+    <div class="fnhead" id="ReplaceArgs">ReplaceArgs</a> (static function)</div>
     <dl>
         <dd>
             This function replaces dynamic arguments inside a translated string. A dynamic argument is a string like $1, $2, ... (starting with 1).
@@ -88,7 +88,7 @@ public:
         </dd>
     </dl>
     <h1>Data types</h1>
-    <h2><a name="LanguageTableEntry">LanguageTableEntry</a></h2>
+    <h2 id="LanguageTableEntry">LanguageTableEntry</h2>
     <pre><code class="laguage-cpp">typedef struct { 
     const char * lang;              // two char language identifier, e.g. 'en' or 'de'
     const char * utf8;              // the language name in utf8
@@ -98,7 +98,7 @@ public:
     <h3>Overview</h3>
     The <code class="laguage-cpp">struct LanguageTableEntry</code> holds information about one language.
 
-    <h2><a name="language_param_type_t">language_param_type_t</a></h2>
+    <h2 id="language_param_type_t">language_param_type_t</h2>
     <pre><code class="laguage-cpp">typedef enum {
     LANGUAGE_PARAM_TYPE_STRING = 0,
     LANGUAGE_PARAM_TYPE_UINT32,

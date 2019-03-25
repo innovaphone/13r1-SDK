@@ -16,8 +16,18 @@ enum MessageMouseType {
     KEYPRESSED,
     KEYPRESSED_DOWN,
     KEYPRESSED_DOWN_UP,
-    KEYPRESSED_UP
+    KEYPRESSED_UP,
+    STOP_HOOK,
+    STOP_HOOK_THREAD
 };
+
+#define REMOTE_CONTROL_MSG_TYPE  0
+#define REMOTE_CONTROL_X_COOR    1
+#define REMOTE_CONTROL_Y_COOR    3
+#define REMOTE_CONTROL_X_DIM     5
+#define REMOTE_CONTROL_Y_DIM     9
+#define REMOTE_CONTROL_VK       13
+#define REMOTE_CONTROL_UNICODE  15
 
 enum MouseType {
     Arrow = 0,
@@ -82,6 +92,7 @@ enum AppSharingMessages {
    MOUSE_MOVE,
    INFO_MESSAGE,
    INFO_MESSAGE_ACK,
+   LOW_QUALITY_IMAGE_MESSAGE,
 };
 
 class UImageBuffer {
@@ -103,7 +114,7 @@ public:
 
     virtual bool Mark(unsigned int appId, int coorX, int coorY, int dimX, int dimY) = 0;
     virtual void Clean(unsigned int appId) = 0;
-    virtual bool GetWindowPosition(byte appId, word * x, word * y) = 0;
+    virtual bool GetWindowPosition(byte appId, word * x, word * y, int * aspectRatio) = 0;
 
     virtual void SubscribeApplications(void) = 0;
     virtual void UnsubscribeApplications(void) = 0;
@@ -139,6 +150,20 @@ public:
     int len;
 };
 
+class ILowQualityImage {
+public:
+    ILowQualityImage(unsigned char *buf, int len) {
+        this->buf = buf;
+        this->len = len;
+        this->type = CompressionType::JPEG;
+    };
+    ~ILowQualityImage() { if(this->buf) free(this->buf); };
+
+    CompressionType type;
+    unsigned char *buf;
+    int len;
+};
+
 #define MAX_X_BLOCKS 30
 #define MAX_Y_BLOCKS 17
 
@@ -154,6 +179,8 @@ public:
     // Only trigger calls in IScreenSink for the consistent part of the current block
     //virtual void Set(byte x, byte y, class IImage * image, byte version, byte update) = 0;
     virtual void Set(class IImage * image) = 0;
+
+    virtual void Set(class ILowQualityImage * image) = 0;
 
     // Returns the number of updates of the specified block
     // Called by IScreenSink to get the image for displaying or network transmission
@@ -181,6 +208,7 @@ public:
     // Notification that a new version of a block is ready for displaying / transmission
     // Senders should mark this block version in the local state
     virtual void ImageAdded(byte x, byte y, byte version) {};
+    virtual void LowQualityImage(class ILowQualityImage * image) {};
 
     // Notification that a new update of a block is ready for displaying / transmission
     // Senders should mark this update in the local state
@@ -205,7 +233,7 @@ public:
     static IRemoteControl * Create(class URemoteControl * const user, class IInstanceLog * const log);
     virtual ~IRemoteControl() {}
 
-    virtual void SendCommand(const char * cmd, int len) = 0;
+    virtual void SendCommand(word coorX, word coorY, int aspectRatio, const char * cmd, int len) = 0;
     virtual void MouseMove(word coorX, word coorY, word posX, word posY) = 0;
     virtual void Close() = 0;
 };

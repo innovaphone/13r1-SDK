@@ -67,6 +67,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
     var MOUSE_MOVE = 9
     var INFO_MESSAGE = 10
     var INFO_MESSAGE_ACK = 11
+    var LOW_QUALITY_IMAGE_MESSAGE = 12
 
     var BLOCK_MSG = 0;
     var BLOCK_MSG_256 = 1;
@@ -161,8 +162,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         var scale_image = true;
         var m_offset_x = 0;
         var m_offset_y = 0;
-        var last_mouse_x = 0;
-        var last_mouse_y = 0;
+        var last_mouse_x = -1;
+        var last_mouse_y = -1;
+        var last_mouse_sent_x = -1;
+        var last_mouse_sent_y = -1;
         var session_id = sessionId;
         var app_name = appName;
         var container_id = null;
@@ -178,6 +181,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         var full_screen_width = 0;
         var full_screen_height = 0;
         var cursor_offset = false;
+        var lastMouseWasRemote = true;
 
         var CURSOR_IDC_ARROW = 0;
         var CURSOR_IDC_HAND = 1;
@@ -410,13 +414,13 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         function mouseMoveHandle(e) {
             if (!have_control || !full_screen) return;
             var rect = canvas_id[2].getBoundingClientRect();
-            console.log('mouseMoveHandle ' + e.clientY + ' x= ' + e.clientX);
-            console.log('rect ' + rect.top + ' b= ' + rect.bottom + ' l= ' + rect.left + ' r= ' + rect.right);
             if (e.clientY < rect.top || e.clientX < rect.left) return;
             if (e.clientY > rect.bottom || e.clientX > rect.right) return;
 
             var coord = onMouseMove(e.clientX, e.clientY, rect);
             if (coord) {
+                console.log('AppSharing: mouseMoveHandle coordinates y=' + e.clientY + ' x=' + e.clientX + ' -> y=' + coord[1] + ' -> x=' + coord[0] + ' canvas t=' + rect.top + ' b=' + rect.bottom + ' l=' + rect.left + ' r=' + rect.right);
+
                 var arrayInfoMsg = new ArrayBuffer(10);
                 var dmsg = new Uint8Array(arrayInfoMsg);
 
@@ -429,6 +433,9 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 dmsg[9] = coord[1] & 0xff;
 
                 if (data_channel) data_channel.send(arrayInfoMsg);
+
+                last_mouse_sent_x = coord[0];
+                last_mouse_sent_y = coord[1];
             }
         }
 
@@ -529,8 +536,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 }
                 dmsg[off] = 0;
                 var infoMsg = new _InfoMessage(arrayInfoMsg, session_id, dmsg[2]);
-                if (data_channel) data_channel.send(arrayInfoMsg);
-                queueInfoMsg(infoMsg);
+                queueInfoMsg(infoMsg, arrayInfoMsg);
+
+                last_mouse_sent_x = coord[0];
+                last_mouse_sent_y = coord[1];
             }
         }
 
@@ -631,8 +640,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 }
                 dmsg[off] = 0;
                 var infoMsg = new _InfoMessage(arrayInfoMsg, session_id, dmsg[2]);
-                if (data_channel) data_channel.send(arrayInfoMsg);
-                queueInfoMsg(infoMsg);
+                queueInfoMsg(infoMsg, arrayInfoMsg);
+
+                last_mouse_sent_x = coord[0];
+                last_mouse_sent_y = coord[1];
             }
         }
 
@@ -652,7 +663,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             if (!have_control) return;
             //log('domMouseScroll ' + e.wheelDelta);
 
-            var jsonMsg = '{"mt":"mouse","wheel":1}';
+            var jsonMsg;
+            if (e.wheelDelta < 0) jsonMsg = '{"mt":"mouse","wheel":1}';
+            else jsonMsg = '{"mt":"mouse","wheel":0}';
+
             var arrayInfoMsg = new ArrayBuffer(9 + jsonMsg.length + 1);
             var dmsg = new Uint8Array(arrayInfoMsg);
 
@@ -668,8 +682,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             }
             dmsg[off] = 0;
             var infoMsg = new _InfoMessage(arrayInfoMsg, session_id, dmsg[2]);
-            if (data_channel) data_channel.send(arrayInfoMsg);
-            queueInfoMsg(infoMsg);
+            queueInfoMsg(infoMsg, arrayInfoMsg);
 
             e.stopPropagation();
             e.preventDefault();
@@ -677,7 +690,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
 
         function mouseWheel(e) {
-            var jsonMsg = '{"mt":"mouse","wheel":1}';
+            var jsonMsg;
+            if (e.wheelDelta < 0) jsonMsg = '{"mt":"mouse","wheel":1}';
+            else jsonMsg = '{"mt":"mouse","wheel":0}';
+
             var arrayInfoMsg = new ArrayBuffer(9 + jsonMsg.length + 1);
             var dmsg = new Uint8Array(arrayInfoMsg);
 
@@ -693,8 +709,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             }
             dmsg[off] = 0;
             var infoMsg = new _InfoMessage(arrayInfoMsg, session_id, dmsg[2]);
-            if (data_channel) data_channel.send(arrayInfoMsg);
-            queueInfoMsg(infoMsg);
+            queueInfoMsg(infoMsg, arrayInfoMsg);
 
             return false;
         }
@@ -703,7 +718,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             //log("onKeyUp " + keyCode + ' ' + shiftKey + ' ' + altKey + ' ' + ctrlKey);
             var ret = Array(3);
 
-            if ((keyCode >= VK_A && keyCode <= VK_Z) || (keyCode >= VK_a && keyCode <= VK_z)) {
+            if ((keyCode >= VK_A && keyCode <= VK_Z)) { // || (keyCode >= VK_a && keyCode <= VK_z)) {
                 ret[0] = 0;
                 return ret;
             }
@@ -725,12 +740,12 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
 
         function keyUp(e, type) {
-            //log("IE-onKeyUp " + e.charCode + ' ' + e.which + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
+            console.log("IE-onKeyUp " + e.char + ' ' + e.charCode + ' ' + e.which + ' ' + e.key + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
             var ret = onKeyUp(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey);
             if (ret[0] == 0) {
                 return false;
             }
-            var jsonMsg = '{"mt":"keyboard","keyUp":' + ret[2] + '}';
+            var jsonMsg = '{"mt":"keyboard","keyUp":' + ret[2] + ',"charCode":"' + e.key + '"}';
             var arrayInfoMsg = new ArrayBuffer(9 + jsonMsg.length + 1);
             var dmsg = new Uint8Array(arrayInfoMsg);
 
@@ -746,8 +761,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             }
             dmsg[off] = 0;
             var infoMsg = new _InfoMessage(arrayInfoMsg, session_id, dmsg[2]);
-            if (data_channel) data_channel.send(arrayInfoMsg);
-            queueInfoMsg(infoMsg);
+            queueInfoMsg(infoMsg, arrayInfoMsg);
 
             return true;
         }
@@ -756,7 +770,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             //log("onKeyDown " + keyCode + ' ' + shiftKey + ' ' + altKey + ' ' + ctrlKey);
             var ret = Array(3);
 
-            if ((keyCode >= VK_A && keyCode <= VK_Z) || (keyCode >= VK_a && keyCode <= VK_z)) {   // Ctrl + X
+            if ((keyCode >= VK_A && keyCode <= VK_Z)) { // || (keyCode >= VK_a && keyCode <= VK_z)) {   // Ctrl + X
                 if (shiftKey) keyCode += 256;
                 if (ctrlKey) keyCode += 512;
                 if (altKey) keyCode += 1024;
@@ -792,11 +806,15 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
 
         function keyDown(e) {
-            //log("KeyDown " + e.charCode + ' ' + e.which + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
+            console.log("KeyDown " + e.char + ' ' + e.charCode + ' ' + e.which + ' ' + e.key + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
             var ret = onKeyDown(e.keyCode, e.shiftKey, e.altKey, e.ctrlKey);
             if (ret[0] == 0) {
                 if (ret[1]) {
-                    var jsonMsg = '{"mt":"keyboard","keyDown":' + ret[2] + '}';
+                    var jsonMsg;
+                    if (ret[1] == 201) jsonMsg = '{"mt":"keyboard","keyDown":' + ret[2] + ',"charCode":"' + e.key + '"}';
+                    else if (ret[1] == 202) jsonMsg = '{"mt":"keyboard","keyDownUp":' + ret[2] + ',"charCode":"' + e.key + '"}';
+                    else if (ret[1] == 200) jsonMsg = '{"mt":"keyboard","keyPressed":' + ret[2] + ',"charCode":"' + e.key + '"}';
+
                     var arrayInfoMsg = new ArrayBuffer(9 + jsonMsg.length + 1);
                     var dmsg = new Uint8Array(arrayInfoMsg);
 
@@ -812,8 +830,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     }
                     dmsg[off] = 0;
                     var infoMsg = new _InfoMessage(arrayInfoMsg, session_id, dmsg[2]);
-                    if (data_channel) data_channel.send(arrayInfoMsg);
-                    queueInfoMsg(infoMsg);
+                    queueInfoMsg(infoMsg, arrayInfoMsg);
                 }
                 return false;
             }
@@ -823,7 +840,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         function onKeyPressed(keyCode, shiftKey, altKey, ctrlKey) {
             var ret = Array(3);
 
-            //log("onKeyPressed " + keyCode + ' ' + shiftKey + ' ' + altKey + ' ' + ctrlKey);
+            //console.log("onKeyPressed " + keyCode + ' ' + shiftKey + ' ' + altKey + ' ' + ctrlKey);
 
             ret[0] = 1;
             ret[1] = 0;
@@ -839,7 +856,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
 
         function keyPress(e, type) {
-            //log("KeyPressed t=" + type + ' ' + e.charCode + ' ' + e.which + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
+            console.log("KeyPressed t=" + type + ' ' + e.char + ' ' + e.charCode + ' ' + e.which + ' ' + e.key + ' ' + e.keyCode + ' ' + e.shiftKey + ' ' + e.altKey + ' ' + e.ctrlKey);
             if (type == 'keypress_l') {
                 var ch = e.keyCode || e.which;
                 var ret = onKeyPressed(e.keyCode || e.which, e.shiftKey, e.altKey, e.ctrlKey);
@@ -850,7 +867,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             }
             if (ret[0] == 0) {
                 if (ret[1]) {
-                    var jsonMsg = '{"mt":"keyboard","keyPress":' + ret[2] + ',"keyCode":' + ch + '}';
+                    var jsonMsg = '{"mt":"keyboard","keyPressed":' + ret[2] + ',"keyCode":' + ch + ',"charCode":"' + e.key + '"}';
                     var arrayInfoMsg = new ArrayBuffer(9 + jsonMsg.length + 1);
                     var dmsg = new Uint8Array(arrayInfoMsg);
 
@@ -866,8 +883,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     }
                     dmsg[off] = 0;
                     var infoMsg = new _InfoMessage(arrayInfoMsg, session_id, dmsg[2]);
-                    if (data_channel) data_channel.send(arrayInfoMsg);
-                    queueInfoMsg(infoMsg);
+                    queueInfoMsg(infoMsg, arrayInfoMsg);
                 }
                 return false;
             }
@@ -1047,13 +1063,62 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             }
         }
 
+        this.processLowQualityImageMessage = function (blob, offset, compression) {
+            console.log("AppSharing: processLowQualityImageMessage " + blob.length + " compression=" + compression + " offset=" + offset + " w=" + img_w + " h=" + img_h);
+            var imageRes = blob;
+            var index = offset;
+            if (compression == JPEG_COMP) {
+                /*var arrayInfoMsg = new ArrayBuffer(blob.length - offset);
+                var imgData = new Uint8Array(arrayInfoMsg);
+                var img_data = image_data.data;
+                for (var i = 0; i < (blob.length - offset) ; i++) {
+                    imgData[i] = imageRes[offset + i];
+                }
+                var imgBlob = new Blob([imgData], { type: "image/jpeg" });
+                var urlCreator = window.URL || window.webkitURL;
+                var url = urlCreator.createObjectURL(imgBlob);
+
+                var c = document.createElement("canvas");
+                c.width = img_w;
+                c.height = img_h;
+                c.style.width = img_w + "px";
+                c.style.height = img_h + "px";
+                var ctx = c.getContext("2d");
+
+                var img = document.createElement("img");
+                img.onload = function () {
+                    ctx.drawImage(this, 0, 0, img_w, img_h);
+                    var jpegData = ctx.getImageData(0, 0, img_w, img_h);
+                    var k = 0;
+                    for (var i = 0; i < img_h; i++) {
+                        var offsetLine = (i * img_w * 4);
+                        for (var j = 0; j < (img_w * 4) ; j += 4) {
+                            img_data[offsetLine + j + 0] = jpegData.data[k++];
+                            img_data[offsetLine + j + 1] = jpegData.data[k++];
+                            img_data[offsetLine + j + 2] = jpegData.data[k++];
+                            img_data[offsetLine + j + 3] = jpegData.data[k++];        // alpha
+                        }
+                    }
+                    redrawCanvas(img_w, img_h);
+                    urlCreator.revokeObjectURL(url);
+                    img = null;
+                    c = null;
+                };
+                img.src = url;*/
+                var j = new innovaphone.applicationSharing.JpegImage();
+                j.parse(imageRes, index);
+                j.copyToImageDataOffset(image_data, offset, img_w, img_h);
+                redrawCanvas(img_w, img_h);
+            }
+        }
+
         this.processImageMessage = function (blob, length, params) {
             readPngCb(blob, params);
         }
 
         this.processMouseMessage = function (params) {
-            //console.log("mouse cursor pos " + params[2] + "x" + params[3] + " mouse:" + params[4] + " x:" + m_offset_x + " y:" + m_offset_y);
-            if (have_control) {
+            //console.log("mouse cursor pos (" + params[2] + "x" + params[3] + ") last (" + last_mouse_sent_x + "x" + last_mouse_sent_y + ") mouse:" + params[4] + " x:" + m_offset_x + " y:" + m_offset_y + " mouse_type=" + mouse_type + " mouse_type_rx=" + params[4] + " have_control=" + have_control);
+            if (have_control && (Math.abs(params[2] - last_mouse_sent_x) < 16) && (Math.abs(params[3] - last_mouse_sent_y) < 16)) {  // sent coordinate -> received coordinate
                 var myCanvas = null;
                 if (container_id) {
                     for (i = 0; i < container_id.childNodes.length; i++) {
@@ -1064,72 +1129,96 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     }
                 }
                 if (myCanvas) {
-                    if (mouse_type != params[4]) {
+                    if (mouse_type != params[4] || lastMouseWasRemote == true) {
                         switch (params[4]) {
                             case CURSOR_IDC_ARROW:
                                 myCanvas.style["cursor"] = "default";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_HAND:
                                 myCanvas.style["cursor"] = "pointer";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -24px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_WAIT:
                                 myCanvas.style["cursor"] = "wait";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -96px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_APPSTARTING:
                                 myCanvas.style["cursor"] = "progress";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -48px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_IBEAM:
                                 myCanvas.style["cursor"] = "text";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_CROSS:
                                 myCanvas.style["cursor"] = "crosshair";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -144px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_HELP:
                                 myCanvas.style["cursor"] = "help";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -24px -120px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_NO:
                                 myCanvas.style["cursor"] = "not-allowed";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -24px -48px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_SIZEALL:
                                 myCanvas.style["cursor"] = "move";
-                                break;
-                            case CURSOR_IDC_SIZENESW:
-                                myCanvas.style["cursor"] = "sw-resize";
-                                break;
-                            case CURSOR_IDC_SIZENS:
-                                myCanvas.style["cursor"] = "n-resize";
-                                break;
-                            case CURSOR_IDC_SIZENWSE:
-                                myCanvas.style["cursor"] = "nw-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px 0px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_SIZEWE:
                                 myCanvas.style["cursor"] = "w-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -24px 0px; width:24px; height:24px;");
+                                break;
+                            case CURSOR_IDC_SIZENS:
+                                myCanvas.style["cursor"] = "n-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -48px 0px; width:24px; height:24px;");
+                                break;
+                            case CURSOR_IDC_SIZENESW:
+                                myCanvas.style["cursor"] = "sw-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -72px 0px; width:24px; height:24px;");
+                                break;
+                            case CURSOR_IDC_SIZENWSE:
+                                myCanvas.style["cursor"] = "nw-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -96px 0px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_UPARROW:
                                 myCanvas.style["cursor"] = "default";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -120px 0px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_VSPLIT:
                                 myCanvas.style["cursor"] = "row-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -48px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_HSPLIT:
                                 myCanvas.style["cursor"] = "col-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_H1SPLIT:
                                 myCanvas.style["cursor"] = "col-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_H2SPLIT:
                                 myCanvas.style["cursor"] = "col-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -72px -72px; width:24px; height:24px;");
                                 break;
                             case CURSOR_IDC_V2SPLIT:
                                 myCanvas.style["cursor"] = "row-resize";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: -48px -72px; width:24px; height:24px;");
                                 break;
                             default:
                                 myCanvas.style["cursor"] = "default";
+                                mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px;");
                                 break;
                         }
                         mouse_type = params[4];
                     }
+                    else {
+                        mouse_element.style["visibility"] = "hidden";
+                    }
                 }
+                lastMouseWasRemote = false;
             }
             else if (mouse_element != null) {
                 if (mouse_type != params[4]) {
@@ -1237,6 +1326,9 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     }
                     mouse_type = params[4];
                 }
+                else {
+                    mouse_element.style["visibility"] = "visible";
+                }
                 var scale_x = 1, scale_y = 1;
                 if (img_w && img_h && full_screen_width && full_screen_height) {
                     var display_w, display_h;
@@ -1263,6 +1355,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 if (full_screen_width > display_w) offX = (full_screen_width - display_w) >> 1;
                 mouse_element.style.left = (((params[2] + m_offset_x) * scale_x) + offX) + "px";
                 mouse_element.style.top = (((params[3] + m_offset_y) * scale_y) + 32) + "px";  // 32 is the header size for the appName
+                lastMouseWasRemote = true;
             }
         }
 
@@ -1345,18 +1438,55 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                         }
                     }
                 }
+                redrawCanvas(img_w, img_h);
             }
             else {
+                //console.log("AppSharing: processImageMessage " + blob.length + " bx=" + params[2] + " by=" + params[3] + " x=" + params[6] + " y=" + params[7] + " w=" + params[8] + " h=" + params[9]);
+                /*var arrayInfoMsg = new ArrayBuffer(blob.length-11);
+                var imgData = new Uint8Array(arrayInfoMsg);
+                for (var i = 0; i < (blob.length - 11) ; i++) {
+                    imgData[i] = imageRes[11 + i];
+                }
+                var imgBlob = new Blob([imgData], { type: "image/jpeg" });
+                var urlCreator = window.URL || window.webkitURL;
+                var url = urlCreator.createObjectURL(imgBlob);
+
+                var c = document.createElement("canvas");  // 300x150
+                c.width = img_w;
+                c.height = img_h;
+                c.style.width = img_w + "px";
+                c.style.height = img_h + "px";
+                var ctx = c.getContext("2d");
+
+                var img = document.createElement("img");
+                img.onload = function () {
+                    ctx.drawImage(this, 0, 0, params[8], params[9]);
+                    var jpegData = ctx.getImageData(0, 0, params[8], params[9]);
+                    var k = 0;
+                    var offset = (params[3] * img_w + params[2]) * 128 * 4; // y * width + x 
+                    offset += (params[7] * img_w + params[6]) * 4;          // inside the block
+                    for (var i = 0; i < params[9]; i++) {
+                        var n_offset = offset + (i * image_data.width * 4);
+                        for (var j = 0; j < (params[8] * 4) ; j += 4) {
+                            img_data[n_offset + j + 0] = jpegData.data[k++];
+                            img_data[n_offset + j + 1] = jpegData.data[k++];
+                            img_data[n_offset + j + 2] = jpegData.data[k++];
+                            img_data[n_offset + j + 3] = jpegData.data[k++];        // alpha
+                        }
+                    }
+                    redrawCanvas(img_w, img_h);
+                    urlCreator.revokeObjectURL(url);
+                    img = null;
+                    c = null;
+                };
+                img.src = url;*/
                 var j = new innovaphone.applicationSharing.JpegImage();
                 j.parse(imageRes, index);
                 var offset = (params[3] * img_w + params[2]) * 128 * 4; // y * width + x 
                 offset += (params[7] * img_w + params[6]) * 4;          // inside the block
                 j.copyToImageDataOffset(image_data, offset, params[8], params[9]);
+                redrawCanvas(img_w, img_h);
             }
-
-            //console.log("AppSharing: END_BIT_IMG rx " + rx_session + " params[8] " + params[8]);
-
-            redrawCanvas(img_w, img_h);
         }
 
         this.getContainerWidth = function () {
@@ -1506,10 +1636,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     }
                 }
                 mouse_type = -1;
-                if (container_id && mouse_element && mouse_element.parentNode == container_id) container_id.removeChild(mouse_element);
+                if (mouse_element) mouse_element.style["visibility"] = "hidden"; //mouse_element.setAttribute("style", "position:absolute; visibility:hidden; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px; ");
             }
             else {
-                console.log('AppSharing: control removed');
+                console.log('AppSharing: control removed ' + container_id);
 
                 if (container_id) {
                     for (i = 0; i < container_id.childNodes.length; i++) {
@@ -1561,7 +1691,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     }
                 }
                 mouse_type = -1;
-                if (container_id && mouse_element) container_id.appendChild(mouse_element);
+                if (mouse_element) mouse_element.style["visibility"] = "visible"; //("style", "position:absolute; visibility:visible; background: url('" + cursors_file + "') no-repeat; background-position: 0px -120px; width:24px; height:24px;");
             }
             if (onRemoteControl) onRemoteControl(session_id, have_control);
         }
@@ -1627,7 +1757,8 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             return infoMsgSeq++;
         }
 
-        function queueInfoMsg(infoMsg) {
+        function queueInfoMsg(infoMsg, arrayData) {
+            if (dataChannel && (infoMessages.length == 0)) dataChannel.send(arrayData);
             infoMessages.push(infoMsg);
             if (infoTimer == null) infoTimer = setInterval(processInfoMessages, 20);
         }
@@ -1738,52 +1869,56 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
 
         function GiveControlToUser(data) {
-            var arrayInfoMsg = new ArrayBuffer(4 + 1 + 4 + sender_name.length + 1);
-            var dmsg = new Uint8Array(arrayInfoMsg);
-
             var receiver = receivers.find(function (r) { return r.getReceiverGuid() === data.id });
             if (receiver) {
-                console.log('AppSharing: give control to ' + receiver.getRemoteName() + ' sessionId=' + receiver.getSessionId() + ' id=' + receiver.getReceiverGuid());
+                var receiver_name = receiver.getRemoteName();
+                var jsonEncoded = JSON.stringify({ participant: receiver_name });
+
+                console.log('AppSharing: give control to ' + receiver_name + ' sessionId=' + receiver.getSessionId() + ' id=' + receiver.getReceiverGuid());
+
+                var arrayInfoMsg = new ArrayBuffer(4 + 1 + 4 + jsonEncoded.length + 1);
+                var dmsg = new Uint8Array(arrayInfoMsg);
 
                 dmsg[0] = INFO_MESSAGE;
                 dmsg[1] = receiver.getSessionId();
                 dmsg[2] = getNewInfoSeq();
-                dmsg[3] = 1 + 4 + sender_name.length + 1;
+                dmsg[3] = 1 + 4 + jsonEncoded.length + 1;
                 dmsg[4] = 0x2; // Info(GiveControl)
                 dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
                 var off = 9;
-                for (var i = 0; i < sender_name.length; i++) {
-                    dmsg[off++] = sender_name[i].charCodeAt();
+                for (var i = 0; i < jsonEncoded.length; i++) {
+                    dmsg[off++] = jsonEncoded[i].charCodeAt();
                 }
                 dmsg[off] = 0;
                 var infoMsg = new _InfoMessage(arrayInfoMsg, receiver.getSessionId(), dmsg[2]);
-                if (dataChannel) dataChannel.send(arrayInfoMsg);
-                queueInfoMsg(infoMsg);
+                queueInfoMsg(infoMsg, arrayInfoMsg);
             }
         }
 
         function RemoveControlFromUser(data) {
-            var arrayInfoMsg = new ArrayBuffer(4 + 1 + 4 + sender_name.length + 1);
-            var dmsg = new Uint8Array(arrayInfoMsg);
-
             var receiver = receivers.find(function (r) { return r.getReceiverGuid() === data.id });
             if (receiver) {
-                console.log('AppSharing: remove control from ' + receiver.getRemoteName() + ' sessionId=' + receiver.getSessionId() + ' id=' + receiver.getReceiverGuid());
+                var receiver_name = receiver.getRemoteName();
+                var jsonEncoded = JSON.stringify({ participant: receiver_name });
+
+                console.log('AppSharing: remove control from ' + receiver_name + ' sessionId=' + receiver.getSessionId() + ' id=' + receiver.getReceiverGuid());
+
+                var arrayInfoMsg = new ArrayBuffer(4 + 1 + 4 + jsonEncoded.length + 1);
+                var dmsg = new Uint8Array(arrayInfoMsg);
 
                 dmsg[0] = INFO_MESSAGE;
                 dmsg[1] = receiver.getSessionId();
                 dmsg[2] = getNewInfoSeq();
-                dmsg[3] = 1 + 4 + sender_name.length + 1;
+                dmsg[3] = 1 + 4 + jsonEncoded.length + 1;
                 dmsg[4] = 0x3; // Info(TakeControl)
                 dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
                 var off = 9;
-                for (var i = 0; i < sender_name.length; i++) {
-                    dmsg[off++] = sender_name[i].charCodeAt();
+                for (var i = 0; i < jsonEncoded.length; i++) {
+                    dmsg[off++] = jsonEncoded[i].charCodeAt();
                 }
                 dmsg[off] = 0;
                 var infoMsg = new _InfoMessage(arrayInfoMsg, receiver.getSessionId(), dmsg[2]);
-                if (dataChannel) dataChannel.send(arrayInfoMsg);
-                queueInfoMsg(infoMsg);
+                queueInfoMsg(infoMsg, arrayInfoMsg);
             }
         }
 
@@ -1792,28 +1927,29 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             for (var i = 0; i < sessions.length; i++) {
                 if (sessions[i].getSessionId() == data.session) {
                     if (sessions[i].haveControl()) return;
-                    foundSession = i;
+                    foundSession = sessions[i].getSessionId();
                     break;
                 }
             }
             if (foundSession < 0) return;
 
-            var arrayInfoMsg = new ArrayBuffer(4 + 1 + sender_name.length + 1);
+            var jsonEncoded = JSON.stringify({ participant: sender_name });
+
+            var arrayInfoMsg = new ArrayBuffer(4 + 1 + jsonEncoded.length + 1);
             var dmsg = new Uint8Array(arrayInfoMsg);
 
             dmsg[0] = INFO_MESSAGE;
-            dmsg[1] = data.session+128;
+            dmsg[1] = foundSession + 128;
             dmsg[2] = getNewInfoSeq();
-            dmsg[3] = 1 + sender_name.length + 1;
+            dmsg[3] = 1 + jsonEncoded.length + 1;
             dmsg[4] = 0x4; // Info(RequestControl)
             var off = 5;
-            for (var i = 0; i < sender_name.length; i++) {
-                dmsg[off++] = sender_name[i].charCodeAt();
+            for (var i = 0; i < jsonEncoded.length; i++) {
+                dmsg[off++] = jsonEncoded[i].charCodeAt();
             }
             dmsg[off] = 0;
             var infoMsg = new _InfoMessage(arrayInfoMsg, data.session, dmsg[2]);
-            if (dataChannel) dataChannel.send(arrayInfoMsg);
-            queueInfoMsg(infoMsg);
+            queueInfoMsg(infoMsg, arrayInfoMsg);
         }
 
         function fitToElement(data) {
@@ -1844,7 +1980,9 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     infoMessages.splice(0, 1);
                 }
                 else {
-                    if(dataChannel) dataChannel.send(infoMessages[0].msg);
+                    var msg = infoMessages[0].get_msg();
+                    console.log('AppSharing: processInfoMessages retransmit=' + msg.byteLength + ' cnt=' + infoMessages[0].get_counter());
+                    if (dataChannel) dataChannel.send(msg);
                     return;
                 }
             }
@@ -1910,7 +2048,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
 
         var processingNode = function (uint8View) {
-            if (uint8View[MESSAGE_TYPE] != IMAGE_MESSAGE && uint8View[MESSAGE_TYPE] != MOUSE_CURSOR) console.log('AppSharing: received from session=' + uint8View[SESSION_ID] + ' and msg=' + uint8View[MESSAGE_TYPE]);
+            if (uint8View[MESSAGE_TYPE] != IMAGE_MESSAGE && uint8View[MESSAGE_TYPE] != MOUSE_CURSOR && uint8View[MESSAGE_TYPE] != MOUSE_MOVE) console.log('AppSharing: received from session=' + uint8View[SESSION_ID] + ' and msg=' + uint8View[MESSAGE_TYPE]);
 
             if (uint8View[MESSAGE_TYPE] == CREATE_SESSION) {
                 var session = 0;
@@ -1924,7 +2062,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     var appInfo = null;
                     if (uint8View.length > 6) {
                         var encodedString = String.fromCharCode.apply(null, uint8View.subarray(6));
-                        appInfo = JSON.parse(decodeURIComponent(escape(encodedString)));
+                        appInfo = JSON.parse(encodedString);
                         console.log('AppSharing: received CREATE_SESSION appName=' + appInfo.name + ' desc=' + appInfo.description);
                     }
                     var session = new _Session(uint8View[SESSION_ID], (appInfo != null ? appInfo.name : null), onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, getNewInfoSeq, queueInfoMsg, dataChannel);
@@ -1939,24 +2077,25 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 dmsg[1] = uint8View[SESSION_ID] + 128;
                 if (dataChannel) dataChannel.send(arrayMsgS);
 
-                console.log('AppSharing: send INFO_MESSAGE:AddParticipant sender_name=' + sender_name);
+                var jsonEncoded = JSON.stringify({ participant: sender_name });
 
-                var arrayInfoMsg = new ArrayBuffer(5+sender_name.length+1);
+                console.log('AppSharing: send INFO_MESSAGE:AddParticipant sender_name=' + sender_name + " jsonEncoded " + jsonEncoded);
+
+                var arrayInfoMsg = new ArrayBuffer(5 + jsonEncoded.length + 1);
                 var dmsg = new Uint8Array(arrayInfoMsg);
 
                 dmsg[0] = INFO_MESSAGE;
                 dmsg[1] = uint8View[SESSION_ID]+128;
                 dmsg[2] = infoMsgSeq++;
-                dmsg[3] = 1 + sender_name.length + 1;
+                dmsg[3] = 1 + jsonEncoded.length + 1;
                 dmsg[4] = 0x0; // Info(AddParticipant)
                 var off = 5;
-                for (var i = 0; i < sender_name.length; i++) {
-                    dmsg[off++] = sender_name[i].charCodeAt();
+                for (var i = 0; i < jsonEncoded.length; i++) {
+                    dmsg[off++] = jsonEncoded[i].charCodeAt();
                 }
                 dmsg[off] = 0;
                 var infoMsg = new _InfoMessage(arrayInfoMsg, uint8View[SESSION_ID], dmsg[2]);
-                if (dataChannel) dataChannel.send(arrayInfoMsg);
-                queueInfoMsg(infoMsg);
+                queueInfoMsg(infoMsg, arrayInfoMsg);
                 return;
             }
             else if (uint8View[MESSAGE_TYPE] == UPDATE_SESSION) {
@@ -1993,24 +2132,25 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                         dmsg[1] = uint8View[SESSION_ID] + 128;
                         if (dataChannel) dataChannel.send(arrayMsgS);
 
+                        var jsonEncoded = JSON.stringify({ participant: sender_name });
+
                         console.log('AppSharing: send INFO_MESSAGE:RemParticipant sender_name=' + sender_name);
 
-                        var arrayInfoMsg = new ArrayBuffer(5+sender_name.length+1);
+                        var arrayInfoMsg = new ArrayBuffer(5 + jsonEncoded.length + 1);
                         var dmsg = new Uint8Array(arrayInfoMsg);
 
                         dmsg[0] = INFO_MESSAGE;
                         dmsg[1] = uint8View[SESSION_ID]+128;
                         dmsg[2] = infoMsgSeq++;
-                        dmsg[3] = 1 + sender_name.length + 1;
+                        dmsg[3] = 1 + jsonEncoded.length + 1;
                         dmsg[4] = 0x1; // Info(RemParticipant)
                         var off = 5;
-                        for (var i = 0; i < sender_name.length; i++) {
-                            dmsg[off++] = sender_name[i].charCodeAt();
+                        for (var i = 0; i < jsonEncoded.length; i++) {
+                            dmsg[off++] = jsonEncoded[i].charCodeAt();
                         }
                         dmsg[off] = 0;
                         var infoMsg = new _InfoMessage(arrayInfoMsg, uint8View[SESSION_ID], dmsg[2]);
-                        if (dataChannel) dataChannel.send(arrayInfoMsg);
-                        queueInfoMsg(infoMsg);
+                        queueInfoMsg(infoMsg, arrayInfoMsg);
                     }
                 }
                 return;
@@ -2037,6 +2177,14 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     }
                 }
             }
+            else if (uint8View[MESSAGE_TYPE] == LOW_QUALITY_IMAGE_MESSAGE) {
+                for (var i = 0; i < sessions.length; i++) {
+                    if (sessions[i].getSessionId() == uint8View[SESSION_ID]) {
+                        sessions[i].processLowQualityImageMessage(uint8View, 3, uint8View[2]);
+                        return;
+                    }
+                }
+            }
             else if (uint8View[MESSAGE_TYPE] == MOUSE_CURSOR) {
                 params[0] = uint8View[MESSAGE_TYPE];
                 params[1] = uint8View[SESSION_ID];
@@ -2055,8 +2203,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 if (uint8View[4] == 0 || uint8View[4] == 1) {  // AddParticipant || RemParticipant
                     if (uint8View[3] > 1) {
                         var tmpName = uint8View.slice(5, uint8View.length - 1);
-                        var encodedString = String.fromCharCode.apply(null, tmpName);
-                        var receiverName = decodeURIComponent(escape(encodedString));
+                        var jsonString = String.fromCharCode.apply(null, tmpName);
+                        console.log("AppSharing: InfoMessage " + jsonString);
+                        var obj = JSON.parse(jsonString);
+                        var receiverName = obj.participant;
 
                         var receiver = null;
                         for (var i = 0; i < receivers.length; i++) {
@@ -2084,11 +2234,13 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                         }
                     }
                 }
-                else if (uint8View[4] == 2 || uint8View[4] == 3 || uint8View[4] == 4) {   // GiveControl || TakeControl || RequestControl
+                else if (uint8View[4] == 2 || uint8View[4] == 3) {   // GiveControl || TakeControl
                     if (uint8View[3] > 1) {
                         var tmpName = uint8View.slice(9, uint8View.length - 1);
-                        var encodedString = String.fromCharCode.apply(null, tmpName);
-                        var receiverName = decodeURIComponent(escape(encodedString));
+                        var jsonString = String.fromCharCode.apply(null, tmpName);
+                        console.log("AppSharing: InfoMessage Give-TakeControl" + jsonString);
+                        var obj = JSON.parse(jsonString);
+                        var receiverName = obj.participant;
                         var token = uint8View[5] << 24 | uint8View[6] << 16 | uint8View[7] << 8 | uint8View[8];
 
                         for (var i = 0; i < sessions.length; i++) {
@@ -2098,6 +2250,16 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                                 break;
                             }
                         }
+                    }
+                }
+                else if (uint8View[4] == 4) {   // RequestControl
+                    if (uint8View[3] > 1) {
+                        var tmpName = uint8View.slice(5, uint8View.length - 1);
+                        var jsonString = String.fromCharCode.apply(null, tmpName);
+                        console.log("AppSharing: InfoMessage RequestControl " + jsonString);
+                        var obj = JSON.parse(jsonString);
+                        var receiverName = obj.participant;
+
                         if (uint8View[4] == 4) {
                             // Remote Side sends this info message
                             for (var i = 0; i < receivers.length; i++) {
@@ -2141,6 +2303,9 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 // Ignore this message here
             }
             else if (uint8View[MESSAGE_TYPE] == CREATE_SESSION_ACK) {
+                // Ignore this message here
+            }
+            else if (uint8View[MESSAGE_TYPE] == MOUSE_MOVE) {
                 // Ignore this message here
             }
             else if (uint8View[MESSAGE_TYPE] == UPDATE_SESSION_ACK) {

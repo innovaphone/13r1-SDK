@@ -66,6 +66,7 @@
 		<li><a href="#GetAppLogin">GetAppLogin</a> - Get digest for App Service login</li>
 		<li><a href="#GetGroup">GetGroup</a> - Read group members</li>
 		<li><a href="#GetRPs">GetRPs</a> - Read configured RPs</li>
+		<li><a href="#GetNodes">GetNodes</a> - Read all nodes and locations</li>
 		<li><a href="#GetConfigs">GetConfigs</a> - Read config templates</li>
 		<li><a href="#GetFilters">GetFilters</a> - Read list of configured filters</li>
 		<li><a href="#GetGroups">GetGroups</a> - Read availabe Groups</li>
@@ -73,6 +74,7 @@
 		<li><a href="#GetPush">GetPush</a> - Read configured Push objects</li>
 		<li><a href="#GetMessages">GetMessages</a> - Read configured Messages objects</li>
 		<li><a href="#GetStun">GetStun</a> - Read STUN config</li>
+		<li><a href="#GetAppLics">GetAppLics</a> - Read available App Lics</li>
 	</ul>
 
     <div><a href="#Objects">Objects</a> - recurring definitions</div>
@@ -198,7 +200,14 @@
     "hide": boolean,
     "cfnr": unsigned,
     "colr": bool,
+    "uclic": bool,
+    "voicemail": bool,
     "fax": bool,
+    "mobility": bool,
+    "mypbx": bool,
+    "video": bool,
+    "app-sharing": bool,
+    "reporting": bool,
     "devices": [<a href="#device">device</a>],
     "grp": [<a href="#group">group</a>],
     "presence": [<a href="#presence">presence</a>],
@@ -211,6 +220,10 @@
     <p>
         Update or create a PBX object. Any property present in the message updates the respective
         information of the PBX object. Properties not present are left unchanged.
+    </p>
+    <p>
+        If bool properties are sent as integers (e.g -1), the parameter is deleted, which means the
+        value inherited from a config template is used
     </p>
 
     <dl>
@@ -294,9 +307,37 @@
         <dd>
             If true no connected number is sent for calls to this object.
         </dd>
+        <dt>uclic</dt>
+        <dd>
+            A UC license shall be acquired for this object.
+        </dd>
+        <dt>voicemail</dt>
+        <dd>
+            A Voicemail license shall be acquired for this object.
+        </dd>
         <dt>fax</dt>
         <dd>
             A Fax license shall be acquired for this object.
+        </dd>
+        <dt>mobility</dt>
+        <dd>
+            A Mobility license shall be acquired for this object.
+        </dd>
+        <dt>mypbx</dt>
+        <dd>
+            A myPBX license shall be acquired for this object.
+        </dd>
+        <dt>video</dt>
+        <dd>
+            A Video license shall be acquired for this object.
+        </dd>
+        <dt>app-sharing</dt>
+        <dd>
+            A App Sharing license shall be acquired for this object.
+        </dd>
+        <dt>reporting</dt>
+        <dd>
+            A Reporting license shall be acquired for this object.
         </dd>
         <dt>devices</dt>
         <dd>
@@ -383,7 +424,14 @@
     "hide": boolean,
     "cfnr": unsigned,
     "colr": bool,
+    "uclic": bool,
+    "voicemail": bool,
     "fax": bool,
+    "mobility": bool,
+    "mypbx": bool,
+    "video": bool,
+    "app-sharing": bool,
+    "reporting": bool,
     "devices": [<a href="#device">device</a>],
     "grp": [<a href="#group">group</a>],
     "presence": [<a href="#presence">presence</a>],
@@ -467,9 +515,37 @@
         <dd>
             If true no connected number is sent for calls to this object.
         </dd>
+        <dt>uclic</dt>
+        <dd>
+            A UC license shall be acquired for this object.
+        </dd>
+        <dt>voicemail</dt>
+        <dd>
+            A Voicemail license shall be acquired for this object.
+        </dd>
         <dt>fax</dt>
         <dd>
             A Fax license shall be acquired for this object.
+        </dd>
+        <dt>mobility</dt>
+        <dd>
+            A Mobility license shall be acquired for this object.
+        </dd>
+        <dt>mypbx</dt>
+        <dd>
+            A myPBX license shall be acquired for this object.
+        </dd>
+        <dt>video</dt>
+        <dd>
+            A Video license shall be acquired for this object.
+        </dd>
+        <dt>app-sharing</dt>
+        <dd>
+            A App Sharing license shall be acquired for this object.
+        </dd>
+        <dt>reporting</dt>
+        <dd>
+            A Reporting license shall be acquired for this object.
         </dd>
         <dt>devices</dt>
         <dd>
@@ -773,6 +849,27 @@
         </dd>
     </dl>
 
+	<h2><a name="GetNodes">GetNodes</a></h2>
+
+	<pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetNodes"
+}</code></pre>
+
+    <p>
+        Request a list of all nodes and locations
+    </p>
+
+	<pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetNodesResult",
+    "nodes":[<a href="#node">node</a>]
+}</code></pre>
+
+    <p>
+        Returns an array of objects describing the nodes
+    </p>
+
 	<h2><a name="GetConfigs">GetConfigs</a></h2>
 
 	<pre><code class="json">{
@@ -942,6 +1039,27 @@
             Activate workaround for slow STUN servers
         </dd>
     </dl>
+
+	<h2><a name="GetAppLics">GetAppLics</a></h2>
+	
+	<pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetAppLics"
+}</code></pre>
+
+    <p>
+        Request the available App Licenses
+    </p>
+
+	<pre><code class="json">{
+    "api": "PbxAdminApi",
+    "mt": "GetAppLicsResult",
+    "lic": [<a href="#app-lic">app-lic</a>]
+}</code></pre>
+
+    <p>
+        Returns the available App licenses
+    </p>
 
 	<h2><a name="Objects">Objects</a></h2>
 
@@ -1299,7 +1417,7 @@
         </dd>
     </dl>
 
-    <a name="boolean"><div class="fnhead">group</div></a>
+    <a name="boolean"><div class="fnhead">boolean</div></a>
 
 	<pre><code class="json">{
     "guid": string,
@@ -1351,5 +1469,44 @@
         </dd>
     </dl>
 
+    <a name="app-lic"><div class="fnhead">app-lic</div></a>
+
+	<pre><code class="json">{
+    "name": string,
+    "version": string,
+    "count": string,
+    "used": string,
+    "local": string,
+    "slaves": string,
+    "key": string
+}</code></pre>
+    <dl>
+        <dt>name</dt>
+        <dd>
+            The name of the license
+        </dd>
+    </dl>
+
+    <a name="node"><div class="fnhead">node</div></a>
+
+	<pre><code class="json">{
+    "name": string,
+    "node": string,
+    "loc": string
+}</code></pre>
+    <dl>
+        <dt>name</dt>
+        <dd>
+            The name (SIP) of the node
+        </dd>
+        <dt>node</dt>
+        <dd>
+            The parent node of this node
+        </dd>
+        <dt>loc</dt>
+        <dd>
+            Present if the node is also a PBX. Indicates the parent PBX.
+        </dd>
+    </dl>
 </body>
 </html>

@@ -71,7 +71,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="AppServiceConstructor">AppService</a></div>
+    <div class="fnhead" id="AppServiceConstructor">AppService</div>
     <dl>
         <dd>
             Constructor
@@ -83,7 +83,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="CreateInstance">CreateInstance</a></div>
+    <div class="fnhead" id="CreateInstance">CreateInstance</div>
     <dl>
         <dd>
             You <b>must</b> override this function inside your class which implements the AppService class.<br />
@@ -97,7 +97,7 @@ public:
             The created <a href="#AppInstance">AppInstance</a> object.
         </dd>
     </dl>
-    <div class="fnhead"><a name="AppServiceApps">AppServiceApps</a></div>
+    <div class="fnhead" id="AppServiceApps">AppServiceApps</div>
     <dl>
         <dd>
             You <b>must</b> override this function inside your class which implements the AppService class.<br />
@@ -109,7 +109,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="AppInstancePlugins">AppInstancePlugins</a></div>
+    <div class="fnhead" id="AppInstancePlugins">AppInstancePlugins</div>
     <dl>
         <dd>
             You <b>can</b> override this function inside your class which implements the AppService class if your app provides app instance plugins (PBX manager plugins).<br />
@@ -121,7 +121,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="AppStart">AppStart</a></div>
+    <div class="fnhead" id="AppStart">AppStart</div>
     <dl>
         <dd>
             You can start an own app instance, e.g. inside your app-main.cpp, if you want to start an instance outside of the manager control.
@@ -131,7 +131,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="AppStopped">AppStopped</a></div>
+    <div class="fnhead" id="AppStopped">AppStopped</div>
     <dl>
         <dd>
             Call this function when your app stopped.
@@ -141,21 +141,21 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="GetAppServiceId">GetAppServiceId</a></div>
+    <div class="fnhead" id="GetAppServiceId">GetAppServiceId</div>
     <dl>
         <dd>
             <h4>Return value</h4>
             The service id of the app service.
         </dd>
     </dl>
-    <div class="fnhead"><a name="GetAppPlatformDNSName">GetAppPlatformDNSName</a></div>
+    <div class="fnhead" id="GetAppPlatformDNSName">GetAppPlatformDNSName</div>
     <dl>
         <dd>
             <h4>Return value</h4>
             The app platform DNS name which can be configured inside the manager settings.
         </dd>
     </dl>
-    <div class="fnhead"><a name="SetAllInstancesLogFlags">SetAllInstancesLogFlags</a></div>
+    <div class="fnhead" id="SetAllInstancesLogFlags">SetAllInstancesLogFlags</div>
     <dl>
         <dd>
             Call this function if you want to set the logFlags of all instances to a certain value.
@@ -189,7 +189,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="AppInstanceConstructor">AppInstance</a></div>
+    <div class="fnhead" id="AppInstanceConstructor">AppInstance</div>
     <dl>
         <dd>
             Constructor
@@ -200,35 +200,35 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="GetAppServiceIdInstance">GetAppServiceId</a></div>
+    <div class="fnhead" id="GetAppServiceIdInstance">GetAppServiceId</div>
     <dl>
         <dd>
             <h4>Return value</h4>
             The app service id.
         </dd>
     </dl>
-    <div class="fnhead"><a name="GetAppName">GetAppName</a></div>
+    <div class="fnhead" id="GetAppName">GetAppName</div>
     <dl>
         <dd>
             <h4>Return value</h4>
             The app name.
         </dd>
     </dl>
-    <div class="fnhead"><a name="GetAppDomain">GetAppDomain</a></div>
+    <div class="fnhead" id="GetAppDomain">GetAppDomain</div>
     <dl>
         <dd>
             <h4>Return value</h4>
             The app domain.
         </dd>
     </dl>
-    <div class="fnhead"><a name="GetKey">GetKey</a></div>
+    <div class="fnhead" id="GetKey">GetKey</div>
     <dl>
         <dd>
             <h4>Return value</h4>
             The unique key string which identifies the app instance: "appname@appdomain".
         </dd>
     </dl>
-    <div class="fnhead"><a name="SetLogFlags">SetLogFlags</a></div>
+    <div class="fnhead" id="SetLogFlags">SetLogFlags</div>
     <dl>
         <dd>
             Call this function to set the logFlags of the instance.
@@ -238,7 +238,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="GenerateKey">GenerateKey</a> (static function)</div>
+    <div class="fnhead" id="GenerateKey">GenerateKey</a> (static function)</div>
     <dl>
         <dd>
             Generates the unique string which identifies an intance.
@@ -252,7 +252,7 @@ public:
             The unique key string which identifies the app instance: "appname@appdomain". Must be freed by the caller!
         </dd>
     </dl>
-    <div class="fnhead"><a name="LogV">LogV</a></div>
+    <div class="fnhead" id="LogV">LogV</div>
     <dl>
         <dd>
             Writes the log string to the debug output (e.g. file or debugging output).
@@ -263,7 +263,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="Log">Log</a></div>
+    <div class="fnhead" id="Log">Log</div>
     <dl>
         <dd>
             Writes the log string to the debug output (e.g. file or debugging output).
@@ -274,7 +274,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="HexDump">HexDump</a></div>
+    <div class="fnhead" id="HexDump">HexDump</div>
     <dl>
         <dd>
             Writes a hexdump of the buffer to the debug output (e.g. file or debugging output).
@@ -285,7 +285,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="SetAlarm">SetAlarm</a></div>
+    <div class="fnhead" id="SetAlarm">SetAlarm</div>
     <dl>
         <dd>
             Sets an alarm, which is sent to the manager (which again sends it to an alarm and events server). An alarm is active until it is cleared.
@@ -298,7 +298,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="ClearAlarm">ClearAlarm</a></div>
+    <div class="fnhead" id="ClearAlarm">ClearAlarm</div>
     <dl>
         <dd>
             Clears an alarm.
@@ -306,7 +306,7 @@ public:
             See <a href="#SetAlarm">SetAlarm</a> for parameter reference.
         </dd>
     </dl>
-    <div class="fnhead"><a name="SendEvent">SendEvent</a></div>
+    <div class="fnhead" id="SendEvent">SendEvent</div>
     <dl>
         <dd>
             Sends an event.
@@ -314,14 +314,14 @@ public:
             See <a href="#SetAlarm">SetAlarm</a> for parameter reference.
         </dd>
     </dl>
-    <div class="fnhead"><a name="Stop">Stop</a></div>
+    <div class="fnhead" id="Stop">Stop</div>
     <dl>
         <dd>
             You <b>must</b> override this function. It is called if the instance or service is stopped by the manager.<br />
             You <b>must</b> call AppService::AppStopped asynchronously if everything has been stopped.
         </dd>
     </dl>
-    <div class="fnhead"><a name="ServerCertificateUpdate">ServerCertificateUpdate</a></div>
+    <div class="fnhead" id="ServerCertificateUpdate">ServerCertificateUpdate</div>
     <dl>
         <dd>
             You <b>can</b> override this function if you need to be notified about the webserver certificate. You can then pass the certificate to an <a href="../interface/socket.htm#ISocketContext">ISocketContext</a>.
@@ -332,7 +332,7 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="SetAppDomain">SetAppDomain</a></div>
+    <div class="fnhead" id="SetAppDomain">SetAppDomain</div>
     <dl>
         <dd>
             Shouldn't be used inside app code.
@@ -351,7 +351,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="AppServiceAppConstructor">AppServiceApp</a></div>
+    <div class="fnhead" id="AppServiceAppConstructor">AppServiceApp</div>
     <dl>
         <dd>
             Constructor
@@ -362,14 +362,14 @@ public:
             </table>
         </dd>
     </dl>
-    <div class="fnhead"><a name="GetName">GetName</a></div>
+    <div class="fnhead" id="GetName">GetName</div>
     <dl>
         <dd>
             <h4>Return value</h4>
             The name.
         </dd>
     </dl>
-    <div class="fnhead"><a name="IsWebsocketOnly">IsWebsocketOnly</a></div>
+    <div class="fnhead" id="IsWebsocketOnly">IsWebsocketOnly</div>
     <dl>
         <dd>
             <h4>Return value</h4>
@@ -401,7 +401,7 @@ public:
     This class is just used internally inside the manager and webserver.
 
     <h1>Data types</h1>
-    <h2><a name="certificate_error_t">ServiceAlarmSeverity</a></h2>
+    <h2 id="certificate_error_t">ServiceAlarmSeverity</h2>
     <pre><code class="laguage-cpp">typedef enum {
     ALARM_SEVERITY_INDETERMINATE,
     ALARM_SEVERITY_MAJOR,
@@ -411,7 +411,7 @@ public:
     <h3>Overview</h3>
     The <code class="laguage-cpp">enum ServiceAlarmSeverity</code> is used to determine the severity of an alarm.
 
-    <h2><a name="ServiceAlarmType">ServiceAlarmType</a></h2>
+    <h2 id="ServiceAlarmType">ServiceAlarmType</h2>
     <pre><code class="laguage-cpp">typedef enum {
     ALARM_TYPE_SET,
     ALARM_TYPE_CLEAR,
@@ -421,7 +421,7 @@ public:
     <h3>Overview</h3>
     The <code class="laguage-cpp">enum ServiceAlarmType</code> is used to determine the alarm type.
 
-    <h2><a name="AppServiceArgs">AppServiceArgs</a></h2>
+    <h2 id="AppServiceArgs">AppServiceArgs</h2>
     <pre><code class="laguage-cpp">struct AppServiceArgs {
     void Parse(int argc, char ** argv, bool keepDefaults = true);
     const char * serviceID;
@@ -448,7 +448,7 @@ public:
         <tr><td class="param">off_t <b>logFileSize </b></td><td>The maximum log file size.</td></tr>
     </table>
 
-    <h2><a name="AppInstanceArgs">AppInstanceArgs</a></h2>
+    <h2 id="AppInstanceArgs">AppInstanceArgs</h2>
     <pre><code class="laguage-cpp">struct AppInstanceArgs {
     AppInstanceArgs();
     void Parse(int argc, char ** argv, bool keepDefaults = true);

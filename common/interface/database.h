@@ -89,6 +89,7 @@ public:
     virtual void PrepareStatement(UDatabase * user, const char * sqlcmd) = 0;
     virtual void ExecSQL(UDatabase * const user, dword flags, class IPreparedStatement * const statement) = 0;
     virtual void InsertSQL(UDatabase * const user, class IPreparedStatement * const statement) = 0;
+    virtual size_t EscapeSearchLiterals(const char * value, char * buffer, size_t bufferSize) = 0;
     virtual const char * GetLastErrorMessage() = 0;
 };
 

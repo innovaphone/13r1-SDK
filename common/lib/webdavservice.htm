@@ -44,8 +44,11 @@
 
     <h1>Classes</h1>
 
-    <h2><a name="UWebdavNotification">UWebdavNotification</a></h2>
+    <h2 id="UWebdavNotification">UWebdavNotification</h2>
     
+    <p>
+        Base class to get notifications if a file is written, moved, or deleted.
+    </p>
 
     <pre><code class="C++">class UWebdavNotification 
 {
@@ -55,19 +58,14 @@ public:
     virtual void MoveCompleted(const char * appName, const char * path) = 0;
 };</code></pre>
 
-    <p>
-        Base class to get notifications if a file is written, moved, or deleted.
-    </p>
 
-    <h3 class="fnhead"><a name="PutCompleted">PutCompleted</a></h3>
-
+    <h3 class="fnhead" id="PutCompleted">PutCompleted</h3>
+    <dd>
     <p>
         Used to get a notifaction if a file has written.
     </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+        <h4>Parameters</h4>
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">const char * <b>appName</b></td>
@@ -89,17 +87,14 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="DeleteCompleted">DeleteCompleted</a></h3>
-
+    <h3 class="fnhead" id="DeleteCompleted">DeleteCompleted</h3>
+    <dd>
     <p>
         Used to get a notifaction if a file has deleted.
     </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+        <h4>Parameters</h4>
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">const char * <b>appName</b></td>
@@ -115,17 +110,16 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="MoveCompleted">MoveCompleted</a></h3>
-
+    <h3 class="fnhead" id="MoveCompleted">MoveCompleted</h3>
+    <dd>
     <p>
         Used to get a notifaction if a file has moved.
     </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">const char * <b>appName</b></td>
@@ -141,10 +135,12 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h2><a name="WebdavNotification">WebdavNotification</a></h2>
 
+    <h2 id="WebdavNotification">WebdavNotification</h2>
+    <p>
+        Internal Class to save apps which are registered for notifications.
+    </p>
     <pre><code class="C++">class WebdavNotification : public istd::listElement &lt; WebdavNotification &gt;
 {
 public:
@@ -155,51 +151,51 @@ public:
     
 };</code></pre>
 
+
+
+    <h2 id="UWebdavService">UWebdavService</h2>
     <p>
-        Internal Class to save apps which are registered for notifications.
+        Callback Function to get the information that the webdavservice is closed.
     </p>
-
-    <h2><a name="UWebdavService">UWebdavService</a></h2>
-
     <pre><code class="C++">class UWebdavService {
 public:
     virtual void WebdavServiceClosed() = 0;
 };</code></pre>
 
-    <p>
-        Callback Function to get the information that the webdavservice is closed.
-    </p>
 
-    <h3 class="fnhead"><a name="WebdavServiceClosed">WebdavServiceClosed</a></h3>
+
+    <h3 class="fnhead" id="WebdavServiceClosed">WebdavServiceClosed</h3>
 
     <p>
         Callback Function.
     </p>
 
-    <h2><a name="IWebdavServiceTask">IWebdavServiceTask</a></h2>
-
+    <h2 id="IWebdavServiceTask">IWebdavServiceTask</h2>
+    <p>
+        Internal Class closing WebdavService.
+    </p>
     <pre><code class="C++">class IWebdavServiceTask {
 public:
     virtual void CloseComplete(class UWebdavServiceTask * task) = 0;
 };</code></pre>
 
+
+
+    <h2 id="UWebdavServiceTask">UWebdavServiceTask</h2>
     <p>
         Internal Class closing WebdavService.
     </p>
-
-    <h2><a name="UWebdavServiceTask">UWebdavServiceTask</a></h2>
-
     <pre><code class="C++">class UWebdavServiceTask : public istd::listElement&lt;uwebdavservicetask&gt; {
 public:
     virtual void Close() = 0;
 };</code></pre>
 
+
+
+    <h2 id="WebdavService">WebdavService</h2>
     <p>
-        Internal Class closing WebdavService.
+        Main Class which is responsible for the webdav requests. Used to forward webdav requests and to register for nofifications.
     </p>
-
-    <h2><a name="WebdavService">WebdavService</a></h2>
-
 
     <pre><code class="C++">class WebdavService : public UTask {
     class IDbFiles * dbFiles;
@@ -245,19 +241,15 @@ public:
     void Close();
 };</code></pre>
 
-    <p>
-        Main Class which is responsible for the webdav requests. Used to forward webdav requests and to register for nofifications.
-    </p>
 
-    <h3 class="fnhead"><a name="WebdavService">WebdavService</a></h3>
 
+    <h3 class="fnhead" id="WebdavService">WebdavService</h3>
+    <dd>
     <p>
         Constructor
     </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+        <h4>Parameters</h4>
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">class UWebdavService * <b>service</b></td>
@@ -297,17 +289,15 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="WebRequestWebdavService">WebRequestWebdavService</a></h3>
-
+    <h3 class="fnhead" id="WebRequestWebdavService">WebRequestWebdavService</h3>
+    <dd>
     <p>
         Function where the webdav requests are linked in.
     </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">IWebserverPlugin * const <b>webserverPlugin</b></td>
@@ -335,29 +325,29 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="GetCompleted">GetCompleted</a></h3>
+
+    <h3 class="fnhead" id="GetCompleted">GetCompleted</h3>
 
     <p>
         Is webdav service is complete loaded.
     </p>
 
-    <h3 class="fnhead"><a name="Start">Start</a></h3>
+    <h3 class="fnhead" id="Start">Start</h3>
 
     <p>
         Starts the connection with the database.
     </p>
 
-    <h3 class="fnhead"><a name="RegisterforNotification">RegisterforNotification</a></h3>
+    <h3 class="fnhead" id="RegisterforNotification">RegisterforNotification</h3>
 
     <p>
         Function to register for notifications of the webdav service
     </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+    <dd>
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">class UWebdavNotification *  <b>notification</b></td>
@@ -374,17 +364,14 @@ public:
                 
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="DeregisterforNotification">DeregisterforNotification</a></h3>
-
+    <h3 class="fnhead" id="DeregisterforNotification">DeregisterforNotification</h3>
+    <dd>
     <p>
         Function to deregister of notifications.
     </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+        <h4>Parameters</h4>
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">class UWebdavNotification *  <b>notification</b></td>
@@ -395,16 +382,17 @@ public:
 
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="Close">Close</a></h3>
+    <h3 class="fnhead" id="Close">Close</h3>
 
     <p>
         Function to close webdav service.
     </p>
 
-    <h2><a name="WebdavServiceGet">WebdavServiceGet</a></h2>
-
+    <h2 id="WebdavServiceGet">WebdavServiceGet</h2>
+    <p>
+        Internal Classes to provide "GET" functionality.
+    </p>
     <pre><code class="C++">enum GetStates
 {
     GETPATHREQUEST = 0,
@@ -467,12 +455,12 @@ public:
     char * GetPath() { return path ? path : 0; }
 };</code></pre>
 
+
+
+    <h2 id="WebdavServicePut">WebdavServicePut</h2>
     <p>
-        Internal Classes to provide "GET" functionality.
+        Internal Classes to provide "PUT" functionality.
     </p>
-
-    <h2><a name="WebdavServicePut">WebdavServicePut</a></h2>
-
     <pre><code class="C++">enum PutStates
 {
     PUTPATHREQUEST = 0,
@@ -549,12 +537,12 @@ public:
     char * GetPath() { return path ? path : 0; }
 };</code></pre>
 
+
+
+    <h2 id="WebdavServicePropfind">WebdavServicePropfind</h2>
     <p>
-        Internal Classes to provide "PUT" functionality.
+        Internal Classes to provide "PROPFIND" functionality.
     </p>
-
-    <h2><a name="WebdavServicePropfind">WebdavServicePropfind</a></h2>
-
     <pre><code class="C++">enum PropfindStates
 {
     PROPFINDPATHREQUEST = 0,
@@ -638,12 +626,12 @@ public:
 };
 </code></pre>
 
+
+
+    <h2 id="WebdavServiceMove">WebdavServiceMove</h2>
     <p>
-        Internal Classes to provide "PROPFIND" functionality.
+        Internal Classes to provide "MOVE" functionality.
     </p>
-
-    <h2><a name="WebdavServiceMove">WebdavServiceMove</a></h2>
-
     <pre><code class="C++">enum MoveStates
 {
     MOVEPATHREQUESTSOURCE = 0,
@@ -736,12 +724,12 @@ public:
 };
 </code></pre>
 
+
+
+    <h2 id="WebdavServiceMkCol">WebdavServiceMkCol</h2>
     <p>
-        Internal Classes to provide "MOVE" functionality.
+        Internal Classes to provide "MKCOL" functionality.
     </p>
-
-    <h2><a name="WebdavServiceMkCol">WebdavServiceMkCol</a></h2>
-
     <pre><code class="C++">enum MkColStates
 {
     MKCOLPATHREQUEST = 0,
@@ -814,11 +802,9 @@ public:
 };
 </code></pre>
 
-    <p>
-        Internal Classes to provide "MKCOL" functionality.
-    </p>
 
-    <h2><a name="WebdavServiceDelete">WebdavServiceDelete</a></h2>
+
+    <h2 id="WebdavServiceDelete">WebdavServiceDelete</h2>
 
     <pre><code class="C++">enum DeleteStates
 {
@@ -891,7 +877,10 @@ public:
         Internal Classes to provide "DELETE" functionality.
     </p>
 
-    <h2><a name="WebdavServiceOptions">WebdavServiceOptions</a></h2>
+    <h2 id="WebdavServiceOptions">WebdavServiceOptions</h2>
+    <p>
+        Internal Classes to provide "OPTIONS" functionality.
+    </p>
 
     <pre><code class="C++">class WebdavServiceOptions : public UWebserverOptions {
     // UWebserverOptions
@@ -905,12 +894,11 @@ public:
 };
 </code></pre>
 
+
+    <h2 id="WebdavServiceLock">WebdavServiceLock</h2>
     <p>
-        Internal Classes to provide "OPTIONS" functionality.
+        Internal Classes to provide "LOCK" functionality.
     </p>
-
-    <h2><a name="WebdavServiceLock">WebdavServiceLock</a></h2>
-
     <pre><code class="C++">class WebdavLock : public istd::listElement<webdavlock> {
 public:
     bool write;         // type
@@ -943,12 +931,12 @@ public:
 };
 </code></pre>
 
+
+
+    <h2 id="WebdavServiceUnLock">WebdavServiceUnLock</h2>
     <p>
-        Internal Classes to provide "LOCK" functionality.
+        Internal Classes to provide "UNLOCK" functionality.
     </p>
-
-    <h2><a name="WebdavServiceUnLock">WebdavServiceUnLock</a></h2>
-
     <pre><code class="C++">class WebdavServiceUnLock : public UWebserverUnlock {
     void WebserverUnlockRequestAcceptComplete(IWebserverUnlock * const webserverUnlock) override;
     void WebserverUnlockSendResult(IWebserverUnlock * const webserverUnlock) override;
@@ -962,12 +950,12 @@ public:
 };
 </code></pre>
 
+
+
+    <h2 id="WebdavServiceProppatch">WebdavServiceProppatch</h2>
     <p>
-        Internal Classes to provide "UNLOCK" functionality.
+        Internal Classes to provide "PROPPATCH" functionality.
     </p>
-
-    <h2><a name="WebdavServiceProppatch">WebdavServiceProppatch</a></h2>
-
     <pre><code class="C++">class SetProperty : public istd::listElement &lt;setproperty&gt;
 {
 public:
@@ -1017,9 +1005,7 @@ public:
 };
 </code></pre>
 
-    <p>
-        Internal Classes to provide "PROPPATCH" functionality.
-    </p>
+
 
 </body>
 </html>

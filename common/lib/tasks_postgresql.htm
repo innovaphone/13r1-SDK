@@ -41,8 +41,11 @@
     <!-- Block with the classes -->
     <h1>Classes</h1>
 
-    <h2><a name="TaskPostgreSQLInitTable">TaskPostgreSQLInitTable</a></h2>
-
+    <h2 id="TaskPostgreSQLInitTable">TaskPostgreSQLInitTable</h2>
+    <dd>
+    <p>
+        A task that creates a single table including columns, constraints and indices, if not existing. Additional columns, constraints and indices are added if they don't exist.
+    </p>
     <pre><code class="C++">class TaskPostgreSQLInitTable : public ITask, public UDatabase {
     ...
 public:
@@ -54,17 +57,16 @@ public:
     <a href="#TaskPostgreSQLInitTable_Start">void Start(class UTask * user) override;</a>
 };</code></pre>
 
-    <p>
-        A task that creates a single table including columns, constraints and indices, if not existing. Additional columns, constraints and indices are added if they don't exist.
-    </p>
+        </dd>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitTable_Constructor">TaskPostgreSQLInitTable</a></h3>
+    <h3 class="fnhead" id="TaskPostgreSQLInitTable_Constructor">TaskPostgreSQLInitTable</h3>
+    <dd>
     <p>
         Contructor used to initialize the class.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">class IDatabase * <b>database</b></td>
@@ -80,15 +82,15 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitTable_AddColumn">AddColumn</a></h3>
+    <h3 class="fnhead" id="TaskPostgreSQLInitTable_AddColumn">AddColumn</h3>
+    <dd>
     <p>
         Specifies a column for the database table.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">const char * <b>name</b></td>
@@ -104,15 +106,16 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitTable_AddConstraint">AddConstraint</a></h3>
+
+    <h3 class="fnhead" id="TaskPostgreSQLInitTable_AddConstraint">AddConstraint</h3>
+    <dd>
     <p>
         Specifies the constraint of a column.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">const char * <b>name</b></td>
@@ -128,15 +131,16 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitTable_AddIndex">AddIndex</a></h3>
+
+    <h3 class="fnhead" id="TaskPostgreSQLInitTable_AddIndex">AddIndex</h3>
+    <dd>
     <p>
         Adds an index to the table. Indices can include a single column or multiple columns.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">const char * <b>name</b></td>
@@ -158,15 +162,16 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitTable_Start">Start</a></h3>
+
+    <h3 class="fnhead" id="TaskPostgreSQLInitTable_Start">Start</h3>
+    <dd>
     <p>
         Starts the task of checking / creating the table.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">class UTask * <b>user</b></td>
@@ -176,11 +181,12 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
 
-    <h2><a name="TaskPostgreSQLInitEnum">TaskPostgreSQLInitEnum</a></h2>
-
+    <h2 id="TaskPostgreSQLInitEnum">TaskPostgreSQLInitEnum</h2>
+    <p>
+        A task that creates an enum in the database, if it does not already exist.
+    </p>
     <pre><code class="C++">class TaskPostgreSQLInitEnum : public ITask, public UDatabase {
     ...
 public:
@@ -190,17 +196,16 @@ public:
     <a href="#TaskPostgreSQLInitEnum_Start">void Start(class UTask * user) override;</a>
 };</code></pre>
 
-    <p>
-        A task that creates an enum in the database, if it does not already exist.
-    </p>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitEnum_Constructor">TaskPostgreSQLInitEnum</a></h3>
+
+    <h3 class="fnhead" id="TaskPostgreSQLInitEnum_Constructor">TaskPostgreSQLInitEnum</h3>
+    <dd>
     <p>
         Contructor used to initialize the class.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">class IDatabase * <b>database</b></td>
@@ -216,15 +221,16 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitEnum_AddValue">AddValue</a></h3>
+
+    <h3 class="fnhead" id="TaskPostgreSQLInitEnum_AddValue">AddValue</h3>
+    <dd>
     <p>
         Adds a single value to the enum.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">const char * <b>name</b></td>
@@ -234,15 +240,16 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="TaskPostgreSQLInitEnum_Start">Start</a></h3>
+
+    <h3 class="fnhead" id="TaskPostgreSQLInitEnum_Start">Start</h3>
+    <dd>
     <p>
         Starts the task of checking / creating the enum.
     </p>
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr>
                     <td class="param">class UTask * <b>user</b></td>
@@ -252,12 +259,11 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
 
     <h1>Code Examples</h1>
 
-    <h2><a name="ExampleInitDatabase">Initializing a database using multiple sequential tasks</a></h2>
+    <h2 id="ExampleInitDatabase">Initializing a database using multiple sequential tasks</h2>
 
     <pre class="sample" style="height: auto;"><code class="language-cpp">
 #include "platform/platform.h"

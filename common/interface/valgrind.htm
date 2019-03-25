@@ -35,18 +35,18 @@
         </tr>
     </table>
     <h1>Classes</h1>
-    <a name="IGuuid"><h2>IValgrind</h2></a>
+    <h2 id="IGuuid">IValgrind</h2></a>
     <pre><code class="language-cpp">class IValgrind {
 public:
     <a href="#RunningOnValgrind" style="text-decoration:none;">static bool RunningOnValgrind()</a>;
 };</code></pre>
     
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="RunningOnValgrind">RunningOnValgrind</a> (static function)</div>
+    <div class="fnhead" id="RunningOnValgrind">RunningOnValgrind (static function)</div>
     <dl>
         <dd>
             This function is used to determine, if the app has been started with valgrind.
-            <h4><a name="ExampleValgrind">Code Example</a> </h4>
+            <h4 id="ExampleValgrind">Code Example</a> </h4>
             <pre class="sample" style="height:auto;">
             <code class="language-cpp">if(IValgrind::RunningOnValgrind()) {
     // do something differently
@@ -55,7 +55,7 @@ public:
         </dd>
     </dl>
     
-    <h3><a name="ExampleValgrindStart" style="text-decoration:none;">Starting an app with valgrind</a></h3>
+    <h3 id="ExampleValgrindStart" style="text-decoration:none;">Starting an app with valgrind</h3>
     <dl>
         <dd>
             You can start valgrind with a lot of options. One option is to tell valgrind to generate XML output files (--xml=yes --xml-file=...).<br>

@@ -56,7 +56,7 @@
     <!-- Block with the classes -->
     <h1>Classes</h1>
 
-    <h2><a name="AppWebsocket">AppWebsocket</a></h2>
+    <h2 id="AppWebsocket">AppWebsocket</h2>
 
     <pre><code class="C++">class AppWebsocket : public UWebsocket, public IJsonApiConnection {
 
@@ -115,15 +115,13 @@ public:
         signaling of events on the protocol.
     </p>
 
-    <h3 class="fnhead"><a name="AppWebsocket">virtual AppWebsocket</a></h3>
+    <div class="fnhead" id="AppWebsocket">virtual AppWebsocket</div>
     
-    <p>
+    <dd>
         Contructor used to initialize the class.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">IWebserverPlugin * <b>plugin</b></td>
                 <td>
@@ -144,85 +142,68 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketPassword1">virtual AppWebsocketPassword (overloaded)</a></h3>
-    <p>
+
+    <div class="fnhead" id="AppWebsocketPassword1">virtual AppWebsocketPassword (overloaded)</div>
+    <dd>
         Called by the library to read the shared secret, which is part of the App instance
         configuration.
-    </p>
 
-    <dl>
-        <dt>Return value</dt>
-        <dd>
+        <h4>Return value</h4>
             The app instance password. If null is returned, the function AppWebsocketLogin is
             called to start assynchronous athentication.
-        </dd>
-    </dl>
+    </dd>
 
-    <h3 class="fnhead"><a name="AppWebsocketPassword2">virtual AppWebsocketPassword (overloaded)</a></h3>
+    <div class="fnhead" id="AppWebsocketPassword2">virtual AppWebsocketPassword (overloaded)</div>
     
-    <p>
+    <dd>
         Called by the library to read another domain dependent shared secret, if the first shared secret failed.
-    </p>
-    
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>domain</b></td>
                 <td>
                     The domain name.
                 </td>
             </tr>
-        </table></dd>
-        <dt>Return value</dt>
-        <dd>
+        </table>
+        <h4>Return value</h4>
             The domain password, if defined. If null is returned, the function AppWebsocketLogin is
             called to start assynchronous athentication.
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketInstanceDomain">virtual AppWebsocketInstanceDomain</a></h3>
+    <div class="fnhead" id="AppWebsocketInstanceDomain">virtual AppWebsocketInstanceDomain</div>
     
-    <p>
+    <dd>
         Called by the library to read the App Instance domain. It is sent within the AppLoginResult
         message as property "domain".
-    </p>
-
-    <dl>
-        <dt>Return value</dt>
-        <dd>
+    
+        <h4>Return value</h4>
             The domain name of the instance.
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketConnectComplete">virtual AppWebsocketConnectComplete</a></h3>
+    <div class="fnhead" id="AppWebsocketConnectComplete">virtual AppWebsocketConnectComplete</div>
     
-    <p>
+    <dd>
         Will be called after the connection / authentication process had been completed and with
         that the AppWebsocket connection had been established.
         The default implementation is just an empty function, which returns true
-    </p>
 
-    <dl>
-        <dt>Return value</dt>
-        <dd>
+        <h4>Return value</h4>
+
             The application should return true to indicate, that it is ready
             to receive messages. If false is returned, a call to AppWebsocketMessageComplete() is needed
             to receive messages.
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketMessage">virtual AppWebsocketMessage</a></h3>
+    <div class="fnhead" id="AppWebsocketMessage">virtual AppWebsocketMessage</div>
 
-    <p>
+    <dd>
         Called by the library on received messages. The message is json decoded.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">class json_io & <b>msg</b></td>
                 <td>
@@ -244,17 +225,15 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketBinaryMessage">virtual AppWebsocketBinaryMessage</a></h3>
 
-    <p>
+    <div class="fnhead" id="AppWebsocketBinaryMessage">virtual AppWebsocketBinaryMessage</div>
+
+    <dd>
         Called by the library on received binary messages.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">void * <b>buffer</b></td>
                 <td>
@@ -275,25 +254,22 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketMessageComplete">virtual AppWebsocketMessageComplete</a></h3>
+    <div class="fnhead" id="AppWebsocketMessageComplete">virtual AppWebsocketMessageComplete</div>
 
-    <p>
+    <dd>
         Function to be called to acknowledge the last message. Unless this function is called no
         further message is received.
-    </p>
+    </dd>
 
-    <h3 class="fnhead"><a name="AppWebsocketMessageSend">virtual AppWebsocketMessageSend</a></h3>
+    <div class="fnhead" id="AppWebsocketMessageSend">virtual AppWebsocketMessageSend</div>
     
-    <p>
+    <dd>
         Function which can be called to send a message. buffer should be a buffer big enough to
         hold the complete message. It is used only during the call to this function.
-    </p>
-    
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">class json_io & <b>msg</b></td>
                 <td>
@@ -307,40 +283,37 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketSendResult">virtual AppWebsocketSendResult</a></h3>
+    <div class="fnhead" id="AppWebsocketSendResult">virtual AppWebsocketSendResult</div>
 
-    <p>
+    <dd>
         Called by the library when the message is sent. The App should not send further messages
         unless this call is received, if the App wants to have flow control for bulk data. If flow
         control on application level is done, this function needs not to be implemented.
-    </p>
+    </dd>
 
-    <h3 class="fnhead"><a name="AppWebsocketClose">AppWebsocketClose</a></h3>
+    <div class="fnhead" id="AppWebsocketClose">AppWebsocketClose</div>
 
-    <p>
+    <dd>
         Can be called to request closing of the websocket connection
-    </p>
+    </dd>
 
-    <h3 class="fnhead"><a name="AppWebsocketClosed">virtual AppWebsocketClosed</a></h3>
+    <div class="fnhead" id="AppWebsocketClosed">virtual AppWebsocketClosed</div>
 
-    <p>
+    <dd>
         Called when the websocket connection is closed. It can be used to delete the App session
         (e.g. delete this).
-    </p>
+    </dd>
 
-    <h3 class="fnhead"><a name="AppWebsocketAppInfo">virtual AppWebsocketAppInfo</a></h3>
+    <div class="fnhead" id="AppWebsocketAppInfo">virtual AppWebsocketAppInfo</div>
 
-    <p>
+    <dd>
         Called by the library to get information of the specified app. This includes for
         example if the app is hidden and which client APIs are provided by the app.
         The application is supposed to encode a JSON structure containing the information.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>app</b></td>
                 <td>
@@ -359,19 +332,38 @@ public:
                     The position inside the JSON structure where to put the information.
                 </td>
             </tr>
-        </table></dd>
-    </dl>
+        </table>
+        <h4>Information that can be published in the JSON</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param"><b>hidden</b></td>
+                <td>
+                    <code>true</code> if the app is an API provider without a UI. Hidden apps are run in the background without displaying them to the user.
+                </td>
+            </tr>
+            <tr>
+                <td class="param"><b>presence</b></td>
+                <td>
+                    <code>true</code> if the app instance provides presence for badge counts on the AppWebsocket connection using the PbxSignal API.
+                </td>
+            </tr>
+            <tr>
+                <td class="param"><b>apis</b></td>
+                <td>
+                    An object that should contain an object for each client API that is provided by the app. Please see the <a href="#ExampleAppInfo">Example</a>.
+                </td>
+            </tr>
+        </table>
+    </dd>
 
-    <h3 class="fnhead"><a name="AppWebsocketServiceInfo">virtual AppWebsocketServiceInfo</a></h3>
+    <div class="fnhead" id="AppWebsocketServiceInfo">virtual AppWebsocketServiceInfo</div>
 
-    <p>
+    <dd>
         Called by the library to get information about the websocket services of a certain app instance.
         The application is supposed to encode a JSON structure containing the information.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>app</b></td>
                 <td>
@@ -391,41 +383,35 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketDeviceAppType">virtual AppWebsocketDeviceAppType</a></h3>
 
-    <p>
+    <div class="fnhead" id="AppWebsocketDeviceAppType">virtual AppWebsocketDeviceAppType</div>
+
+    <dd>
         Called by the library to get information about the device app type. This happens when an
         AppInfo message is received.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>app</b></td>
                 <td>
                     The name of the app for which the information is requested.
                 </td>
             </tr>
-        </table></dd>
-        <dt>Return Value</dt>
-        <dd>
+        </table>
+        <h4>Return Value</h4>
             A string, which is sent as "deviceapp" property in the AppInfoResult message.
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketLogin">virtual AppWebsocketLogin</a></h3>
+    <div class="fnhead" id="AppWebsocketLogin">virtual AppWebsocketLogin</div>
 
-    <p>
+    <dd>
         Called by the library if null is returned on AppWebsocketPassword, so that the
         Login can be handled assynchronously in the application
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">class json_io & <b>msg</b></td>
                 <td>
@@ -438,52 +424,46 @@ public:
                     Handle of the info object inside the AppLogin message.
                 </td>
             </tr>
-        </table></dd>
-        <dt>Return Value</dt>
-        <dd>
+        </table>
+        <h4>Return Value</h4>
             A string, which is sent as "deviceapp" property in the AppInfoResult message.
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketApiPermission">virtual AppWebsocketApiPermission</a></h3>
+    <div class="fnhead" id="AppWebsocketApiPermission">virtual AppWebsocketApiPermission</div>
 
-    <p>
+    <dd>
         Called by the library when the function JsonApiPermission is called by an JsonApi
         implementation, so that the application can check if the use of the Api is allowed
         in the context of this session.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>api</b></td>
                 <td>
                     The Api id.
                 </td>
             </tr>
-        </table></dd>
-        <dt>Return Value</dt>
-        <dd>
+        </table>
+        <h4>Return Value</h4>
+
             Return true to allow the use of the Api.
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketCheckLogin">virtual AppWebsocketCheckLogin</a></h3>
 
-    <p>
+    <div class="fnhead" id="AppWebsocketCheckLogin">virtual AppWebsocketCheckLogin</div>
+
+    <dd>
         Called by the library when the message AppCheckLogin is received. This can be used
         to check if a login is valid. The PBX Manager uses this function to verify if the
         passwords stored in App objects are valid.
-    </p>
-    <p>
+
         The default implementation calls AppWebsocketCheckLoginComplete with AppWebsocketPassword,
         so that this check works in case the AppWebsocketPassword function is used for the password.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>src</b></td>
                 <td>
@@ -509,18 +489,16 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketLoginComplete">virtual AppWebsocketLoginComplete</a></h3>
+    <div class="fnhead" id="AppWebsocketLoginComplete">virtual AppWebsocketLoginComplete</div>
 
-    <p>
+    <dd>
         Called by the application to complete a login process started with the AppWebsocketLogin
         call
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>password</b></td>
                 <td>
@@ -540,18 +518,16 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketCheckLoginComplete">virtual AppWebsocketCheckLoginComplete</a></h3>
+    <div class="fnhead" id="AppWebsocketCheckLoginComplete">virtual AppWebsocketCheckLoginComplete</div>
 
-    <p>
+    <dd>
         Called by the application to complete a check login process started with the
         AppWebsocketCheckLogin call
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>src</b></td>
                 <td>
@@ -583,17 +559,15 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketMessageSendText">virtual AppWebsocketMessageSendText</a></h3>
 
-    <p>
+    <div class="fnhead" id="AppWebsocketMessageSendText">virtual AppWebsocketMessageSendText</div>
+
+    <dd>
         Can be used to send a plain text message
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>buffer</b></td>
                 <td>
@@ -601,17 +575,15 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketMessageSendBinary">virtual AppWebsocketMessageSendBinary</a></h3>
 
-    <p>
+    <div class="fnhead" id="AppWebsocketMessageSendBinary">virtual AppWebsocketMessageSendBinary</div>
+
+    <dd>
         Can be used to send a binary message
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">char * <b>buffer</b></td>
                 <td>
@@ -625,18 +597,16 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketEncrypt">AppWebsocketEncrypt</a></h3>
 
-    <p>
+    <div class="fnhead" id="AppWebsocketEncrypt">AppWebsocketEncrypt</div>
+
+    <dd>
         Can be used to encrypt a text send on the AppWebsocket connection, using the session
         key
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * seed<b>seed</b></td>
                 <td>
@@ -664,18 +634,15 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketDecrypt">AppWebsocketDecrypt</a></h3>
+    <div class="fnhead" id="AppWebsocketDecrypt">AppWebsocketDecrypt</div>
 
-    <p>
+    <dd>
         Can be used to dencrypt a text send on the AppWebsocket connection, using the session
         key
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * seed<b>seed</b></td>
                 <td>
@@ -703,17 +670,15 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketHash">AppWebsocketHash</a></h3>
 
-    <p>
+    <div class="fnhead" id="AppWebsocketHash">AppWebsocketHash</div>
+
+    <dd>
         Calculate a SHA256 hash using the session key
-    </p>
-
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+    
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * seed<b>seed</b></td>
                 <td>
@@ -740,25 +705,22 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="AppWebsocketIsEncryptedConnection">AppWebsocketIsEncryptedConnection</a></h3>
+    <div class="fnhead" id="AppWebsocketIsEncryptedConnection">AppWebsocketIsEncryptedConnection</div>
 
-    <p>
+    <dd>
         Returns true if a TLS connection is used
-    </p>
+    </dd>
 
-    <h3 class="fnhead"><a name="RegisterJsonApi">RegisterJsonApi</a></h3>
+    <div class="fnhead" id="RegisterJsonApi">RegisterJsonApi</div>
 
-    <p>
+    <dd>
         Used by an Api implementation to register the Api to the session. Needed to receive
         messages with the matching "api" property. This is usually called when the Api
         implementation is called with JsonApiRequested, when a new api value is received
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">class JsonApi * <b>api</b></td>
                 <td>
@@ -766,17 +728,14 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="UnRegisterJsonApi">UnRegisterJsonApi</a></h3>
+    <div class="fnhead" id="UnRegisterJsonApi">UnRegisterJsonApi</div>
 
-    <p>
+    <dd>
         Used by an Api implementation to unregister the Api from the session.
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">class JsonApi * <b>api</b></td>
                 <td>
@@ -784,17 +743,15 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="JsonApiMessage">JsonApiMessage</a></h3>
 
-    <p>
+    <div class="fnhead" id="JsonApiMessage">JsonApiMessage</div>
+
+    <dd>
         Used by a JsonApi implementation to send a message
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">class json_io & <b>msg</b></td>
                 <td>
@@ -808,47 +765,44 @@ public:
                 </td>
             </tr>
         </table></dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="JsonApiMessageComplete">JsonApiMessageComplete</a></h3>
 
-    <p>
+    <div class="fnhead" id="JsonApiMessageComplete">JsonApiMessageComplete</div>
+
+    <dd>
         Used by a JsonApi implementation to acknowledge a received message so that the
         next message is received
-    </p>
+    </dd>
 
-    <h3 class="fnhead"><a name="JsonApiPermission">JsonApiPermission</a></h3>
+    <div class="fnhead" id="JsonApiPermission">JsonApiPermission</div>
 
-    <p>
+    <dd>
         Used by a JsonApi implementation to check if the use of the Api is allowed for
         this session
-    </p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd><table style="margin-left:-12px">
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b></b></td>
                 <td>
                     The name of the api.
                 </td>
             </tr>
-        </table></dd>
-        <dt>Return Value</dt>
-        <dd>
+        </table>
+        <h4>Return value</h4>
             Return true to allow the use of the Api.
         </dd>
-    </dl>
 
     <h1>Code Examples</h1>
 
-    <h2><a name="ExampleAppInfo">Publishing app information</a></h2>
+    <h2 id="ExampleAppInfo">Publishing app information</h2>
     
     <pre class="sample" style="height:250px;"><code class="language-cpp">void MySession::AppWebsocketAppInfo(const char * app, class json_io & msg, word base)
 {
     if (!strcmp(app, "my-searchprovider")) {
         // general app info
-        msg.add_bool(base, "hidden", true);
+        msg.add_bool(base, "hidden", true); // app is hidden
+        msg.add_bool(base, "presence", true); // app provides presence (badge counts)
         
         // apis
         word apis = msg.add_object(base, "apis");
@@ -858,7 +812,7 @@ public:
     }
 }</code></pre>
 
-    <h2><a name="ExampleServiceInfo">Publishing service information</a></h2>
+    <h2 id="ExampleServiceInfo">Publishing service information</h2>
 
     <pre class="sample" style="height:250px;"><code class="language-cpp">void MySession::AppWebsocketServiceInfo(const char * app, class json_io & msg, word base)
 {

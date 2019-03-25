@@ -58,7 +58,7 @@
     <h2>Functions to initialize</h2>
     <pre><code class="C++">class ISmtpProvider * CreateSmtpProvider();
 </code></pre>
-    <a name="CreateServicesApi"><div class="fnhead">CreateSmtpProvider</div></a>
+    <div id="CreateSmtpProvider" class="fnhead">CreateSmtpProvider</div>
     <dd>
         Creates an instance of the ISmtpProvider.
         <h4>Return value</h4>
@@ -68,7 +68,7 @@
 
     <!-- Block with the classes -->
     <h1>Classes</h1>
-    <a name="ISmtpProvider"><h2>ISmtpProvider</h2></a>
+    <h2 id="ISmtpProvider">ISmtpProvider</h2>
     <pre><code class="C++">class ISmtpProvider {
 public:
     virtual ~ISmtpProvider() {}
@@ -96,7 +96,7 @@ public:
     </dd>
 
 
-    <a name="ISmtp"><h2>ISmtp</h2></a>
+    <h2 id="ISmtp">ISmtp</h2>
     <pre><code class="C++">class ISmtp {
 public:
     virtual ~ISmtp() {}
@@ -139,7 +139,7 @@ public:
     </dd>
 
 
-    <a name="ISmtpSend"><h2>ISmtpSend</h2></a>
+    <h2 id="ISmtpSend">ISmtpSend</h2>
     <pre><code class="C++">class ISmtpSend : public ITask {
 public:
     virtual void AddAttachment(const char *attachmentUrl) = 0;
@@ -198,7 +198,7 @@ public:
 
 
     <h1> Code Examples </h1>
-    <a name="ExampleInitialize"><h2>Initialize the Provider</h2></a>
+    <h2 id="ExampleInitialize">Initialize the Provider</h2>
     <pre class="sample" style="height:150px;"><code class="language-cpp">#include "common/interface/smtp.h"
 ...
 ISmtpProvider * smtpProvider = CreateSmtpProvider();
@@ -207,7 +207,7 @@ AppService * service = new AppService(iomux, localSocketProvider, tcpSocketProvi
 ...
 delete smtpProvider;</code></pre>
 
-    <a name="ExampleCreate"><h2>Create the ISmtp instance</h2></a>
+    <h2 id="ExampleCreate">Create the ISmtp instance</h2>
     <pre class="sample" style="height:250px;"><code class="language-cpp">app::app(IIoMux * const iomux, ISocketProvider * localSocketProvider, IWebserverPluginProvider * const webserverPluginProvider, IDatabaseProvider * databaseProvider, class Service * service, ISmtpProvider * smtpProvider, AppInstanceArgs * args) :
 AppInstance(service, args)
 {
@@ -220,7 +220,7 @@ app::~app()
     if (smtp) delete smtp;
 }</code></pre>
 
-    <a name="ExampleSend"><h2>Send Emails</h2></a>
+    <h2 id="ExampleSend">Send Emails</h2>
     <pre class="sample" style="height:700px;"><code class="language-cpp">SendEmail::SendEmail(class App * app): taskSmtp(this, &SendEmail::SmtpSendComplete, &SendEmail::SmtpSendFailed, &SendEmail::SmtpSendProgress)
 {        
     ...

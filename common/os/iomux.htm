@@ -135,5 +135,13 @@ void LdapServerConn::TimerOnTimeout(ITimer * timer)
             </ul>
         </dd>
     </dl>
+    
+    
+    
+    <h2>ITimerAbsolute</h2>
+    <p>
+        Timer implementation, which takes an absolute timestamp to trigger. Note that this version uses system timers from the Linux OS, so use them carefully.
+        ITImerAbsolute is used in the same way as ITimer (except that the user for callback is UTimerAbsolute).
+    </p>
 </body>
 </html>

@@ -23,6 +23,8 @@ innovaphone.Avatar = innovaphone.Avatar || function (start, user, domain, appdom
     }
 
     this.url = function (sip, size, dn) {
+        if (!sip) sip = "";
+        else if (sip == undefined) sip = "";
         var at = sip.indexOf("@");
         var d = appdomain;
         if (at != -1) {

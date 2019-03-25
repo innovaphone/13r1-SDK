@@ -9,8 +9,6 @@ class UBadgeCountSignaling {
 
 public:
     virtual void CreateBadgeCountPresenceMonitor(class BadgeCountSignaling * signaling, int call, const char * user, const char * topic) = 0;
-
-    class AppUpdatesFilters badgeCountFilters;
 };
 
 class BadgeCountSignaling : public JsonApi {

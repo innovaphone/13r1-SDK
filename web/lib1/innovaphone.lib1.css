@@ -11,6 +11,11 @@ html
     font-weight: normal;
 }
 
+input
+{
+    font-family: titillium, 'Open Sans', sans-serif;
+}
+
 body, p
 {
     margin: 0px;

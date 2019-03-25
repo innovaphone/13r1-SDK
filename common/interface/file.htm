@@ -85,7 +85,7 @@ public:
     To enable logging for File interface, the flag LOG_FILE must be set in the Manager App diagnostic settings.
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="OpenWriteFile">OpenWriteFile</a> (static function)</div>
+    <div class="fnhead" id="OpenWriteFile">OpenWriteFile (static function)</div>
     <dl><dd>
         The main function to use to open a file for write operation. An empty file is created and opened for writinf if append is false; otherwise the file is opened for the writing at the end of the file.
         If the file is opened successfully, an object of class <a href="#IFileWrite">IFileWrite</a> is returned. In case of error, a null pointer is returned.
@@ -98,7 +98,7 @@ public:
             </table>
             <h4>Return value</h4>
             The IFileWrite instance created. It must be freed by the C++ operator delete, if no longer needed.
-            <h4><a name="ExampleOpenWriteFile">Code Example</a> </h4>
+            <h4 id="ExampleOpenWriteFile">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">class IFileWrite * file = FileSystem::OpenWriteFile("/path/file.txt", false, log_instance);
 if(file) {
 ....
@@ -120,7 +120,7 @@ delete file;
             </table>
             <h4>Return value</h4>
             The IFileRead instance created. It must be freed by the C++ operator delete, if no longer be used.
-            <h4><a name="ExampleOpenReadFile">Code Example</a></h4>
+            <h4 id="ExampleOpenReadFile">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">class IFileRead * file = FileSystem::OpenReadFile("/path/file.txt", log_instance);
 if(file) {
 ....
@@ -130,7 +130,7 @@ delete file;
 }
                 </code></pre>
         </dd></dl>
-    <div class="fnhead"><a name="OpenDirectory">OpenDirectory</a> (static function)</div>
+    <div class="fnhead" id="OpenDirectory">OpenDirectory (static function)</div>
     <dl><dd>
             The main function to use to open a directory corresponding to <i>directoryName</i>. An object of class <a href="#IDirectory">IDirectory</a> is returned on success and a null pointer on failure.
 
@@ -141,7 +141,7 @@ delete file;
             </table>
             <h4>Return value</h4>
             The created IDirectory instance. It must be freed by the C++ operator delete, if no longer be used.
-            <h4><a name="ExampleOpenDirectory">Code Example</a></h4>
+            <h4 id="ExampleOpenDirectory">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">class IDirectory * dir = FileSystem::OpenDirectory("/dir/", log_instance);
 if(dir) {
 ....
@@ -152,7 +152,7 @@ delete dir;
                 </code></pre>
         </dd></dl>
 
-    <div class="fnhead"><a name="OpenElfBinary">OpenElfBinary</a> (static function)</div>
+    <div class="fnhead" id="OpenElfBinary">OpenElfBinary (static function)</div>
     <dl>
         <dd>
             The function is used to open a binary file <i>bin</i>. An object of class <a href="#IElfBinary">IElfBinary</a> is returned on success and a null pointer on failure. This object can be used
@@ -165,7 +165,7 @@ delete dir;
             </table>
             <h4>Return value</h4>
             The created IElfBinary instance. It must be freed by the C++ operator delete, if no longer be used.
-            <h4><a name="ExampleOpenDirectory">Code Example</a></h4>
+            <h4 id="ExampleOpenDirectory">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">class IElfBinary * bin = FileSystem::OpenElfBinary(binary, log_instance);
 if(bin) {
 ....
@@ -177,7 +177,7 @@ delete bin;
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="ReadWholeFile">ReadWholeFile</a> (static function)</div>
+    <div class="fnhead" id="ReadWholeFile">ReadWholeFile (static function)</div>
     <dl>
         <dd>
             Opens and reads the whole file into a buffer with a defined size. The file is closed afterwards.
@@ -193,7 +193,7 @@ delete bin;
             If the read is successfull true is returned; otherwise false.
         </dd></dl>
 
-    <div class="fnhead"><a name="WriteWholeFile">WriteWholeFile</a> (static function)</div>
+    <div class="fnhead" id="WriteWholeFile">WriteWholeFile (static function)</div>
     <dl><dd>
         Opens a file with an absolute path and writes the whole content of the write buffer into the file.
         The file is closed afterwards.
@@ -207,14 +207,14 @@ delete bin;
         </table>
         <h4>Return value</h4>
         If the write is successfull true is returned; otherwise false.
-            <h4> <a name="ExampleWriteWholeFile">Code Example</a> </h4>
+            <h4 id="ExampleWriteWholeFile">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">char * buffer = malloc(BIG_ENOUGH_SIZE);
 FileSystem::WriteWholeFile("/path/important_file.txt", buffer, strlen(buffer), log_instance);
 free(buffer);
                 </code></pre>
     </dd></dl>
 
-    <div class="fnhead"><a name="ScanFile">ScanFile</a> (static function)</div>
+    <div class="fnhead" id="ScanFile">ScanFile (static function)</div>
     <dl><dd>
         Scans a file given as an absolute path, based on a set of characters specified in a format string. 
 
@@ -227,14 +227,14 @@ free(buffer);
         </table>
         <h4>Return value</h4>
         If scanning the file is successfull, the file is closed and true is returned; otherwise false.
-            <h4> <a name="ExampleScanFile">Code Example</a> </h4>
+            <h4 id="ExampleScanFile">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">long long unsigned time;
 int id;
 char s_string[128];
 FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %s", &time, &id, s_string);</code></pre>
     </dd></dl>
 
-    <div class="fnhead"><a name="FileExists">FileExists</a> (static function)</div>
+    <div class="fnhead" id="FileExists">FileExists (static function)</div>
     <dl><dd>
         Checks if a file exists.
 
@@ -248,7 +248,7 @@ FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %
         If a file exists true is returned; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="GetLastWriteTime">GetLastWriteTime</a> (static function)</div>
+    <div class="fnhead" id="GetLastWriteTime">GetLastWriteTime (static function)</div>
     <dl><dd>
         Returns the time of the last write operation performed on a file specified by an absolute path.
 
@@ -262,7 +262,7 @@ FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %
         On success the time in seconds is retured; otherwise -1.
     </dd></dl>
 
-    <div class="fnhead"><a name="GetFileSize">GetFileSize</a> (static function)</div>
+    <div class="fnhead" id="GetFileSize">GetFileSize (static function)</div>
     <dl><dd>
         Returns the current size of the file.
 
@@ -276,7 +276,7 @@ FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %
         On success the size of the file is retured; otherwise -1.
     </dd></dl>
 
-    <div class="fnhead"><a name="GetFileBlockSize">GetFileBlockSize</a> (static function)</div>
+    <div class="fnhead" id="GetFileBlockSize">GetFileBlockSize (static function)</div>
     <dl><dd>
         Returns the current block size of the file.
 
@@ -290,7 +290,7 @@ FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %
         On success the block size of the file is retured; otherwise -1.
     </dd></dl>
 
-    <div class="fnhead"><a name="Rename">Rename</a> (static function)</div>
+    <div class="fnhead" id="Rename">Rename (static function)</div>
     <dl><dd>
         Renames a file.
 
@@ -303,13 +303,13 @@ FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %
         </table>
         <h4>Return value</h4>
         On success true is retured; otherwise false.
-            <h4> <a name="ExampleRename">Code Example</a> </h4>
+            <h4 id="ExampleRename">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">if (FileSystem::FileExists("/path/myPbx.txt", log_instance)) {
     FileSystem::Rename("/path/myPbx.txt", "/path/myApps.txt", log_instance);
 }</code></pre>
     </dd></dl>
 
-    <div class="fnhead"><a name="RemoveFile">RemoveFile</a> (static function)</div>
+    <div class="fnhead" id="RemoveFile">RemoveFile (static function)</div>
     <dl><dd>
         Removes a file.
 
@@ -323,7 +323,7 @@ FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %
         On success true is retured; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="CreateDirectory">CreateDirectory</a> (static function)</div>
+    <div class="fnhead" id="CreateDirectory">CreateDirectory (static function)</div>
     <dl><dd>
         Creates a directory.
 
@@ -337,12 +337,12 @@ FileSystem::ScanFile(log_instance, "/path/file_to_scan", "%*32[^:]:%llu %*s %d %
         <h4>Return value</h4>
         On success true is retured; otherwise false.
 
-        <h4> <a name="ExampleCreateDirectory">Code Example</a> </h4>
+        <h4 id="ExampleCreateDirectory">Code Example</h4>
         <pre class="sample" style="height:auto;"><code class="language-cpp">//mode 0755 defined as rwxr-xr-x 
 FileSystem::CreateDirectory("/home/new", 0755, log)</code></pre>
     </dd></dl>
 
-    <div class="fnhead"><a name="RemoveDirectory">RemoveDirectory</a> (static function)</div>
+    <div class="fnhead" id="RemoveDirectory">RemoveDirectory (static function)</div>
     <dl><dd>
         Removes a directory. If the directory is not empty, all included directories and files are deleted as well.
 
@@ -356,7 +356,7 @@ FileSystem::CreateDirectory("/home/new", 0755, log)</code></pre>
         On success true is retured; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="ChangeOwner">ChangeOwner</a> (static function)</div>
+    <div class="fnhead" id="ChangeOwner">ChangeOwner (static function)</div>
     <dl><dd>
         Changes the owner and group of the directory specified by an absolute path.
 
@@ -372,7 +372,7 @@ FileSystem::CreateDirectory("/home/new", 0755, log)</code></pre>
         On success true is retured; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="ChangeMode">ChangeMode</a> (static function)</div>
+    <div class="fnhead" id="ChangeMode">ChangeMode (static function)</div>
     <dl><dd>
         Changes the mode of a file.
 
@@ -385,11 +385,11 @@ FileSystem::CreateDirectory("/home/new", 0755, log)</code></pre>
         </table>
         <h4>Return value</h4>
         On success true is retured; otherwise false.
-        <h4> <a name="ExampleChangeMode">Code Example</a> </h4>
+        <h4 id="ExampleChangeMode">Code Example</h4>
         <pre class="sample" style="height:auto;"><code class="language-cpp">FileSystem::ChangeMode("/directory", 0744, log);</code></pre>
     </dd></dl>
 
-    <div class="fnhead"><a name="GetFileSystemTotalSize">GetFileSystemTotalSize</a> (static function)</div>
+    <div class="fnhead" id="GetFileSystemTotalSize">GetFileSystemTotalSize (static function)</div>
     <dl><dd>
         Returns the total size of the file system in bytes.
 
@@ -401,11 +401,11 @@ FileSystem::CreateDirectory("/home/new", 0755, log)</code></pre>
         </table>
         <h4>Return value</h4>
         On success the size is returned in bytes; otherwise -1.
-        <h4> <a name="ExampleGetFileSystemTotalSize">Code Example</a> </h4>
+        <h4 id="ExampleGetFileSystemTotalSize">Code Example</h4>
         <pre class="sample" style="height:auto;"><code class="language-cpp">ulong64 totalSize = FileSystem::GetFileSystemTotalSize("/mnt/sda1", log);</code></pre>
     </dd></dl>
 
-    <div class="fnhead"><a name="GetFileSystemUsedSpace">GetFileSystemUsedSpace</a> (static function)</div>
+    <div class="fnhead" id="GetFileSystemUsedSpace">GetFileSystemUsedSpace (static function)</div>
     <dl><dd>
         Returns the total used space of the file system in bytes.
 
@@ -419,7 +419,7 @@ FileSystem::CreateDirectory("/home/new", 0755, log)</code></pre>
         On success the size is returned in bytes; otherwise -1.
     </dd></dl>
 
-    <div class="fnhead"><a name="CheckSystemUser">CheckSystemUser</a> (static function)</div>
+    <div class="fnhead" id="CheckSystemUser">CheckSystemUser (static function)</div>
     <dl><dd>
         Checks if a system user and group exist.
 
@@ -434,7 +434,7 @@ FileSystem::CreateDirectory("/home/new", 0755, log)</code></pre>
         If the user and group are available to use, true is returned; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="GetFileSystemUser">GetFileSystemUser</a> (static function)</div>
+    <div class="fnhead" id="GetFileSystemUser">GetFileSystemUser (static function)</div>
     <dl><dd>
         Returns the system user of a file.
 
@@ -464,7 +464,7 @@ public:
     To enable logging for File interface, the flag LOG_FILE must be set in the managers diagnostic settings.
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IsOpen">IsOpen</a></div>
+    <div class="fnhead" id="IsOpen">IsOpen</div>
     <dl><dd>
         Checks if the file is opened.
 
@@ -472,7 +472,7 @@ public:
         Returns true if the file is opened successfully; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="Write">Write</a></div>
+    <div class="fnhead" id="Write">Write</div>
     <dl><dd>
         Writes the buffer with a size len into the file.
         <h4>Parameters</h4>
@@ -485,20 +485,20 @@ public:
         Returns true if the write operation was successful; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="Flush">Flush</a> (static function)</div>
+    <div class="fnhead" id="Flush">Flush (static function)</div>
     <dl><dd>
         Flushes the stream opened for writing any unwritten data
 
     </dd></dl>
 
-    <div class="fnhead"><a name="Close">Close</a></div>
+    <div class="fnhead" id="Close">Close</div>
     <dl><dd>
         Close the file after writing is finished. After the write operation is completed, a call to Close() should be performed explicitly.
         <h4>Return value</h4>
         Returns true if the the file was closed successfully; otherwise false.
     </dd></dl>
 
-    <h3> <a name="ExampleIFileWrite">Code Example</a> </h3>
+    <h3 id="ExampleIFileWrite">Code Example</h3>
     <pre class="sample" style="height:auto;"><code class="language-cpp">bool append = false;
 class IFileWrite * file = FileSystem::OpenWriteFile("file.txt", append, log);
 file->Write(buffer, strlen(buffer));
@@ -521,7 +521,7 @@ public:
     To enable logging for File interface, the flag LOG_FILE must be set in the managers diagnostic settings.
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IsOpenR">IsOpen</a></div>
+    <div class="fnhead" id="IsOpenR">IsOpen</div>
     <dl><dd>
         Checks if the file is opened.
 
@@ -529,7 +529,7 @@ public:
         Returns true if the file is opened successfully; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="Read">Read</a></div>
+    <div class="fnhead" id="Read">Read</div>
     <dl><dd>
         Reads the file into the buffer.
         <h4>Parameters</h4>
@@ -542,7 +542,7 @@ public:
         Returns the count of the written bytes in the buffer.
     </dd></dl>
 
-    <div class="fnhead"><a name="CloseR">Close</a></div>
+    <div class="fnhead" id="CloseR">Close</div>
     <dl><dd>
         Close the file after writing is finished. After the last read operation is completed, a call to Close() should be performed explicitly.
         <h4>Return value</h4>
@@ -564,7 +564,7 @@ public:
     To enable logging for File interface, the flag LOG_FILE must be set in the managers diagnostic settings.
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IsOpenD">IsOpen</a></div>
+    <div class="fnhead" id="IsOpenD">IsOpen</div>
     <dl><dd>
         Checks if the directory is opened.
 
@@ -572,7 +572,7 @@ public:
         Returns true if the directory is opened successfully; otherwise false.
     </dd></dl>
 
-    <div class="fnhead"><a name="ReadNext">ReadNext</a></div>
+    <div class="fnhead" id="ReadNext">ReadNext</div>
     <dl><dd>
         Starts reading the first entry of the directory. This function iterates through the whole directory till end of the directory is reached or if an error occurs.
 
@@ -580,14 +580,14 @@ public:
         An instance of class DirectoryEntry is returned specifying whether the entry is a regular file or a directory. NULL is returned on error or if the end of directory is reached.
     </dd></dl>
 
-    <div class="fnhead"><a name="CloseD">Close</a></div>
+    <div class="fnhead" id="CloseD">Close</div>
     <dl><dd>
         Closes the associated directory. A call to Close() should be done explicitly after reading is done.
         <h4>Return value</h4>
         Returns true if the the directory was closed successfully; otherwise false.
     </dd></dl>
 
-    <h3> <a name="ExampleIDirectory">Code Example</a> </h3>
+    <h3 id="ExampleIDirectory">Code Example</h3>
     <pre class="sample" style="height:auto;"><code class="language-cpp">class IDirectory * dir = FileSystem::OpenDirectory("/directory", log);
 class IDirectoryEntry * entry;
 while ((entry = dir->ReadNext())) {
@@ -613,7 +613,7 @@ public:
     To enable logging for File interface, the flag LOG_FILE must be set in the managers diagnostic settings.
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="GetName">GetName</a></div>
+    <div class="fnhead" id="GetName">GetName</div>
     <dl><dd>
         Reads the name of the directory entry.
 
@@ -621,7 +621,7 @@ public:
         Returns the name read.
     </dd></dl>
 
-    <div class="fnhead"><a name="IsFile">IsFile</a></div>
+    <div class="fnhead" id="IsFile">IsFile</div>
     <dl><dd>
         Checks if the directory entry is a regular file.
 
@@ -646,7 +646,7 @@ public:
     To enable logging for File interface, the flag LOG_FILE must be set in the managers diagnostic settings.
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IsOpenElf">IsOpen</a></div>
+    <div class="fnhead" id="IsOpenElf">IsOpen</div>
     <dl>
         <dd>
             Check if the binary file is opened.
@@ -656,7 +656,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IsElfBinary">IsElfBinary</a></div>
+    <div class="fnhead" id="IsElfBinary">IsElfBinary</div>
     <dl>
         <dd>
             Checks whether the file is a valid ELF binary. The header of the binary is read the magic number is checked.
@@ -666,7 +666,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IsExecutable">IsExecutable</a></div>
+    <div class="fnhead" id="IsExecutable">IsExecutable</div>
     <dl>
         <dd>
             Checks whether the file is an executible ELF binary. 
@@ -676,7 +676,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="GetArchitecture">GetArchitecture</a></div>
+    <div class="fnhead" id="GetArchitecture">GetArchitecture</div>
     <dl>
         <dd>
             Returns the architecture of the ELF binary. The types checked are ARM and X86_64 only.
@@ -686,7 +686,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="ElfClose">Close</a></div>
+    <div class="fnhead" id="ElfClose">Close</div>
     <dl>
         <dd>
             Closes the binary file.

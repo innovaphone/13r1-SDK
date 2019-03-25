@@ -28,10 +28,11 @@ class json_io {
     word base;
     
     struct {
-        unsigned int type : 4;
-        unsigned int count : 14;
-        unsigned int flags : 2;
-        unsigned int base : 12;
+        word count;
+        byte type;
+        byte flags;
+        word base;
+        word spare;
         const char * name;
         const char * info;
     } content[JSON_MAX_ITEM];
@@ -63,7 +64,7 @@ public:
     void reset();
     bool decode();
     word encode();
-    word encode(word handle, char * buffer) { char * p = buffer;  write(handle, p); return p - buffer; };
+    word encode(word handle, char * buffer) { char * p = buffer;  write(handle, p); return (word)(p - buffer); };
     class packet * encode_to_packet(class packet * data=0);
     void write(word current, char * & p, word incomplete = 0xffff);
     class packet * write_to_packet(word current, word & count, class packet * data);
@@ -117,6 +118,7 @@ public:
 #endif
     bool get_bool(word base, const char * name, bool * present=0);
     bool get_bool(word base, word & last, bool * present=0);
+    bool get_bool_int(word base, const char * name, int & iret, byte * present=0);
     char * last;
     char * name_last;
     char * incomplete;

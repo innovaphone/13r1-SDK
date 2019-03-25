@@ -29,7 +29,12 @@
 
 	<h1>Classes</h1>
 
-    <h2><a name="TaskFileWrite">TaskFileWrite</a></h2>
+    
+    <h2 id="TaskFileWrite">TaskFileWrite</h2>
+    <dd>
+        Used to write to a file. A file may be created, an existing file replaced or to an existing file
+        appended.
+    </dd>
 
     <pre><code class="C++">class TaskFileWrite : public STask {
     void SStart();
@@ -50,23 +55,18 @@ public:
     void writeBuffer(byte * buffer, unsigned length, bool last);
 };</code></pre>
 
-    <p>
-        Used to write to a file. A file may be created, an existing file replaced or to an existing file
-        appended.
-    </p>
-	
-    <h3 class="fnhead"><a name="TaskFileWrite">TaskFileWrite</a></h3>
 
-    <p>
-        Contructor. TaskFileWrite uses STask as base class, which means for the operation, first
+	
+    <h3 class="fnhead" id="TaskFileWrite">TaskFileWrite</h3>
+
+    <dd>
+        <p>Contructor. TaskFileWrite uses STask as base class, which means for the operation, first
         the class is allocated with all required parameters and then SStart() is used to start it.
         The TaskProgress, TaskComplete and TaskFailed functions are used to indicate
-        progress and completion of the Task.
-    </p>
+        progress and completion of the Task.</p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr><td class="param">class STaskContext * <b>context</b></td>
                     <td>
@@ -94,19 +94,16 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="write">write</a></h3>
+    <h3 class="fnhead" id="write">write</h3>
 
-    <p>
-        Write data to the file. May be called after the TaskProgress callback was called, either
+    <dd>
+        <p>Write data to the file. May be called after the TaskProgress callback was called, either
         after SStart() or the last write() call.
-        The data passed by this function is copied into a new buffer.
-    </p>
+        The data passed by this function is copied into a new buffer.</p>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr><td class="param">byte * <b>buffer</b></td>
                     <td>
@@ -126,16 +123,19 @@ public:
                 </tr>
             </table>
         </dd>
-    </dl>
 
-    <h3 class="fnhead"><a name="writeBuffer">writeBuffer</a></h3>
+    <h3 class="fnhead" id="writeBuffer">writeBuffer</h3>
 
-    <p>
+    <dd>
         Same functionality as write, except the data is not copied and the buffer is freed
         after the data is written.
-    </p>
+    </dd>
 
-    <h2><a name="TaskFileRead">TaskFileRead</a></h2>
+    <h2 id="TaskFileRead">TaskFileRead</h2>
+
+    <dd>
+        Used to read from a file.
+    </dd>
 
     <pre><code class="C++">class TaskFileRead : public STask {
     void SStart();
@@ -155,22 +155,20 @@ public:
     void getData(byte * buffer, unsigned length) { memcpy(buffer, this->buffer, length); };
 };</code></pre>
 
-    <p>
-        Used to read from a file.
-    </p>
 
-    <h3 class="fnhead"><a name="TaskFileRead">TaskFileRead</a></h3>
 
-    <p>
-        Contructor. TaskFileRead uses STask as base class, which means for the operation, first
-        the class is allocated with all required parameters and then SStart() is used to start it.
-        The TaskProgress, TaskComplete and TaskFailed functions are used to indicate
-        progress and completion of the Task.
-    </p>
+    <h3 class="fnhead" id="TaskFileRead">TaskFileRead</h3>
 
-    <dl>
-        <dt>Parameters</dt>
-        <dd>
+    <dd>
+        <p>
+            Contructor. TaskFileRead uses STask as base class, which means for the operation, first
+            the class is allocated with all required parameters and then SStart() is used to start it.
+            The TaskProgress, TaskComplete and TaskFailed functions are used to indicate
+            progress and completion of the Task.
+        </p>
+
+        <h4>Parameters</h4>
+
             <table style="margin-left:-12px">
                 <tr><td class="param">class STaskContext * <b>context</b></td>
                     <td>
@@ -202,15 +200,15 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="read">read</a></h3>
+    <h3 class="fnhead" id="read">read</h3>
 
-    <p>
+    <dd>
         Initiates reading of the next block of data. May be called after the TaskProgress
         callback was called, either after SStart() or the last read() call.
-    </p>
+    </dd>
 
     <dl>
-        <dt>Parameters</dt>
+        <h4>Parameters</h4>
         <dd>
             <table style="margin-left:-12px">
                 <tr><td class="param">unsigned <b>length</b></td>
@@ -227,20 +225,20 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="getLength">getLength</a></h3>
+    <h3 class="fnhead" id="getLength">getLength</h3>
 
-    <p>
+    <dd>
         Return the actual read length after the TaskProgress call
-    </p>
+    </dd>
 
-    <h3 class="fnhead"><a name="getData">getData</a></h3>
+    <h3 class="fnhead" id="getData">getData</h3>
 
-    <p>
+    <dd>
         Copies the read data.
-    </p>
+    </dd>
 
     <dl>
-        <dt>Parameters</dt>
+        <h4>Parameters</h4>
         <dd>
             <table style="margin-left:-12px">
                 <tr><td class="param">byte * <b>buffer</b></td>

@@ -27,7 +27,10 @@
 
 	<h1>Classes</h1>
 
-    <h2><a name="Httpfiles_unzipItem">Httpfiles_unzipItem</a></h2>
+    <h2 id="Httpfiles_unzipItem">Httpfiles_unzipItem</h2>
+    <p>
+        Internal class. For every file in the zip folder there is httpfiles_unzipItem.
+    </p>
 
     <pre><code class="C++">class Httpfiles_unzipItem : public istd::listElement&lt;httpfiles_unzipitem&gt;
 {
@@ -39,11 +42,13 @@ public:
     ~Httpfiles_unzipItem();
 };</code></pre>
 
-    <p>
-        Internal class. For every file in the zip folder there is httpfiles_unzipItem.
-    </p>
 
-    <h2><a name="Httpfiles_unzip">Httpfiles_unzip</a></h2>
+
+    <h2 id="Httpfiles_unzip">Httpfiles_unzip</h2>
+
+    <p>
+        Used to unzip the file. Used in the app-main.cpp after the AppService is started
+    </p>
 
     <pre><code class="C++">class Httpfiles_unzip {
     class IInstanceLog * log;
@@ -55,11 +60,9 @@ public:
     ~Httpfiles_unzip();
 };</code></pre>
 
-    <p>
-        Used to unzip the file. Used in the app-main.cpp after the AppService is started
-    </p>
+
 	
-    <h3 class="fnhead"><a name="Httpfiles_unzip">Httpfiles_unzip</a></h3>
+    <h3 class="fnhead" id="Httpfiles_unzip">Httpfiles_unzip</h3>
 
     <p>
         Contructor. 

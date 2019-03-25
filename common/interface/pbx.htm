@@ -42,7 +42,7 @@
     <h2>Functions to initialize</h2>
     <pre><code class="C++">extern class IPbxApi * CreatePbxApi(class IJsonApiConnection * conn);
 </code></pre>
-    <a name="CreatePbxApi"><div class="fnhead" style="margin-top:5px">CreatePbxApi</div></a>
+    <a name="CreatePbxApi"><div class="fnhead" style="margin-top:5px">CreatePbxApi</div>
     This function creates a IPbxApi object that will be connected to a given IJsonApiConnection, typically an AppWebsocket.
     <dd>
         <h4>Return value</h4>
@@ -51,7 +51,7 @@
 
     <!-- Block with the classes -->
     <h1>Classes</h1>
-    <a name="IPbxApi"><h2>IPbxApi</h2></a>
+    <h2 id="IPbxApi">IPbxApi</h2>
     <pre><code class="C++">class IPbxApi {
 public:
     virtual ~IPbxApi() {};
@@ -62,7 +62,7 @@ public:
     <h3>Overview</h3>
     The interface of the PBX API. It provides functions to create several tasks that can be used to communicate with the PBX.
     <h3>Public functions</h3>
-    <a name="CreateSetPresence"><div class="fnhead">CreateSetPresence</div></a>
+    <div id="CreateSetPresence" class="fnhead">CreateSetPresence</div>
     <dd>
         Creates an ITask that sets the presence for a given contact of a given user.
         <h4>Parameters</h4>
@@ -101,7 +101,7 @@ public:
         <h4>Return value</h4>
         An ITask object that implements the presence change.
     </dd>
-    <a name="CreatePresenceSubscription"><div class="fnhead">CreatePresenceSubscription</div></a>
+    <div id="CreatePresenceSubscription" class="fnhead">CreatePresenceSubscription</div>
     <dd>
         Creates a presence subscription for a given SIP URI or phone number.
         <h4>Parameters</h4>
@@ -129,7 +129,7 @@ public:
         An <a href="#IPbxApiPresenceSubscription">IPbxApiPresenceSubscription</a> object that implements the presence subscription.
     </dd>
 
-	<a name="CreateGetNodeInfo"><div class="fnhead">CreateGetNodeInfo</div></a>
+	<div id="CreateGetNodeInfo" class="fnhead">CreateGetNodeInfo</div>
 	<dd>
 		Creates an ITask that retrieves some node configuration info.
 		<h4>Parameters</h4>
@@ -152,7 +152,7 @@ public:
 	</dd>
 
 
-    <a name="IPbxApiPresenceSubscription"><h2>IPbxApiPresenceSubscription</h2></a>
+    <h2 id="IPbxApiPresenceSubscription">IPbxApiPresenceSubscription</h2>
     <pre><code class="C++">class IPbxApiPresenceSubscription : public ITask {
 public:
     virtual ~IPbxApiPresenceSubscription() {}
@@ -178,7 +178,7 @@ public:
         </dd>
     </dl>
     <h3>Public functions</h3>
-    <a name="Start"><div class="fnhead">Start</div></a>
+    <div id="Start" class="fnhead">Start</div>
     <dd>
         Starts the presence subscription. The specified UTask will get the TaskProgress callback on any changes or TaskFailed on a fatal error.
         <h4>Parameters</h4>
@@ -191,49 +191,49 @@ public:
             </tr>
         </table>
     </dd>
-    <a name="Stop"><div class="fnhead">Stop</div></a>
+    <div id="Stop" class="fnhead">Stop</div>
     <dd>
         Stops the presence subscription. The UTask will get the TaskComplete callback, when the presence subscription has terminated.
     </dd>
-    <a name="IsUp"><div class="fnhead">IsUp</div></a>
+    <div id="IsUp" class="fnhead">IsUp</div>
     <dd>
         Tells if the presence monitor is up or down. All the other info is just available, if the presence monitor is up.
         <h4>Return value</h4>
         <code>true</code> if the presence monitor is up. <code>false</code> if it is down.
     </dd>
-    <a name="GetSip"><div class="fnhead">GetSip</div></a>
+    <div id="GetSip" class="fnhead">GetSip</div>
     <dd>
         <h4>Return value</h4>
         The SIP URI of the monitored endpoint.
     </dd>
-    <a name="GetCn"><div class="fnhead">GetCn</div></a>
+    <div id="GetCn" class="fnhead">GetCn</div>
     <dd>
         <h4>Return value</h4>
         The common name of the monitored endpoint.
     </dd>
-    <a name="GetDn"><div class="fnhead">GetDn</div></a>
+    <div id="GetDn" class="fnhead">GetDn</div>
     <dd>
         <h4>Return value</h4>
         The display name of the monitored endpoint.
     </dd>
-    <a name="GetNum"><div class="fnhead">GetNum</div></a>
+    <div id="GetNum" class="fnhead">GetNum</div>
     <dd>
         <h4>Return value</h4>
         The phone number of the monitored endpoint.
     </dd>
-    <a name="GetEmail"><div class="fnhead">GetEmail</div></a>
+    <div id="GetEmail" class="fnhead">GetEmail</div>
     <dd>
         <h4>Return value</h4>
         The email address of the monitored endpoint.
     </dd>
-    <a name="GetPresence"><div class="fnhead">GetPresence</div></a>
+    <div id="GetPresence" class="fnhead">GetPresence</div>
     <dd>
         <h4>Return value</h4>
         A pointer to an IPbxApiPresence object that contains the list of presence entries, or null if there are none.
     </dd>
 
 
-    <a name="IPbxApiPresence"><h2>IPbxApiPresence</h2></a>
+    <h2 id="IPbxApiPresence">IPbxApiPresence</h2>
     <pre><code class="C++">class IPbxApiPresence {
 public:
     <a href="#GetContact">virtual const char * GetContact() = 0;</a>
@@ -247,65 +247,71 @@ public:
     The IPbxApiPresence object represents a single entry with a pointer to the next entry in the list.
     Please note that object is volatile. The application should not store any pointers to it but copy the needed information.
     <h3>Public functions</h3>
-    <a name="GetContact"><div class="fnhead">GetContact</div></a>
+    <div id="GetContact" class="fnhead">GetContact</div>
     <dd>
         <h4>Return value</h4>
         The contact string of the presence entry (e.g. "tel:") or NULL.
     </dd>
-    <a name="GetStatus"><div class="fnhead">GetStatus</div></a>
+    <div id="GetStatus" class="fnhead">GetStatus</div>
     <dd>
         <h4>Return value</h4>
         The status string of the presence entry ("open", "closed") or NULL.
     </dd>
-    <a name="GetActivity"><div class="fnhead">GetActivity</div></a>
+    <div id="GetActivity" class="fnhead">GetActivity</div>
     <dd>
         <h4>Return value</h4>
         The activity string of the presence entry ("away", "busy", etc) or NULL.
     </dd>
-    <a name="GetNote"><div class="fnhead">GetNote</div></a>
+    <div id="GetNote" class="fnhead">GetNote</div>
     <dd>
         <h4>Return value</h4>
         The note string of the presence entry or NULL.
     </dd>
-    <a name="GetNext"><div class="fnhead">GetNext</div></a>
+    <div id="GetNext" class="fnhead">GetNext</div>
     <dd>
         <h4>Return value</h4>
         The next IPbxApiPresence object in the list or NULL if there is none.
     </dd>
 
-	<a name="IPbxApiTaskGetNodeInfo"><h2>IPbxApiTaskGetNodeInfo</h2></a>
+	<h2 id="IPbxApiTaskGetNodeInfo">IPbxApiTaskGetNodeInfo</h2>
 	<pre><code class="C++">class IPbxApiTaskGetNodeInfo : public ITask {
 public:
 	<a href="#GetName">virtual const char * GetName() = 0;</a>
 	<a href="#GetPrefixIntl">virtual const char * GetPrefixIntl() = 0;</a>
 	<a href="#GetPrefixNtl">virtual const char * GetPrefixNtl() = 0;</a>
 	<a href="#GetPrefixSubs">virtual const char * GetPrefixSubs() = 0;</a>
+	<a href="#GetAreaCode">virtual const char * GetAreaCode() = 0;</a>	
 	<a href="#GetCountryCode">virtual const char * GetCountryCode() = 0;</a>
 };</code></pre>
 	<h3>Overview</h3>
 	A PBX node's configuration can be read upon completion.
 	<h3>Public functions</h3>
-	<a name="GetName"><div class="fnhead">GetName</div></a>
+	<div id="GetName" class="fnhead">GetName</div>
 	<dd>
 		<h4>Return value</h4>
 		The node's name.
 	</dd>
-	<a name="GetPrefixIntl"><div class="fnhead">GetPrefixIntl</div></a>
+	<div id="GetPrefixIntl" class="fnhead">GetPrefixIntl</div>
 	<dd>
 		<h4>Return value</h4>
 		The node's prefix for international numbers.
 	</dd>
-	<a name="GetPrefixNtl"><div class="fnhead">GetPrefixNtl</div></a>
+	<div id="GetPrefixNtl" class="fnhead">GetPrefixNtl</div>
 	<dd>
 		<h4>Return value</h4>
 		The node's prefix for national numbers.
 	</dd>
-	<a name="GetPrefixSubs"><div class="fnhead">GetPrefixSubs</div></a>
+	<div id="GetPrefixSubs" class="fnhead">GetPrefixSubs</div>
 	<dd>
 		<h4>Return value</h4>
 		The node's prefix for subscriber numbers.
 	</dd>
-	<a name="GetCountryCode"><div class="fnhead">GetCountryCode</div></a>
+	<div id="GetAreaCode" class="fnhead">GetAreaCode</div>
+	<dd>
+		<h4>Return value</h4>
+		The node's configured area code, e.g. 30 for Berlin.
+	</dd>
+	<div id="GetCountryCode" class="fnhead">GetCountryCode</div>
 	<dd>
 		<h4>Return value</h4>
 		The node's configured country code, e.g. 49 for germany.

@@ -56,7 +56,15 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
 
     this.checkBuild = false;
     window.addEventListener('message', onpostmessage);
-    window.addEventListener('beforeunload', function () { close() });
+    window.addEventListener('beforeunload', function () {
+        if (ws) {
+            console.log("close beforeunload");
+            ws.onclose = undefined;
+            ws.onerror = undefined;
+            ws.close();
+            ws = null;
+        }
+    });
 
     function onopen() {
         timeout = TIMEOUT_MIN;
@@ -84,6 +92,10 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     if (obj.ok) {
                         state = states.CONNECTED;
                         instance.onconnected(domain, user, dn, obj.domain);
+                    }
+                    else {
+                        var login_info = instance.logindata ? instance.logindata.info : {};
+                        close(login_info.unlicensed ? "UNLICENSED" : "LOGIN_FAILURE");
                     }
                     break;
                 case "CheckBuildResult":

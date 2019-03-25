@@ -279,6 +279,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                 if ((typeof(window.parent.console) != "undefined") && window.parent.console.custom) {
                     window.console = window.parent.console;
                 }
+                if (window.parent.webkit && window.parent.webkit.messageHandlers && window.parent.webkit.messageHandlers.console_message_) {
+                    window.webkit.messageHandlers.console_message_ = window.parent.webkit.messageHandlers.console_message_;
+                }
             }
             catch (e) {
             }
@@ -575,6 +578,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
             else if (argname == "url") {
                 start.url = value;
             }
+            else if (argname == "originalUrl") {
+                start.originalUrl = value;
+            }
             else {
                 if (!start.args[argname]) start.args[argname] = value;
                 (start.margs[argname] = start.margs[argname] || []).push(value);
@@ -584,6 +590,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         start.url = start.url.slice(0, start.url.search(".htm"));
         start.url = start.url.slice(0, start.url.lastIndexOf("/"));
         start.url = start.url.replace("http", "ws");
+        start.originalUrl = start.originalUrl || location.href;
+        start.originalUrl = start.originalUrl.slice(0, start.originalUrl.search(".htm"));
+        start.originalUrl = start.originalUrl.slice(0, start.originalUrl.lastIndexOf("/"));
         start.postClientMessage({ mt: "Alive" });
         if (langFile) loadObjectScript(langFile + "." + start.lang, function () { onload(start); });
         else onload(start);

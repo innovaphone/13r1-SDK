@@ -44,7 +44,7 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         this.setScrollBottom = function (bottom) { inner.container.scrollTop = sizer.container.offsetHeight - outer.container.offsetHeight - bottom };
         this.getScrollBottom = function () { return sizer.container.offsetHeight - outer.container.offsetHeight - inner.container.scrollTop };
         this.scrollToBottom = function () { if (sizer.container.offsetHeight > outer.container.offsetHeight) inner.container.scrollTop = sizer.container.offsetHeight - outer.container.offsetHeight; };
-        this.isScrollBottom = function () { return (inner.container.scrollTop == (sizer.container.offsetHeight - outer.container.offsetHeight)); };
+        this.isScrollBottom = function () { return (inner.container.scrollTop >= (sizer.container.offsetHeight - outer.container.offsetHeight)); };
         this.isScrollTop = function () { return (inner.container.scrollTop == 0); };
         this.contentHeight = function () { return sizer.container.offsetHeight; };
     }
@@ -71,7 +71,7 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         this.setScrollBottom = function (bottom) { this.container.scrollTop = content.container.offsetHeight - this.container.clientHeight - bottom };
         this.getScrollBottom = function () { return content.container.offsetHeight - this.container.clientHeight - this.container.scrollTop };
         this.scrollToBottom = function () { if (content.container.offsetHeight > this.container.offsetHeight) this.container.scrollTop = content.container.offsetHeight - this.container.clientHeight; };
-        this.isScrollBottom = function () {  return (this.container.scrollTop == (content.container.offsetHeight - this.container.clientHeight)); };
+        this.isScrollBottom = function () {  return (this.container.scrollTop >= (content.container.offsetHeight - this.container.clientHeight)); };
         this.isScrollTop = function () { return (this.container.scrollTop == 0); };
         this.contentHeight = function () { return content.container.offsetHeight; };
     }

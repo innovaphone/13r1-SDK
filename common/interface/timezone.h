@@ -556,8 +556,8 @@ public:
     virtual ~ITimeZoneDSTRange() {};
 
     virtual class ITimeZone * TimeZone() = 0;
-    virtual ulong64 RangeStart() = 0;
-    virtual ulong64 RangeEnd() = 0;
+    virtual long64 RangeStart() = 0;
+    virtual long64 RangeEnd() = 0;
 };
 
 
@@ -569,13 +569,13 @@ public:
     virtual const char * UTCName() = 0;
     virtual long64 UTCDiff() = 0;
     virtual long64 DSTDiff() = 0;
-    virtual ulong64 ToLocalTime(ulong64 utcTime) = 0;
-    virtual ulong64 ToUTCTime(ulong64 localTime) = 0;
-    virtual ulong64 RemoveDST(ulong64 timeStamp) = 0;
-    virtual ulong64 AddDST(ulong64 timeStamp) = 0;
-    virtual bool IsDST(ulong64 timeStamp, bool isLocalTime = false) = 0;
-    virtual bool IsDST(ITimeZoneDSTRange * dstRange, ulong64 timeStamp, bool isLocalTime = false) = 0;
-    virtual ITimeZoneDSTRange * GetDSTRange(ulong64 rangeStartDate, ulong64 rangeEndDate) = 0;
+    virtual long64 ToLocalTime(long64 utcTime) = 0;
+    virtual long64 ToUTCTime(long64 localTime) = 0;
+    virtual long64 RemoveDST(long64 timeStamp) = 0;
+    virtual long64 AddDST(long64 timeStamp) = 0;
+    virtual bool IsDST(long64 timeStamp, bool isLocalTime = false) = 0;
+    virtual bool IsDST(ITimeZoneDSTRange * dstRange, long64 timeStamp, bool isLocalTime = false) = 0;
+    virtual ITimeZoneDSTRange * GetDSTRange(long64 rangeStartDate, long64 rangeEndDate) = 0;
 };
 
 

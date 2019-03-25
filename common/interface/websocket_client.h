@@ -19,6 +19,7 @@ public:
 	virtual ~IWebsocketClient() {};
 	virtual void Connect(const char * uri) = 0;
 	virtual void Close() = 0;
+	virtual void Cancel() = 0;
 	virtual void Send(const void * buf, size_t len, bool text = true) = 0;
 	virtual void Recv(void * buf = NULL, size_t len = 0) = 0;
     virtual void Ping() = 0;

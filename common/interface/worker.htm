@@ -35,7 +35,7 @@
     </table>
 
     <h1>Classes</h1>
-    <a name="IWorker"><h2>IWorker</h2></a>
+    <h2 id="IWorker">IWorker</h2>
     <pre><code class="language-cpp">class IWorker {
 public:
     <a href="#Create" style="text-decoration:none;">static IWorker* Create(class IIoMux * const iomux,unsigned int numThreads)</a>;
@@ -44,7 +44,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="Create">Create</a> (static function)</div>
+    <div class="fnhead" id="Create">Create</a> (static function)</div>
     <dl>
         <dd>
             Creates an instance of IWorker. iomux is the main thread's iomux control. It is used to run the callbacks in the main thread context.numThreads sets the maximum number of concurrently running threads. Note: each user defined task that runs under the IWorker control operates in a single thread. The numThreads parameter (if it is > 1) comes into play when another task is scheduled before the previously scheduled is still running. Then a second, third,.., thread is started until the numThreads limit is reached. In this case the actual request is queued and processed as soon as one of the threads terminates. 
@@ -60,14 +60,14 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="~IWorker">~IWorker</a> (destructor fuction)</div>
+    <div class="fnhead" id="~IWorker">~IWorker</a> (destructor fuction)</div>
     <dl>
         <dd>
             The class IWorker destructor.
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="WorkerScheduleJob">WorkerScheduleJob</a> (virtual void function)</div>
+    <div class="fnhead" id="WorkerScheduleJob">WorkerScheduleJob</a> (virtual void function)</div>
     <dl>
         <dd>
             Starts the textual task description in the user defined WORKER_TASK workerTask. The results and progress indications are returned to the main thread via the functions defined in the UWorker class.
@@ -82,7 +82,7 @@ log is used to log AppInstance related logs depedent of the log flag LOG_WORKER.
         </dd>
     </dl>
 
-    <a name="IWorker"><h2>UWorker</h2></a>
+    <h2 id="UWorker">UWorker</h2>
     <pre><code class="language-cpp">class UWorker {
 public:
     <a href="#WorkerJobComplete" style="text-decoration:none;">void WorkerJobComplete(class IWorker * const task, const char * jobResult)</a>;
@@ -91,7 +91,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="WorkerJobComplete">WorkerJobComplete</a> (callback fuction)</div>
+    <div class="fnhead" id="WorkerJobComplete">WorkerJobComplete</a> (callback fuction)</div>
     <dl>
         <dd>
            This function is called after successful completion of the scheduled job. Parameters: "class IWorker * const task": the IWorker instance the job was processed by. "const char * jobResult": the result string returned in int(*WORKER_TASK)(.., char** result,..);. 
@@ -105,7 +105,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="WorkerJobFailed">WorkerJobFailed</a> (callback fuction)</div>
+    <div class="fnhead" id="WorkerJobFailed">WorkerJobFailed</a> (callback fuction)</div>
     <dl>
         <dd>
             This function is called after unsuccessful completion of the scheduled job. Parameters: "class IWorker * const task": the IWorker instance the job was processed by. "int error": the error (!=0) return code returned by WORKER_TASK;.
@@ -119,7 +119,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="WorkerJobProgress">WorkerJobProgress</a> (callback fuction)</div>
+    <div class="fnhead" id="WorkerJobProgress">WorkerJobProgress</a> (callback fuction)</div>
     <dl>
         <dd>
             This function is called if the WORKER_TASK calls the NOTIFICATION_FUNC during operation. Parameters: "class IWorker * const task": the IWorker instance the job was processed by. "const char * notification": the notification text;
@@ -133,7 +133,7 @@ public:
     </dl>    
 
     <h1>Data types</h1>
-    <h2><a name="WORKER_TASK">WORKER_TASK</a></h2>
+    <h2 id="WORKER_TASK">WORKER_TASK</h2>
     <pre><code class="laguage-cpp">typedef int(*WORKER_TASK)(const char * job, class UWorker * const user, char** result, class IWorker * const task, NOTIFICATION_FUNC notificationFunc);</code></pre>
 
     <h3>Overview</h3>
@@ -143,7 +143,7 @@ public:
             Returning 0 indicates success and leads to a WorkerJobComplete(..) callback, otherwise the WorkerJobFailed(.., int error) is called and the return code is passed in "error" .
 
 
-    <h2><a name="NOTIFICATION_FUNC">NOTIFICATION_FUNC</a></h2>
+    <h2 id="NOTIFICATION_FUNC">NOTIFICATION_FUNC</h2>
     <pre><code class="laguage-cpp">typedef void(*NOTIFICATION_FUNC)(class UWorker * const user, class IWorker * const task, char* notification);</code></pre>
 
     <h3>Overview</h3>

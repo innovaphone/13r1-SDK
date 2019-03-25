@@ -22,7 +22,7 @@ typedef enum {
 
 typedef enum {
     RM_JANUARY,
-    RM_FEBRURARY,
+    RM_FEBRUARY,
     RM_MARCH,
     RM_APRIL,
     RM_MAY,
@@ -42,7 +42,7 @@ typedef enum {
 #define RD_WEEK_DAYS    (RD_MONDAY | RD_TUESDAY | RD_WEDNESDAY | RD_THURSDAY | RD_FRIDAY)
 #define RD_WEEKEND_DAYS (RD_SUNDAY | RD_SATURDAY)
 
-#define RD_NO_END_DATE  UINT64_MAX
+#define RD_NO_END_DATE  INT64_MAX
 #define RD_NO_LIMIT     UINT32_MAX
 
 inline recurring_days_t IntToDays(int days)
@@ -60,14 +60,14 @@ class UTimeOccurrence {
 public:
     UTimeOccurrence() {}
     virtual ~UTimeOccurrence() {}
-    virtual bool TimeOccurrenceResult(class TimeOccurrence * timeOccurrence, ulong64 timeStamp) { return false; }
+    virtual bool TimeOccurrenceResult(class TimeOccurrence * timeOccurrence, long64 timeStamp) { return false; }
 };
 
 class TimeOccurrence {
 private:
     int recurringType;
-    ulong64 start;
-    ulong64 end;
+    long64 start;
+    long64 end;
     word days;
     word dayNum;
     dword interval;
@@ -81,41 +81,43 @@ private:
     word weekEndDays;
 
     size_t resultCount;
-    ulong64 * results;
+    long64 * results;
     size_t resultArraySize;
 
-    bool ArrayPut(ulong64 value, word maxResults);
-    void CalculateDailyOccurrences(ulong64 tpStart, ulong64 tpEnd, word maxResults, UTimeOccurrence * user);
-    void CalculateWeeklyOccurrences(ulong64 tpStart, ulong64 tpEnd, word maxResults, UTimeOccurrence * user);
-    void CalculateMonthlyOccurrences(ulong64 tpStart, ulong64 tpEnd, word maxResults, UTimeOccurrence * user);
-    void CalculateOccurrences(ulong64 tpStart, ulong64 tpEnd, word maxResults, UTimeOccurrence * user);
+    bool ArrayPut(long64 value, word maxResults);
+    void CalculateDailyOccurrences(long64 tpStart, long64 tpEnd, word maxResults, UTimeOccurrence * user);
+    void CalculateWeeklyOccurrences(long64 tpStart, long64 tpEnd, word maxResults, UTimeOccurrence * user);
+    void CalculateMonthlyOccurrences(long64 tpStart, long64 tpEnd, word maxResults, UTimeOccurrence * user);
+    void CalculateOccurrences(long64 tpStart, long64 tpEnd, word maxResults, UTimeOccurrence * user);
 
     void Prepare();
     void PrepareDayList();
     void SetRelativeDay(time_tm_t * tm);
     void SetRelativeWeekDay(time_tm_t * tm, word days);
     void SetRelativeAnyDay(time_tm_t * tm);
-    ulong64 CalculateWeeklyEnd(ulong64 startDate, dword numOfOccurrences);
+    long64 CalculateWeeklyEnd(long64 startDate, dword numOfOccurrences);
+    long64 DoCalculateFirstOccurrence(long64 ts);
+    void NormalizeSeriesStart();
 
 public:
     TimeOccurrence();
     ~TimeOccurrence();
 
-    void SetDailyMaster(ulong64 start, ulong64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
-    void SetWeeklyMaster(dword days, ulong64 start, ulong64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
-    void SetMonthlyMaster(dword dayNum, recurring_days_t day, ulong64 start, ulong64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
-    void SetYearlyMaster(dword dayNum, recurring_days_t day, recurring_month_t month, ulong64 start, ulong64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
+    void SetDailyMaster(long64 start, long64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
+    void SetWeeklyMaster(dword days, long64 start, long64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
+    void SetMonthlyMaster(dword dayNum, recurring_days_t day, long64 start, long64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
+    void SetYearlyMaster(dword dayNum, recurring_days_t day, recurring_month_t month, long64 start, long64 end = RD_NO_END_DATE, dword interval = 1, dword maxOccurrences = RD_NO_LIMIT);
 
     void SetWeekDays(word weekDays);
     void SetWeekEndDays(word weekEndDays);
 
     bool Empty() { return this->resultCount == 0; }
     size_t Count() { return this->resultCount; }
-    ulong64 Result(size_t index);
-    ulong64 operator[] (size_t index) { return this->Result(index); }
+    long64 Result(size_t index);
+    long64 operator[] (size_t index) { return this->Result(index); }
 
-    void Calculate(ulong64 timePeriodStart = 0, ulong64 timePeriodEnd = UINT64_MAX, word maxResults = UINT16_MAX);
-    void Calculate(UTimeOccurrence * user, ulong64 timePeriodStart = 0, ulong64 timePeriodEnd = UINT64_MAX);
-    ulong64 CalculateLastOccurrence(dword numOfOccurrences = 0);
-    ulong64 CalculateFirstOccurrence();
+    void Calculate(long64 timePeriodStart = 0, long64 timePeriodEnd = RD_NO_END_DATE, dword maxResults = RD_NO_LIMIT);
+    void Calculate(UTimeOccurrence * user, long64 timePeriodStart = 0, long64 timePeriodEnd = RD_NO_END_DATE);
+    long64 CalculateFirstOccurrence(long64 timePeriodStart = 0);
+    long64 CalculateLastOccurrence(dword numOfOccurrences = 0);
 };

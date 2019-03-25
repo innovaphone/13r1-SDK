@@ -83,14 +83,14 @@
     </dl>
 
     <h1>Classes</h1>
-    <a name="IDbFilesProvider"><h2>IDbFilesProvider</h2></a>
+    <h2 id="IDbFilesProvider">IDbFilesProvider</h2>
     <pre><code class="language-cpp">class IDbFilesProvider {
 public:
     <a href="#CreateDbFiles" style="text-decoration:none;">class IDbFiles * CreateDbFiles(class IIoMux * iomux, class IInstanceLog * const log)</a>;
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="CreateDbFiles">CreateDbFiles</a></div>
+    <div class="fnhead" id="CreateDbFiles">CreateDbFiles</div>
     <dl>
         <dd>
             This function creates a new IDbFiles object which can be used to create tasks for writing, reading, ... of files.
@@ -102,7 +102,7 @@ public:
         </dd>
     </dl>
 
-    <a name="IDbFiles"><h2>IDbFiles</h2></a>
+    <h2 id="IDbFiles">IDbFiles</h2>
     <pre><code class="language-cpp">class IDbFiles {
 public:
     <a href="#Start" style="text-decoration:none;">class IDbFilesStart * Start(class UTask * user, class IDatabase * database, const char * folder);</a>
@@ -115,7 +115,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="Start">Start</a></div>
+    <div class="fnhead" id="Start">Start</div>
     <dl>
         <dd>
             Creates an IDbFilesStart instance to start the database initialization for dbfiles. Must be called when the database initialization is complete.
@@ -141,7 +141,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="Put">Put</a></div>
+    <div class="fnhead" id="Put">Put</div>
     <dl>
         <dd>
             Creates an IDbFilesPut instance to put a new file into the database.
@@ -157,7 +157,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="Get">Get</a></div>
+    <div class="fnhead" id="Get">Get</div>
     <dl>
         <dd>
             Creates an IDbFilesGet instance to get a file from the database.
@@ -173,7 +173,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="Del">Del</a></div>
+    <div class="fnhead" id="Del">Del</div>
     <dl>
         <dd>
             Creates an IDbFilesDel instance to get a file from the database.
@@ -187,7 +187,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="Move">Move</a></div>
+    <div class="fnhead" id="Move">Move</div>
     <dl>
         <dd>
             Creates an IDbFilesMove instance to move a file or folder.
@@ -203,7 +203,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="List">List</a></div>
+    <div class="fnhead" id="List">List</div>
     <dl>
         <dd>
             Creates an IDbFilesList instance to list files and folders inside a folder.
@@ -218,7 +218,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="PathInfo">PathInfo</a></div>
+    <div class="fnhead" id="PathInfo">PathInfo</div>
     <dl>
         <dd>
             Creates an IDbFilesPathInfo instance to get information about a file or folder.
@@ -232,13 +232,13 @@ public:
         </dd>
     </dl>
 
-    <a name="IDbFilesStart"><h2>IDbFilesStart</h2></a>
+    <h2 id="IDbFilesStart">IDbFilesStart</h2>
     Starts the database initialization for dbfiles. Must be called when the database initialization is complete. The ITask Start() method is implicitly called!
     <pre><code class="language-cpp">class IDbFilesStart {
 public:
 };</code></pre>
 
-    <a name="IDbFilesGet"><h2>IDbFilesGet</h2></a>
+    <h2 id="IDbFilesGet">IDbFilesGet</h2>
     Gets a file from the database. The ITask Start() method is implicitly called!<br />
     After TaskProgress (or TaskFinished) <a href="#IDbFilesGetGet">Get</a> can be called to get the read data.<br />
     With <a href="#IDbFilesGetRead">Read</a> the next data can be requested, which will be indicated with TaskProgress again. If no more data is available
@@ -252,7 +252,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IDbFilesGetGet">Get</a></div>
+    <div class="fnhead" id="IDbFilesGetGet">Get</div>
     <dl>
         <dd>
             Get the read data. The data pointer is set to a pointer allocated by dbfiles and
@@ -265,7 +265,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IDbFilesGetRead">Read</a></div>
+    <div class="fnhead" id="IDbFilesGetRead">Read</div>
     <dl>
         <dd>
             Initiate next read.
@@ -276,14 +276,14 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IDbFilesGetStop">Stop</a></div>
+    <div class="fnhead" id="IDbFilesGetStop">Stop</div>
     <dl>
         <dd>
             Stops the current operations which will trigger an asynchronous TaskComplete/TaskFailed.
         </dd>
     </dl>
 
-    <a name="IDbFilesPut"><h2>IDbFilesPut</h2></a>
+    <h2 id="IDbFilesPut">IDbFilesPut</h2>
     Puts a new file into the database. The ITask Start() method is implicitly called!<br />
     After the TaskComplete or TaskProgress callbacks, the function call <a href="#IDbFilesGetGet">Get</a> can be used to read the id of the new file.<br />
     After TaskProgress the function <a href="#IDbFilesPutWrite">Write</a> can be called to write data to the file. This creates a new row in the files_data table.
@@ -297,7 +297,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IDbFilesPutGet">Get</a></div>
+    <div class="fnhead" id="IDbFilesPutGet">Get</div>
     <dl>
         <dd>
             <h4>Return value</h4>
@@ -307,7 +307,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IDbFilesPutWrite">Write</a></div>
+    <div class="fnhead" id="IDbFilesPutWrite">Write</div>
     <dl>
         <dd>
             Can be called after TaskProgress to write data to the file. This creates a new row in the files_data table.
@@ -320,28 +320,28 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IDbFilesPutStop">Stop</a></div>
+    <div class="fnhead" id="IDbFilesPutStop">Stop</div>
     <dl>
         <dd>
             Stops the current operation which will trigger an asynchronous TaskComplete/TaskFailed.
         </dd>
     </dl>
 
-    <a name="IDbFilesDel"><h2>IDbFilesDel</h2></a>
+    <h2 id="idbfilesdel">IDbFilesDel</h2>
     Deletes a file from the database. The ITask Start() method is implicitly called!<br />
     TaskFailed is called on errors.<br /><br />
     <pre><code class="language-cpp">class IDbFilesDel {
 public:
 };</code></pre>
 
-    <a name="IDbFilesMove"><h2>IDbFilesMove</h2></a>
+    <h2 id="IDbFilesMove">IDbFilesMove</h2>
     Moves a file inside the database. The ITask Start() method is implicitly called!<br />
     TaskFailed is called on errors.<br /><br />
     <pre><code class="language-cpp">class IDbFilesMove {
 public:
 };</code></pre>
 
-    <a name="IDbFilesList"><h2>IDbFilesList</h2></a>
+    <h2 id="IDbFilesList">IDbFilesList</h2>
     Gets the list of files assigned to a given folder. The ITask Start() method is implicitly called!<br /><br />
     If a limit is set, TaskComplete indicates that the list is availabe. The entries in the list can be read with multiple calls to <a href="#IDbFilesListGet">Get</a> until true is returned.<br /><br />
     If no limit is set the entries are read one by one. TaskProgress indicates that an entry is available, which can be read with <a href="#IDbFilesListGet">Get</a>.<br />
@@ -354,7 +354,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IDbFilesListGet">Get</a></div>
+    <div class="fnhead" id="IDbFilesListGet">Get</div>
     <dl>
         <dd>
             <h4>Parameters</h4>
@@ -371,21 +371,21 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IDbFilesListNext">Next</a></div>
+    <div class="fnhead" id="IDbFilesListNext">Next</div>
     <dl>
         <dd>
             Starts reading the next item in the list.
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IDbFilesListStop">Stop</a></div>
+    <div class="fnhead" id="IDbFilesListStop">Stop</div>
     <dl>
         <dd>
             Stops the current operation which will trigger an asynchronous TaskComplete/TaskFailed.
         </dd>
     </dl>
 
-    <a name="IDbFilesPathInfo"><h2>IDbFilesPathInfo</h2></a>
+    <h2 id="IDbFilesPathInfo">IDbFilesPathInfo</h2>
     Gets information of a file or folder.
     <pre><code class="language-cpp">class IDbFilesList {
 public:
@@ -394,7 +394,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="IDbFilesPathInfoGet">Get</a></div>
+    <div class="fnhead" id="IDbFilesPathInfoGet">Get</div>
     <dl>
         <dd>
             Function which can be called from TaskComplete, to get the result.
@@ -410,7 +410,7 @@ public:
         </dd>
     </dl>
 
-    <div class="fnhead"><a name="IDbFilesPathInfoGetFailed">GetFailed</a></div>
+    <div class="fnhead" id="IDbFilesPathInfoGetFailed">GetFailed</div>
     <dl>
         <dd>
             Function which can be called from TaskFailed, to get the result.

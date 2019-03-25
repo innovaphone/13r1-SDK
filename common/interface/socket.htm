@@ -79,11 +79,11 @@ extern "C" ISocketProvider * CreateLocalSocketProvider();
     socket provider for local sockets. The last one will be used for inter process communication between the apps.<br />
     A type of a created socket cannot be changed, except for TCP sockets which can be upgraded to a TLS socket.
     <br><br>
-    <a name="CreateTCPSocketProvider" />
-    <a name="CreateTLSSocketProvider" />
-    <a name="CreateUDPSocketProvider" />
-    <a name="CreateLocalSocketProvider" />
-    <div class="fnhead" style="margin-top:5px">CreateTCPSocketProvider<br>CreateTLSSocketProvider<br>CreateUDPSocketProvider<br>CreateLocalSocketProvider<br></div>
+    <div class="fnhead" id="CreateTCPSocketProvider">CreateTCPSocketProvider</div>
+    <div class="fnhead" id="CreateTLSSocketProvider">CreateTLSSocketProvider</div>
+    <div class="fnhead" id="CreateUDPSocketProvider">CreateUDPSocketProvider</div>
+    <div class="fnhead" id="CreateLocalSocketProvider">CreateLocalSocketProvider</div>
+
     <dl><dd>
             <h4>Parameters (CreateTLSSocketProvider only)</h4>
             <table style="margin-left:-12px">
@@ -103,7 +103,7 @@ public:
     virtual ~ISocketProvider() {};
     virtual ISocketContext * CreateSocketContext(class IInstanceLog * const log);
     virtual ISocket * CreateSocket(class IIoMux * const iomux, USocket * const user, class IInstanceLog * const log, bool useIPv6, class ISocketContext * socketContext = nullptr);
-    virtual ISocket * UpgradeToTLSSocket(class ISocket * fromTCPSocket, IIoMux * const iomux, USocket * const user, IInstanceLog * const log, bool initServerSide = false, class ISocketContext * socketContext = NULL);
+    virtual ISocket * UpgradeToTLSSocket(class ISocket * fromTCPSocket, IIoMux * const iomux, USocket * const user, IInstanceLog * const log, bool initServerSide = false, class ISocketContext * socketContext = nullptr);
 };</code></pre>
 
     <h3>Overview</h3>
@@ -115,7 +115,7 @@ public:
     <dl>
         <dd>
             Creates an ISocketContext instance. ISocketContext will be used to give additional informations to an ISocket. So it must be setup correctly after creation and
-            before passing to create an ISocket insatance.
+            before passing to create an ISocket instance.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
                 <tr><td class="param">class IInstanceLog * const <b>log</b></td><td>The <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> instance used for loging purposes.</td></tr>
@@ -633,7 +633,7 @@ void app::SocketListenResult(ISocket * const socket, const char * remoteAddr, wo
 {
     // Deny local connections...
     if (strcmp(remoteAddr, "127.0.0.1") == 0)
-        this->serverSocket->Accept(NULL);
+        this->serverSocket->Accept(nullptr);
     else
         this->serverSocket->Accept(new remoteUser());
 }
@@ -641,11 +641,11 @@ void app::SocketListenResult(ISocket * const socket, const char * remoteAddr, wo
 void app::SocketShutdown(ISocket * const socket, shutdownreason_t reason)
 {
     // If true, an error occured during a call to Bind() and SocketBindResult()
-    if (this->serverSocket == NULL)
+    if (this->serverSocket == nullptr)
         delete socket;
     else {
         delete this->serverSocket;
-        this->serverSocket = NULL;
+        this->serverSocket = nullptr;
     }
     this->iomux->Terminate();
 }</code></pre>

@@ -7,11 +7,31 @@
 
 class STaskThread;
 
-class STask : public ITask, public UIoExec {
-    void IoExec(void * execContext);
+class STaskContext {
+public:
+    STaskContext(class IIoMux * iomux) {
+        this->iomux = iomux;
+    };
+
+    class IIoMux * iomux;
+    istd::list<STaskThread> threadsIdle;
+    istd::list<STaskThread> threadsBusy;
+};
+
+class STaskComplete {};
+class STaskFailed {};
+class STaskProgress {};
+
+class STask : public ITask,
+    public UIoExecSubclass<STaskComplete>,
+    public UIoExecSubclass<STaskFailed>,
+    public UIoExecSubclass<STaskProgress>
+{
+    void IoExec(STaskComplete * execContext);
+    void IoExec(STaskFailed * execContext);
+    void IoExec(STaskProgress * execContext);
 
     class STaskContext * context;
-    dword progress;
 
 protected:
     void TaskComplete();
@@ -22,19 +42,9 @@ protected:
 
 public:
     STask(class STaskContext * context);
+    virtual ~STask();
     void Start(class UTask * user);
     virtual void SStart() = 0;
-};
-
-class STaskContext {
-public:
-    STaskContext(class IIoMux * iomux) {
-        this->iomux = iomux;
-    };
-
-    class IIoMux * iomux;
-    istd::list<STaskThread> threadsIdle;
-    istd::list<STaskThread> threadsBusy;
 };
 
 class STaskThread : public istd::listElement<STaskThread> {

@@ -41,11 +41,12 @@ class xml_io {
     const char * namespc;
 
     struct {
-        unsigned int type : 4;
-        unsigned int count : 12;
-        unsigned int href : 3;
-        unsigned int flags : 1;
-        unsigned int base : 12;
+        word count;
+        byte type;
+        byte href;
+        word base;
+        byte flags;
+        byte spare;
         const char * info;
     } content[XML_MAX_TAG];
 
@@ -97,10 +98,10 @@ public:
     void save_incomplete(word root, word base,xml_io & to);
     void copy_out(word base, class xml_io & to, word & to_base, char * & to_p);
     void copy_in(word base, class xml_io & to, word to_base, char * & to_p);
-    int ofs() { return eod-buffer; };
+    int ofs() { return (int)(eod-buffer); };
 
     bool read_tag(char * & p);
-    bool decode(bool href = false);
+    bool decode(bool href = false, word * decoded =  0);
     char * info(word handle) { return (char *) content[handle].info; };
     word count(word handle) { return content[handle].count; };
     byte type(word handle) { return content[handle].type; };

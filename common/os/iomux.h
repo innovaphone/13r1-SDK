@@ -11,9 +11,9 @@ public:
 };
 
 class IShutdownHandler {
-
 public:
     virtual void Shutdown() = 0;
+    virtual void ShutdownTimeout() = 0;
 };
 
 class IChildExitedHandler {
@@ -74,6 +74,7 @@ public:
     virtual void SetExecLocked(UIoExec * ioContext, void * execContext) = 0;
     virtual void CancelSetExec(UIoExec * const ioContext) = 0;
     virtual void Shutdown() = 0;
+    virtual void ShutdownTimeout() = 0;
     virtual void ShutdownComplete(IShutdownHandler * shutdownHandler) = 0;
 };
 
@@ -121,3 +122,27 @@ public:
     virtual void TimerOnTimeout(ITimerSubclass * timer) = 0;
 };
 
+class ITimerAbsolute : public UIoContext {
+private:
+    class IIoMux * const iomux;
+    class UTimerAbsolute * const user;
+    bool running;
+
+    virtual void IoContextNotify(bool indRX, bool indTX);
+
+public:
+    ITimerAbsolute(class IIoMux * iomux, class UTimerAbsolute * user);
+    virtual ~ITimerAbsolute();
+    
+    void Start(long64 timeOutTimeAbs);
+    void Cancel();
+    bool IsRunning() const { return running; }
+};
+
+class UTimerAbsolute {
+public:
+    UTimerAbsolute() {}
+    virtual ~UTimerAbsolute() {}
+
+    virtual void TimerAbsoluteOnTimeout(ITimerAbsolute * timer) = 0;
+};

@@ -26,7 +26,7 @@
                 </td>
             </tr>
             <tr>
-                <td><b><a href="#ap">The App Platform</a></b></td>
+                <td><b><a href="#ap">App Platform</a></b></td>
                 <td>
                     The App Platform hosts App Services, which provide Apps to the myApps client. All
                     backend serices for the Apps are implemented there.
@@ -59,7 +59,7 @@
         </table>
     </p>
 
-    <h2><a name="pbx">The PBX</a></h2>
+    <h2><a name="pbx">PBX</a></h2>
     <p>
         PBX objects are used to link the different modules/components of a innovaphone PBX system. There are
         different types used for different purposes
@@ -113,7 +113,99 @@
         PBX APIs are accessible by the App instance is also configured in the App object.
     </p>
 
-    <h2><a name="ap">The App Platform</a></h2>
+    <h2><a name="myapps">myApps Client</a></h2>
+    <p>
+        The myApps client is the main application for users and admins. It has some very basic functionality like
+        user authentication, presence and app handling. All other functionality is added by apps that are started
+        inside the myApps client.
+        <br />
+        myApps is designed as a webapplication that runs in a browser. But there is also an installable version we call
+        the myApps launcher that is available for some platforms - currently Windows, iOS and Android.
+    </p>
+    <ul>
+        <li><a href="#Authentication">Authentication</a></li>
+        <li><a href="#AppsOrganization">Organization of apps</a></li>
+        <li><a href="#AppRuntime">Runtime environment for apps</a></li>
+        <li><a href="#Launcher">myApps launcher</a></li>
+    </ul>
+
+    <a name="Authentication"><h3>Authentication</h3></a>
+    <p>
+        The first time the user logs-in on a new device, myApps asks for the username and password. If two-factor authentication
+        on the PBX is activated, the user also needs to confirm the login by clicking an email link or using an existing myApps
+        session on a different device.
+        If the login was successful, a permanent session is created and stored in both the PBX and the local storage of the
+        browser. This session is used for all subsequent logins on the same device. So the user is not asked for the username
+        and password again. If the user logs-out, the session is deleted on both the PBX and the browser.
+    </p>
+    <p>
+        For security reasons the user can view all the permanent sessions in myApps. If a session is
+        suspicious or not needed any more, it can be deleted. Devices using that session are instantly disconnected and have no more
+        access to the user account.
+    </p>
+
+    <a name="AppsOrganization"><h3>Organization of apps</h3></a>
+    <p>
+        In order to grant access to an app, the admin needs to configure a permission at the user object in the PBX.
+        myApps then shows a list of all available apps to the user. The user can choose interesting apps from the list
+        and attach them to a home screen for direct access. This selection is also stored in the PBX so it is synchronized
+        across all devices of the user.
+    </p>
+    <p>
+        Also each app can attach items to the home screen. They are referenced by an app link: <code>&lt;app-name&gt;?&lt;app-parameters&gt;#&lt;client-parameters&gt;</code>.
+        When the item is clicked the app is opened and the app-parameters are passed to the app. The client-parameters are used by the myApps client. 
+        They can contain a SIP URI for presence monitoring and a display name.
+    </p>
+    <p>
+        If the app service specified that it provides presence information the client starts a subscription for all links to that app on the home screen.
+        The app service can then provide a badge count in the presence note that is displayed at the item.
+    </p>
+
+    <a name="AppRuntime"><h3>Runtime environment for apps</h3></a>
+    <p>
+        Apps are started inside an iframe in the main window or in a separate browser window. URL parameters are used to pass some initial settings
+        like the active color scheme and language to the app. Afterwards the communication is done exclusively using window messages between the iframe
+        and the myApps client.
+    </p>
+    <p>
+        For authenticating against the app service the apps use a challenge response mechanism on the AppWebsocket connection. For creating the
+        response digest, knowledge about the app service password is needed. Neither the app nor the client know it but the PBX does.
+        So the app passes the challenge to the client (using a window message) and the client forwards it to the PBX (over its authenticated websocket connection).
+        The PBX checks the following conditions before it answers the request.
+        <ul>
+            <li>The websocket connection of the myApps client has a valid login.</li>
+            <li>There is an app object for that app in the PBX.</li>
+            <li>The user object has a permission for that app.</li>
+        </ul>
+        If all conditions are met, the PBX generates the response digest and provides an additional JSON structure with information about the user that is also protected by the digest.
+        Both is transmitted back to the app that can forward it to the app service. As the app service also knows the app service password it
+        can check the digest, associate the AppWebsocket with the user info and grant access.
+    </p>
+    <p>
+        myApps provides a framework called Client APIs that can be used to communicate with the myApps client or with other apps. Apps can specify
+        that they are a provider of an API. Other apps can then find that API provider and send messages to it for inter-app communication.
+        This is the way how apps can do search requests or start phone calls in a different app.
+        APIs have an ID in the reverse domain syntax like <a href="../web/com.innovaphone.search/lib1_api_search.htm">com.innovaphone.search</a>. 
+        For each Client API - especially for the phone and chat API - the user can select a standard app that shall be used for all actions regarding that API.
+    </p>
+    <p>
+        An app does not necessarily need to have a user interface. If its only purpose is to provide an API it can declare itself as "hidden".
+        Those hidden apps are not displayed to the user. myApps starts them automatically in the background on incoming API messages.
+    </p>
+    <p>
+        Apps have access to the runtime environment (myApps client and ClientAPIs) using the <a href="../web/lib1/lib1.htm#start">start object</a> that
+        is passed to them during initialization.
+    </p>
+
+    <a name="Launcher"><h3>myApps launcher</h3></a>
+    <p>
+        The myApps launcher is a software that can be installed on the computer or smartphone of the user. It comes with an integrated browser for running the
+        myApps client. Some additional services are included in the launcher that would not be available in regular browsers. Apps can find that services
+        using Client APIs and then establish websocket connections to them. For example phone apps can use an application sharing service that
+        is part of the launcher.
+    </p>
+
+    <h2><a name="ap">App Platform</a></h2>
 
     <p>
         The innovaphone App Platform is a Linux based system, which may run on a innovaphone gateway
@@ -127,14 +219,14 @@
 
     <h3>Table of content</h3>
     <ul>
-        <li><a href="#Manager">The App Platform Manager</a></li>
-        <li><a href="#Webserver">The App Platform Webserver</a></li>
-        <li><a href="#Database">The App Platform Database</a></li>
-        <li><a href="#AppService">The App Service</a></li>
-        <li><a href="#App">The App</a></li>
+        <li><a href="#Manager">App Platform Manager</a></li>
+        <li><a href="#Webserver">App Platform Webserver</a></li>
+        <li><a href="#Database">App Platform Database</a></li>
+        <li><a href="#AppService">App Service</a></li>
+        <li><a href="#App">App</a></li>
     </ul>
 
-    <a name="Manager"><h3>The App Platform Manager</h3></a>
+    <a name="Manager"><h3>App Platform Manager</h3></a>
     <p>
         The manager is responsible for managing the App services and instances (see below).
         There is the place where each service and instance can be stopped or started, Apps can be installed
@@ -146,7 +238,7 @@
         can only access and modify their own data.
     </p>
 
-    <a name="Webserver"><h3>The App Platform Webserver</h3></a>
+    <a name="Webserver"><h3>App Platform Webserver</h3></a>
     <p>
         The webserver is the entrance to the world for each app. An app will register itself to the webserver
         buy using an plugin system of the SDK. When registering, the app will use a path which can be accessed
@@ -159,7 +251,7 @@
         what to to with the HTTP protocol, so it is recommended to use passthrough only, if you have to!
     </p>
 
-    <a name="Database"><h3>The App Platform Database</h3></a>
+    <a name="Database"><h3>App Platform Database</h3></a>
     <p>
         Even if the SDK supports two database systems (mySQL and PostgreSQL), PostgreSQL is the database
         used for the apps. So it is recommended to use it for your application, too.
@@ -171,7 +263,7 @@
         and restored, if you're going to restore the backup. This makes creating a Backup of the apps data easy.
     </p>
 
-    <a name="AppService"><h3>The App Service</h3></a>
+    <a name="AppService"><h3>App Service</h3></a>
     <p>
         The App Service ia an in C++ written application running on the App Platform.
         The SDK provides a set of interfaces for everything needed to created an app for the
@@ -221,7 +313,7 @@
         context.
     </p>
 
-    <a name="App"><h3>The App</h3></a>
+    <a name="App"><h3>App</h3></a>
     <p>
         The App is the component, which runs in the myApps client. It is written in Javascript. Of course
         an App typically needs an backend service to provide useful functionality, so the App is mostly just

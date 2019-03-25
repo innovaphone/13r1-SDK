@@ -109,8 +109,8 @@
     <h3>Overview</h3>
     This function must be used to create an instance of the IWebserverPluginProvider. With that instance, an IWebserverPlugin instance can be created.
     <br/><br/>
-    <a name="CreateWebserverPluginProvider" />
-    <div class="fnhead" style="margin-top:5px">CreateWebserverPluginProvider</div>
+
+    <div id="CreateWebserverPluginProvider" class="fnhead" style="margin-top:5px">CreateWebserverPluginProvider</div>
     <dd>
         <h4>Return value</h4>
         The IWebserverPluginProvider instance. That instance can be freed as soon as it no longer is used by calling the C++ delete operator.
@@ -127,8 +127,7 @@ inline const char * WSWebdavResultToStr(ws_webdav_result_t r);
 	are for mapping an enum type to a human readable string. That helps especially for debugging purposes. 
     <br/><br/>
 
-    <a name="GetResponseTypeForFileName" />
-    <div class="fnhead" style="margin-top:5px">GetResponseTypeForFileName</div>
+    <div id="GetResponseTypeForFileName" class="fnhead" style="margin-top:5px">GetResponseTypeForFileName</div>
     <dd>
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -139,8 +138,7 @@ inline const char * WSWebdavResultToStr(ws_webdav_result_t r);
         The wsr_type_t resource type to set for a GET request. The response type will be returned depending on the file prefix. See <a href="#wsr_type_t">wsr_type_t</a> for more information.
     </dd>
 
-    <a name="WSCancelTypeToStr" />
-    <div class="fnhead" style="margin-top:5px">WSCancelTypeToStr</div>
+    <div id="WSCancelTypeToStr" class="fnhead" style="margin-top:5px">WSCancelTypeToStr</div>
     <dd>
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -151,8 +149,7 @@ inline const char * WSWebdavResultToStr(ws_webdav_result_t r);
         The given wsr_cancel_type_t value as human readable string, so that it can be written to a log instead of only a number value.
     </dd>
 
-    <a name="WSPCloseReasonToStr" />
-    <div class="fnhead" style="margin-top:5px">WSPCloseReasonToStr</div>
+    <div id="WSPCloseReasonToStr" class="fnhead" style="margin-top:5px">WSPCloseReasonToStr</div>
     <dd>
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -163,8 +160,8 @@ inline const char * WSWebdavResultToStr(ws_webdav_result_t r);
         The given wsp_close_reason_t value as human readable string, so that it can be written to a log instead of only a number value.
     </dd>
 
-    <a name="WSWebdavResultToStr" />
-    <div class="fnhead" style="margin-top:5px">WSWebdavResultToStr</div>
+
+    <div id="WSWebdavResultToStr" class="fnhead" style="margin-top:5px">WSWebdavResultToStr</div>
     <dd>
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -3350,7 +3347,7 @@ Note that the application is responsible for releasing the UWebserverPassthrough
     <tr><td><a name="WS_RESPONSE_CHUNKED"><b>WS_RESPONSE_CHUNKED</b></td><td>Flag to define that a response should be sent to the client chunk encoded.</td></tr>
 </table>
 
-<h2><a name="wsr_cancel_type_t">wsr_cancel_type_t</h2>
+<h2><a name="wsr_cancel_type_t">wsr_cancel_type_t</a></h2>
 <pre><code style="laguage-cpp">typedef enum {
     // Everything from 0 to 15 will be internal types
     WSP_CANCEL_NOT_FOUND = 0x10,
@@ -3382,7 +3379,7 @@ the incomming request) or of the request handler itself (to cancel an accepted r
     <tr><td><b>WSP_CANCEL_INTERNAL_ERROR</b></td><td>An internal error occured. Will send a HTTP 500 response to the client.</td></tr>
 </table>
 
-<h2><a name="wsp_path_type_t">wsp_path_type_t</h2>
+<h2><a name="wsp_path_type_t">wsp_path_type_t</a></h2>
 <pre><code style="laguage-cpp">typedef enum {
     WSP_PATH_TYPE_HTTP,
     WSP_PATH_TYPE_WEBSOCKET,
@@ -3400,7 +3397,7 @@ been called.
     <tr><td><b>WSP_PATH_TYPE_PASSTHROUGH</b></td><td>The result for a PassthroughListen() call.</td></tr>
 </table>
 
-<h2><a name="ws_webdav_result_t">ws_webdav_result_t</h2>
+<h2><a name="ws_webdav_result_t">ws_webdav_result_t</a></h2>
 <pre><code style="laguage-cpp">typedef enum {
     WEBDAV_RESULT_OK = 0x100,
     WEBDAV_RESULT_CREATED,
@@ -3434,7 +3431,7 @@ of WebDAV request needs to be answered.
     <tr><td><b>WEBDAV_RESULT_INSUFFICIENT_STORAGE</b></td><td><b>PROPPATCH, MKCOL, COPY:</b> The resource doesn't have enough space to execute the methid. Will send a HTTP 507 response ot the client.</td></tr>
 </table>
     
-<h2><a name="wsr_type_t">wsr_type_t</h2>
+<h2><a name="wsr_type_t">wsr_type_t</a></h2>
 <pre><code style="laguage-cpp">typedef enum {
     // Start of resource file types
     WSP_RESPONSE_NO_TYPE = 0x100,
@@ -3475,7 +3472,7 @@ and WSP_RESPONSE_BINARY (a general binary data stream with MIME type application
 An application can use the <a href="#GetResponseTypeForFileName">GetResponseTypeForFileName()</a> function to determine the correct wsr_type_t value according
 to the filename suffix.
 
-<h2><a name="wsp_close_reason_t">wsp_close_reason_t</h2>
+<h2><a name="wsp_close_reason_t">wsp_close_reason_t</a></h2>
 <pre><code style="laguage-cpp">typedef enum {
     WSP_NORMAL_CLOSE,                // The app itself initiated the shutdown
     WSP_REGISTER_PATH_INVALID,       // The given path is invalid
@@ -3502,7 +3499,7 @@ shutdown. This close reasons here are for the WebserverPlugin itself.
 </table>
 
 
-<h2><a name="ws_close_reason_t">ws_close_reason_t</h2>
+<h2><a name="ws_close_reason_t">ws_close_reason_t</a></h2>
 <pre><code style="laguage-cpp">typedef enum {
     WSCR_NORMAL_CLOSE,
     WSCR_BUFFER_OVERFLOW,
@@ -3522,7 +3519,7 @@ had been closed. This values are for Websocket only.
     <tr><td><b>WSCR_ERROR</b></td><td>An error occured. See log for details.</td></tr>
 </table>
 
-<h2><a name="ws_request_type_t">ws_request_type_t</h2>
+<h2><a name="ws_request_type_t">ws_request_type_t</a></h2>
 <pre><code style="laguage-cpp">typedef enum {
     WS_REQUEST_GET          = 0x0001,
     WS_REQUEST_POST         = 0x0002,
@@ -3564,7 +3561,7 @@ internally and because of this never be passed to UWebserverPlugin::WebserverPlu
 </table>
 
 
-<h2><a name="IWebserverGetRange_range_type_t">IWebserverGetRange::range_type_t</h2>
+<h2><a name="IWebserverGetRange_range_type_t">IWebserverGetRange::range_type_t</a></h2>
 <pre><code style="laguage-cpp">class IWebserverGetRange {
 public:
     enum range_type_t {
@@ -3587,7 +3584,7 @@ This are values to define the type of the range received with a GET request.
 </table>
 
 <h1>Structures</h1>
-<h2><a name="ws_type_sfx_t">ws_type_sfx_t</h2>
+<h2><a name="ws_type_sfx_t">ws_type_sfx_t</a></h2>
 <pre><code style="laguage-cpp">typedef struct {
     const char * sfx;
     wsr_type_t type;

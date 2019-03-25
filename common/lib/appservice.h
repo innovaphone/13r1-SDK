@@ -85,7 +85,8 @@ class AppServiceSocket : public IShutdownHandler, public USocket, public IInstan
     void AppSocketShutdown();
     void AppSocketMessageSend(class json_io & send, char * buff);
     void SocketRecv(size_t len, bool partial);
-    void Shutdown();
+    void Shutdown() override;
+    void ShutdownTimeout() override;
     void TryShutdown();
 
     void SocketConnectComplete(ISocket * const socket) override;
@@ -113,6 +114,7 @@ public:
     ~UAppServiceSocket() {};
 
     virtual void AppServiceShutdown() = 0;
+    virtual void AppServiceShutdownTimeout() = 0;
     virtual void AppStart(AppInstanceArgs * args) = 0;
     virtual void UpdateServerCertificate(const char * cert) = 0;
     virtual void AppServiceApps(istd::list<AppServiceApp> * appList) = 0;
@@ -136,6 +138,7 @@ class AppService : public UAppServiceSocket, public IInstanceLog {
     char * appPlatformDNSName;
 
     void AppServiceShutdown() override;
+    void AppServiceShutdownTimeout() override;
     void AppStop(const char * appName, const char * appDomain) override;
     void UpdateServerCertificate(const char * cert) override;
     void AppSetLogFlags(const char * appName, const char * appDomain, ulong64 logFlags) override;

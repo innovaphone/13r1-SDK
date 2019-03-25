@@ -39,6 +39,11 @@ typedef float __float128;
 #include <set>
 #include <vector>
 
+extern const char * _BUILD_STRING_;
+extern const char * __BUILD_STRING__;
+extern const char * _VERSION_STR_;
+extern const char * _RELEASE_STATE_;
+
 #if __INTELLISENSE__
 #undef __cplusplus
 #define __cplusplus 1

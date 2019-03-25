@@ -49,7 +49,7 @@ public:
 };</code></pre>
 
     <h3>Public functions</h3>
-    <div class="fnhead"><a name="ChangePassword">ChangePassword</a> (static function)</div>
+    <div class="fnhead" id="ChangePassword">ChangePassword (static function)</div>
     <dl>
         <dd>
             This function changes the password of a given <i>user</i>. The old and the new password must be both provided.
@@ -61,14 +61,14 @@ public:
             </table>
             <h4>Return value</h4>
             If the password is successfully changed <code>USERS_PASSWORD_CHANGE_SUCCESS</code> is returned.
-            <h4><a name="ExampleChangePassword">Code Example</a> </h4>
+            <h4 id="ExampleChangePassword">Code Example</h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">users_password_change_error_t error = IUsers::ChangePassword("root", "topSecret", "superTopSecret");
                 </code></pre>
         </dd>
     </dl>
 
     <h1>Data types</h1>
-    <h2><a name="users_password_change_error_t">users_password_change_error_t</a></h2>
+    <h2 id="users_password_change_error_t">users_password_change_error_t</h2>
     <pre><code class="laguage-cpp">typedef enum {
     USERS_PASSWORD_CHANGE_SUCCESS = 0,
     USERS_PASSWORD_CHANGE_PAM,

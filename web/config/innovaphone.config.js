@@ -7,32 +7,45 @@ var innovaphone = innovaphone || {};
 innovaphone.Config = innovaphone.Config || function() {
     var that = this,
         appWebsocket = null,
+        initialized = false,
         itemInfos = [],
         evOnConfigItemsReceived = new innovaphone.lib1.Event(this),
         evOnConfigLoaded = new innovaphone.lib1.Event(this),
+        evOnConfigUpdate = new innovaphone.lib1.Event(this),
         evOnConfigSaveResult = new innovaphone.lib1.Event(this);
 
     function init(app)
     {
-        appWebsocket = app;
-        appWebsocket.registerApi(that, "Config");
+        appWebsocket = new app.Src();
+        appWebsocket.onmessage = this.onmessage;
+        //appWebsocket = app;
+        //srcID = app.Src;
+        //appWebsocket.registerApi(that, "Config");
         appWebsocket.send({
             "api": "Config",
             "mt": "GetConfigItems"
         });
+        //appWebsocket.send({
+        //    "api": "Config",
+        //    "src": srcID,
+        //    "mt": "GetConfigItems"
+        //});
     }
 
     this.onmessage = function (message)
     {
         switch (message.mt) {
             case "GetConfigItemsResult": recvConfigItems(message); break;
-            case "ReadConfigResult": recvConfigValues(message); break;
-            case "WriteConfigResult": evOnConfigSaveResult.notify(message.result == "ok"); break;
+            case "ReadConfigResult": recvConfigValues(message, false); break;
+            case "WriteConfigResult": if (message.src == appWebsocket.src) evOnConfigSaveResult.notify(message.result == "ok"); break;
+            case "ConfigUpdate": recvConfigValues(message, true); break;
         }
     }
 
     function recvConfigItems(message)
     {
+        if (message.src != appWebsocket.src) return;
+
         for (var i = 0; i < message.ConfigItems.length; ++i) {
             var obj = message.ConfigItems[i];
             console.log(message.ConfigItems[i].name);
@@ -53,7 +66,8 @@ innovaphone.Config = innovaphone.Config || function() {
                     break;
 
                 case "STRING":
-                    that[obj.name] = "";
+                    if (obj.password == true) addPasswordProperty(obj)
+                    else that[obj.name] = "";
                     break;
             }
         }
@@ -62,10 +76,26 @@ innovaphone.Config = innovaphone.Config || function() {
         appWebsocket.send({ "api": "Config", "mt": "ReadConfig" });
     }
 
+    function addPasswordProperty(obj)
+    {
+        obj.changed = false;
+        Object.defineProperty(that, obj.name, {
+            configurable: true,
+            get()  { return obj.value; },
+            set(v) { 
+                if (obj.value != v) {
+                    obj.value = v;
+                    obj.changed = true;
+                }
+            }
+        });
+    }
+
     function addLimitedProperty(obj, defValue)
     {
         obj["value"] = defValue;
         Object.defineProperty(that, obj.name, {
+            configurable: true,
             get()  { return obj.value; },
             set(v) {
                 v = parseInt(v);
@@ -83,6 +113,7 @@ innovaphone.Config = innovaphone.Config || function() {
     {
         obj["value"] = defValue;
         Object.defineProperty(that, obj.name, {
+            configurable: true,
             get()  { return obj.value; },
             set(v) {
                 v = parseInt(v);
@@ -92,14 +123,19 @@ innovaphone.Config = innovaphone.Config || function() {
         });
     }
 
-    function recvConfigValues(message)
+    function recvConfigValues(message, configUpdate)
     {
+        if (configUpdate == false && message.src != appWebsocket.src) return;
+
         var items = Object.keys(message.ConfigItems);
         for (var i = 0; i < items.length; ++i) {
             that[items[i]] = message.ConfigItems[items[i]];
         }
 
-        evOnConfigLoaded.notify();
+        initialized = true;
+
+        if (configUpdate) evOnConfigUpdate.notify();
+        else evOnConfigLoaded.notify();
     }
 
     function save()
@@ -109,9 +145,11 @@ innovaphone.Config = innovaphone.Config || function() {
         for (var i = 0; i < names.length; ++i) {
             var curItem = itemInfos[names[i]];
             if (curItem.password == true) {
-                if (that[curItem.name] != "") {
-                    var seed = Math.random().toString(36);
-                    data[curItem.name] = { value: appWebsocket.encrypt(seed, that[curItem.name]), key: seed };
+                if (curItem.changed == true) {
+                    if (that[curItem.name] != "") {
+                        var seed = Math.random().toString(36);
+                        data[curItem.name] = { value: appWebsocket.encrypt(seed, that[curItem.name]), key: seed };
+                    }
                 }
             }
             else data[curItem.name] = that[curItem.name];
@@ -132,8 +170,10 @@ innovaphone.Config = innovaphone.Config || function() {
 
     this.evOnConfigItemsReceived = evOnConfigItemsReceived;
     this.evOnConfigLoaded = evOnConfigLoaded;
+    this.evOnConfigUpdate = evOnConfigUpdate;
     this.evOnConfigSaveResult = evOnConfigSaveResult;
     this.save = save;
     this.getItemChoices = getItemChoices;
+    this.initialized = initialized;
     this.init = init;
 };

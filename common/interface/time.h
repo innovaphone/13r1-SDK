@@ -47,24 +47,24 @@ class ITime {
 public:
     static bool ParseTimeZoneString(const char * tz, timezone_info_t & tiOut, int * errPos = NULL);
 
-    static ulong64 TimeStampMilliseconds();
-    static ulong64 TimeStampMilliseconds(timezone_info_t & ti);
-    static ulong64 UTCTimeToLocalTime(ulong64 timeMsUtc, timezone_info_t & ti);
+    static long64 TimeStampMilliseconds();
+    static long64 TimeStampMilliseconds(timezone_info_t & ti);
+    static long64 UTCTimeToLocalTime(long64 timeMsUtc, timezone_info_t & ti);
 
-    static ulong64 GetMonotonicTime();
+    static long64 GetMonotonicTime();
     static size_t GetTimeStamp(char * buf, unsigned sz);
-    static void GetTimeStruct(ulong64 timeMs, time_tm_t * t);
-    static void GetTimeStruct(ulong64 timeMs, time_tm_t * t, timezone_info_t & ti);
+    static void GetTimeStruct(long64 timeMs, time_tm_t * t);
+    static void GetTimeStruct(long64 timeMs, time_tm_t * t, timezone_info_t & ti);
 
-    static ulong64 TimeStructToMilliseconds(time_tm_t * ts);
+    static long64 TimeStructToMilliseconds(time_tm_t * ts);
     static bool NormalizeTimeStruct(time_tm_t * ts);
 
-    static size_t FormatTimeStampISO(char * buf, unsigned length, ulong64 timeMs);
-    static size_t FormatTimeStampRFC1123(char * buf, unsigned length, ulong64 timeMs);
-    static size_t FormatTimeStamp(char * buf, unsigned length, const char * formatStr, ulong64 timeMs);
-    static size_t FormatTimeStamp(char * buf, unsigned length, const char * formatStr, ulong64 timeMs, timezone_info_t & ti);
+    static size_t FormatTimeStampISO(char * buf, unsigned length, long64 timeMs);
+    static size_t FormatTimeStampRFC1123(char * buf, unsigned length, long64 timeMs);
+    static size_t FormatTimeStamp(char * buf, unsigned length, const char * formatStr, long64 timeMs);
+    static size_t FormatTimeStamp(char * buf, unsigned length, const char * formatStr, long64 timeMs, timezone_info_t & ti);
 
-    static ulong64 RemoveTime(ulong64 timeStamp) {
+    static long64 RemoveTime(long64 timeStamp) {
         return (timeStamp / 86400000 * 86400000);
     }
 

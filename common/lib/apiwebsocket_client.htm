@@ -36,7 +36,7 @@
 
     <!-- Block with the classes -->
     <h1>Classes</h1>
-    <h2><a name="ApiWebsocketClient">ApiWebsocketClient</a></h2>
+    <h2 id="ApiWebsocketClient">ApiWebsocketClient</h2>
     <pre><code class="C++">class ApiWebsocketClient : public UWebsocketClient, public UTimer {
     ...
 public:
@@ -52,7 +52,7 @@ public:
         Base class for websocket sessions to the ApiRelay of the myApps launcher.
     </p>
 
-    <h3 class="fnhead"><a name="ApiWebsocketClient">ApiWebsocketClient</a></h3>
+    <h3 class="fnhead" id="ApiWebsocketClient">ApiWebsocketClient</h3>
     <p>
         Contructor function.
     </p>
@@ -82,7 +82,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiWebsocketClientIsConnected">ApiWebsocketClientIsConnected</a></h3>
+    <h3 class="fnhead" id="ApiWebsocketClientIsConnected">ApiWebsocketClientIsConnected</h3>
     <dl>
         <dt>Return value</dt>
         <dd>
@@ -90,32 +90,32 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiWebsocketClientClose">ApiWebsocketClientClose</a></h3>
+    <h3 class="fnhead" id="ApiWebsocketClientClose">ApiWebsocketClientClose</h3>
     <p>
         Shall be called to close the connection and all attached API providers and consumers.
         The application will get the <code>ApiWebsocketClientCloseComplete</code> callback
         when this is done.
     </p>
 
-    <h3 class="fnhead"><a name="ApiWebsocketClientCloseComplete">ApiWebsocketClientCloseComplete</a></h3>
+    <h3 class="fnhead" id="ApiWebsocketClientCloseComplete">ApiWebsocketClientCloseComplete</h3>
     <p>
         Will be called after the connection and all attached API providers and consumers have been closed.
         Applications that use the library should not exit before this callback is received.
     </p>
 
-    <h3 class="fnhead"><a name="ApiWebsocketClientConnected">ApiWebsocketClientConnected</a></h3>
+    <h3 class="fnhead" id="ApiWebsocketClientConnected">ApiWebsocketClientConnected</h3>
     <p>
         Called if the connection went up.
     </p>
 
-    <h3 class="fnhead"><a name="ApiWebsocketClientDisconnected">ApiWebsocketClientDisconnected</a></h3>
+    <h3 class="fnhead" id="ApiWebsocketClientDisconnected">ApiWebsocketClientDisconnected</h3>
     <p>
         Called if the connection went down.
     </p>
 
 
 
-    <h2><a name="ApiProvider">ApiProvider</a></h2>
+    <h2 id="ApiProvider">ApiProvider</h2>
     <pre><code class="C++">class ApiProvider : public btree, public UIoExec {
     ...
 protected:
@@ -137,7 +137,7 @@ public:
         It is deleted by the ApiWebsocketClient. So the application doesn't need to keep a reference to it.
     </p>
 
-    <h3 class="fnhead"><a name="ApiProvider">ApiProvider</a></h3>
+    <h3 class="fnhead" id="ApiProvider">ApiProvider</h3>
     <p>
         Contructor function.
     </p>
@@ -161,7 +161,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiProviderSend">ApiProviderSend</a></h3>
+    <h3 class="fnhead" id="ApiProviderSend">ApiProviderSend</h3>
     <p>
         This function is used for sending ApiResult messages.
         The parameters client, consumer and src should be echoed from the corresponding ApiRequest message received using <code>ApiProviderRecv</code>.
@@ -210,7 +210,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiProviderUpdate">ApiProviderUpdate</a></h3>
+    <h3 class="fnhead" id="ApiProviderUpdate">ApiProviderUpdate</h3>
     <p>
         This function is used for sending a new ApiModel to the client.
     </p>
@@ -240,7 +240,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiProviderRecv">ApiProviderRecv</a></h3>
+    <h3 class="fnhead" id="ApiProviderRecv">ApiProviderRecv</h3>
     <p>
         This callback is called when an ApiRequest is received. ApiResults should be sent using the <code>ApiProviderSend</code> function.
         The extra parameters (client, consumer and src) must be echoed back in the response.
@@ -283,7 +283,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiProviderConsumerClosed">ApiProviderConsumerClosed</a></h3>
+    <h3 class="fnhead" id="ApiProviderConsumerClosed">ApiProviderConsumerClosed</h3>
     <p>
         This callback is called when an API consumer has been closed. This can be used to cancel any open API requests or subscriptions done by that consumer.
     </p>
@@ -307,29 +307,29 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiProviderClose">ApiProviderClose</a></h3>
+    <h3 class="fnhead" id="ApiProviderClose">ApiProviderClose</h3>
     <p>
         This callback is called before the object is deleted by the AppWebsocketClient.
         Subclasses should stop any activities and then call <code>ApiProviderClosed()</code>.
     </p>
 
-    <h3 class="fnhead"><a name="ApiProviderConnected">ApiProviderConnected</a></h3>
+    <h3 class="fnhead" id="ApiProviderConnected">ApiProviderConnected</h3>
     <p>
         Called when the provider is connected to the api relay.
     </p>
 
-    <h3 class="fnhead"><a name="ApiProviderDisconnected">ApiProviderDisconnected</a></h3>
+    <h3 class="fnhead" id="ApiProviderDisconnected">ApiProviderDisconnected</h3>
     <p>
         Called when the provider is disconnected from the api relay.
     </p>
 
-    <h3 class="fnhead"><a name="ApiProviderClosed">ApiProviderClosed</a></h3>
+    <h3 class="fnhead" id="ApiProviderClosed">ApiProviderClosed</h3>
     <p>
         This function should be called after the <code>ApiProviderClose()</code> callback, when the implementing class has stopped any activities.
     </p>
 
 
-    <h2><a name="ApiConsumer">ApiConsumer</a></h2>
+    <h2 id="ApiConsumer">ApiConsumer</h2>
     <pre><code class="C++">class ApiConsumer : public btree, public UIoExec {
     ....
 protected:
@@ -350,7 +350,7 @@ public:
         It is deleted by the ApiWebsocketClient. So the application doesn't need to keep a reference to it.
     </p>
 
-    <h3 class="fnhead"><a name="ApiConsumer">ApiConsumer</a></h3>
+    <h3 class="fnhead" id="ApiConsumer">ApiConsumer</h3>
     <p>
         Contructor function.
     </p>
@@ -374,7 +374,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiConsumerSend">ApiConsumerSend</a></h3>
+    <h3 class="fnhead" id="ApiConsumerSend">ApiConsumerSend</h3>
     <p>
         Call this function to send an ApiRequst message to the specified provider.
     </p>
@@ -421,7 +421,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiConsumerRecv">ApiConsumerRecv</a></h3>
+    <h3 class="fnhead" id="ApiConsumerRecv">ApiConsumerRecv</h3>
     <p>
         This function is called when an ApiResult message is received.
     </p>
@@ -457,7 +457,7 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiConsumerUpdate">ApiConsumerUpdate</a></h3>
+    <h3 class="fnhead" id="ApiConsumerUpdate">ApiConsumerUpdate</h3>
     <p>
         This function is called when the API model has changed.
     </p>
@@ -481,23 +481,23 @@ public:
         </dd>
     </dl>
 
-    <h3 class="fnhead"><a name="ApiConsumerClose">ApiConsumerClose</a></h3>
+    <h3 class="fnhead" id="ApiConsumerClose">ApiConsumerClose</h3>
     <p>
         This callback is called before the object is deleted by the AppWebsocketClient.
         Subclasses should stop any activities and then call <code>ApiConsumerClosed()</code>.
     </p>
 
-    <h3 class="fnhead"><a name="ApiConsumerConnected">ApiConsumerConnected</a></h3>
+    <h3 class="fnhead" id="ApiConsumerConnected">ApiConsumerConnected</h3>
     <p>
         Called when the consumer is connected to the api relay.
     </p>
 
-    <h3 class="fnhead"><a name="ApiConsumerDisconnected">ApiConsumerDisconnected</a></h3>
+    <h3 class="fnhead" id="ApiConsumerDisconnected">ApiConsumerDisconnected</h3>
     <p>
         Called when the consumer is disconnected from the api relay.
     </p>
 
-    <h3 class="fnhead"><a name="ApiConsumerClosed">ApiConsumerClosed</a></h3>
+    <h3 class="fnhead" id="ApiConsumerClosed">ApiConsumerClosed</h3>
     <p>
         This function should be called after the <code>ApiConsumerClose()</code> callback, when the implementing class has stopped any activities.
     </p>

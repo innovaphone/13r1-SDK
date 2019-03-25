@@ -75,20 +75,20 @@
 void write_object_identifier(dword * in, byte * out);
 </code></pre>
     <br/>
-    <a name="read_object_identifier"><div class="fnhead" style="margin-top:5px">read_object_identifier</div></a>
+    <div id="read_object_identifier" class="fnhead" style="margin-top:5px">read_object_identifier</div></a>
     <dd>
         Reads an object identifier from its normal ASN1 representation as byte array into an array
         of dwords with each node as one dword in the array.
     </dd>
 
-    <a name="write_object_identifier"><div class="fnhead" style="margin-top:5px">write_object_identifier</div></a>
+    <div id="write_object_identifier" class="fnhead" style="margin-top:5px">write_object_identifier</div></a>
     <dd>
         Writes an object identifier to its normal ASN1 representation as byte array from an array of
         dword, with each node as one dword in the array.
     </dd>
 
     <h1>Classes</h1>
-    <a name="asn1_out"><h2>asn1_out</h2></a>
+    <h2 id="asn1_out">asn1_out</h2>
     <pre><code class="C++">class asn1_out {
 public:
     virtual void bit(bool v)=0;
@@ -126,7 +126,7 @@ public:
         <dd>get a reference to the current output position. The meaning of buffer and offset depends on
         the actual output class</dd>
     </dl>
-    <a name="asn1_in"><h2>asn1_in</h2></a>
+    <h2 id="asn1_in">asn1_in</h2>
     <pre><code class="C++">class asn1_in {
 public:
     virtual bool bit()=0;
@@ -175,7 +175,7 @@ public:
         <dd>get a reference to the current input position. The meaning of buffer and offset depends on
         the actual output class</dd>
     </dl>
-    <a name="asn1_context"><h2>asn1_context, asn1_tag</h2></a>
+    <h2 id="asn1_context">asn1_context, asn1_tag</h2>
     <pre><code class="C++">struct asn1_tag {
     dword tag;
     void * content;
@@ -217,7 +217,7 @@ public:
         class to holding the actual decoded data or holding the data to be encoded. See documentation of
         specific encoder for usage.
     </p>
-    <a name="asn1"><h2>asn1</h2></a>
+    <h2 id="asn1">asn1</h2>
     <pre><code class="C++">class asn1 {
 
 public:
@@ -247,7 +247,7 @@ public:
         indicates that the datatype may be extended.
     </p>
     
-    <a name="asn1_null"><h3>asn1_null</h3></a>
+    <h3 id="asn1_null">asn1_null</h3>
     <pre><code class="C++">class asn1_null : public asn1 {
 
 public:
@@ -260,7 +260,7 @@ public:
         ASN1 NULL datatype. The put_content sets the element as present.
     </p>
     
-    <a name="asn1_boolean"><h3>asn1_boolean</h3></a>
+    <h3 id="asn1_boolean">asn1_boolean</h3>
     <pre><code class="C++">class asn1_boolean : public asn1 {
 
 public:
@@ -273,7 +273,7 @@ public:
         ASN1 BOOLEAN datatype
     </p>
     
-    <a name="asn1_int"><h3>asn1_int</h3></a>
+    <h3 id="asn1_int">asn1_int</h3>
     <pre><code class="C++">class asn1_int : public asn1 {
 
 public:
@@ -292,7 +292,7 @@ public:
         <dd>Number of bits needed for the integer value. 0 means no restriction</dd>
     </dl>
     
-    <a name="asn1_ints"><h3>asn1_ints</h3></a>
+    <h3 id="asn1_ints">asn1_ints</h3>
     <pre><code class="C++">class asn1_ints : public asn1 {
 
 public:
@@ -306,7 +306,7 @@ public:
         defined with this type.
     </p>
     
-    <a name="asn1_inte"><h3>asn1_inte</h3></a>
+    <h3 id="asn1_inte">asn1_inte</h3>
     <pre><code class="C++">class asn1_inte : public asn1 {
 
 public:
@@ -323,7 +323,7 @@ public:
         max the maximum value.
     </p>
 
-    <a name="asn1_int8"><h3>asn1_int8</h3></a>
+    <h3 id="asn1_int8">asn1_int8</h3>
     <pre><code class="C++">class asn1_int8 : public asn1 {
 
 public:
@@ -336,7 +336,7 @@ public:
         ASN1 INTEGER datatype. Optimization for the common case of an restriction to 8 bits.
     </p>
 
-    <a name="asn1_int16"><h3>asn1_int16</h3></a>
+    <h3 id="asn1_int16">asn1_int16</h3>
     <pre><code class="C++">class asn1_int16 : public asn1 {
 
 public:
@@ -349,7 +349,7 @@ public:
         ASN1 INTEGER datatype. Optimization for the common case of an restriction to 16 bits.
     </p>
 
-    <a name="asn1_bitstring"><h3>asn1_bitstring</h3></a>
+    <h3 id="asn1_bitstring">asn1_bitstring</h3>
     <pre><code class="C++">class asn1_bitstring : public asn1 {
 
 public:
@@ -374,7 +374,7 @@ public:
         needed to represent max_length - min_length</dd>
     </dl>
 
-    <a name="asn1_enumerated"><h3>asn1_enumerated</h3></a>
+    <h3 id="asn1_enumerated">asn1_enumerated</h3>
     <pre><code class="C++">class asn1_enumerated : public asn1 {
 
 public:
@@ -395,7 +395,7 @@ public:
         <dt>count_bits</dt><dd>Number of bits needed to represent count</dd>
     </dl>
 
-    <a name="asn1_octet_array"><h3>asn1_octet_array</h3></a>
+    <h3 id="asn1_octet_array">asn1_octet_array</h3>
     <pre><code class="C++">class asn1_octet_array : public asn1 {
 
 public:
@@ -413,7 +413,7 @@ public:
         <dt>length</dt><dd>length of the array</dd>
     </dl>
 
-    <a name="asn1_ia5_string"><h3>asn1_ia5_string</h3></a>
+    <h3 id="asn1_ia5_string">asn1_ia5_string</h3>
     <pre><code class="C++">class asn1_ia5_string : public asn1 {
 
 public:
@@ -439,7 +439,7 @@ public:
         <dt>from</dt><dd>Array of characters represented by char_bits</dd>
     </dl>
 
-    <a name="asn1_octet_string"><h3>asn1_octet_string</h3></a>
+    <h3 id="asn1_octet_string">asn1_octet_string</h3>
     <pre><code class="C++">class asn1_octet_string : public asn1 {
 	
 public:
@@ -463,7 +463,7 @@ public:
         <dt>len_bits</dt><dd>The number of bits needed to represent max_length - min_length</dd>
     </dl>
 
-    <a name="asn1_word_string"><h3>asn1_word_string</h3></a>
+    <h3 id="asn1_word_string">asn1_word_string</h3>
     <pre><code class="C++">class asn1_word_string : public asn1 {
 
 public:
@@ -485,7 +485,7 @@ public:
         <dt>len_bits</dt><dd>The number of bits needed to represent max_length - min_length</dd>
     </dl>
 
-    <a name="asn1_object_identifier"><h3>asn1_object_identifier</h3></a>
+    <h3 id="asn1_object_identifier">asn1_object_identifier</h3>
     <pre><code class="C++">class asn1_object_identifier : public asn1 {
 
 public:
@@ -498,7 +498,7 @@ public:
         ASN1 OBJECT IDENTIFIER
     </p>
 
-    <a name="asn1_sequence"><h3>asn1_sequence</h3></a>
+    <h3 id="asn1_sequence">asn1_sequence</h3>
     <pre><code class="C++">class asn1_sequence : public asn1 {
 
 public:
@@ -525,7 +525,7 @@ public:
         <dt>tag_count</dt><dd>used for BER only</dd>
     </dl>
 
-    <a name="asn1_choice"><h3>asn1_choice</h3></a>
+    <h3 id="asn1_choice">asn1_choice</h3>
     <pre><code class="C++">class asn1_choice : public asn1 {
 
 public:
@@ -552,7 +552,7 @@ public:
         <dt>tag_count</dt><dd>used for BER only</dd>
     </dl>
 
-    <a name="asn1_sequence_of"><h3>asn1_sequence_of</h3></a>
+    <h3 id="asn1_sequence_of">asn1_sequence_of</h3>
     <pre><code class="C++">class asn1_sequence_of : public asn1 {
 
 public:
@@ -574,7 +574,7 @@ public:
         <dt>min_length</dt><dd>minimum number of elements in sequence of</dd>
         <dt>asn1</dt><dd>pointer to asn1 class for the type of elements in the sequence of</dd>
     </dl>
-    <a name="asn1_set_of"><h3>asn1_set_of</h3></a>
+    <h3 id="asn1_set_of">asn1_set_of</h3>
     <pre><code class="C++">class asn1_set_of : public asn1 {
 
 public:
@@ -592,7 +592,7 @@ public:
         ASN1 SET OF
     </p>
 
-    <a name="asn1_numeric_string"><h3>asn1_numeric_string</h3></a>
+    <h3 id="asn1_numeric_string">asn1_numeric_string</h3>
     <pre><code class="C++">class asn1_numeric_string : public asn1 {
 
 public:
@@ -611,7 +611,7 @@ public:
         ASN1 NUMERIC STRING
     </p>
 
-    <a name="asn1_any"><h3>asn1_any</h3></a>
+    <h3 id="asn1_any">asn1_any</h3>
     <pre><code class="C++">class asn1_any : public asn1 {
 public:
     asn1_any(int & tag, const char * name);

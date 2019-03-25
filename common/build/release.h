@@ -1,9 +1,8 @@
 
-// the components release state. usually applied in platform/config.h
-# define RELEASE_STATE "dvl "
-# define VERSION_STR_MAJOR "13r1"
-# define VERSION_STR "13r1"
-# define VERSION_SOAP 1300
+#define RELEASE_STATE "dvl "
+#define VERSION_STR_MAJOR "13r1"
+#define VERSION_STR "13r1"
+#define VERSION_SOAP 1300
 
 #define BUILD_DO_QUOTE(X)         #X
 #define BUILD_QUOTE(X)            BUILD_DO_QUOTE(X)
@@ -29,3 +28,11 @@
 #define BUILD_STRING              BUILD_QUOTE(BUILD)
 #endif
 #endif
+
+NAMESPACE_BEGIN
+const char * _BUILD_STRING_ = BUILD_STRING;
+const char * __BUILD_STRING__ = "/" BUILD_STRING "/";
+const char * _VERSION_STR_ = VERSION_STR;
+const char * _RELEASE_STATE_ = RELEASE_STATE;
+const int _VERSION_SOAP_ = VERSION_SOAP;
+NAMESPACE_END

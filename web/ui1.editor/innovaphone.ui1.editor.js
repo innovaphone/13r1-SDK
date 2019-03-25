@@ -64,7 +64,7 @@ innovaphone.ui1.Editor = innovaphone.ui1.Editor || function (style, scrollWidth,
                 }
                 return;
         }
-        if (onChanged) onChanged(e.keyCode, getSelection());
+        if (onChanged) onChanged(e.keyCode, getSelection(), e);
     }
 
     function enter() {

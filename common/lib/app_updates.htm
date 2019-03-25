@@ -39,7 +39,7 @@
         <tr><td><b><a href="#Tutorial">Tutorial</a></b></td></tr>
     </table>
 
-    <h2><a name="Basic ideas">Basic ideas</a></h2>
+    <h2 id="Basic ideas">Basic ideas</h2>
     <ul>
         <li>
             A class <b>AppUpates</b> is used to keep all information needed per instance. These are
@@ -90,9 +90,9 @@
         </li>
     </ul>
 
-	<h1><a name="Classes">Classes</a></h1>
+	<h1 id="Classes">Classes</a></h1>
 
-    <h2><a name="AppUpdates">AppUpdates</a></h2>
+    <h2 id="AppUpdates">AppUpdates</h2>
 
     <pre><code class="C++">class AppUpdates : public UIoExec {
     friend class AppUpdatesSession;
@@ -114,19 +114,19 @@ public:
         global lists for updates.
     </p>
 
-    <h3 class="fnhead"><a name="AppUpdates>">AppUpdates</a></h3>
+    <h3 class="fnhead" id="AppUpdates>">AppUpdates</h3>
     
     <p>
         The constructor needs iomux for the SetExec mechanism
     </p>
 
-    <h3 class="fnhead"><a name="StartUpdate>">StartUpdate</a></h3>
+    <h3 class="fnhead" id="StartUpdate>">StartUpdate</h3>
     
     <p>
         To be called to start the update process.
     </p>
 
-    <h2><a name="AppUpdatesSession">AppUpdatesSession</a></h2>
+    <h2 id="AppUpdatesSession">AppUpdatesSession</h2>
 
     <pre><code class="C++">class AppUpdatesSession : public AppWebsocket, public istd::listElement&lt;AppUpdatesSession&gt; {
     friend class AppUpdates;
@@ -154,25 +154,25 @@ public:
     unsigned responsePending;
 };</code></pre>
 
-    <h3 class="fnhead"><a name="AppUpdatesSession">AppUpdatesSession</a></h3>
+    <h3 class="fnhead" id="AppUpdatesSession">AppUpdatesSession</h3>
 
     <p>
         Constructor
     </p>
 
-    <h3 class="fnhead"><a name="SendResponse">SendResponse</a></h3>
+    <h3 class="fnhead" id="SendResponse">SendResponse</h3>
 
     <p>
         This function should be called to send responses on the Websocket connection.
     </p>
 
-    <h3 class="fnhead"><a name="SendUpdate">SendUpdate</a></h3>
+    <h3 class="fnhead" id="SendUpdate">SendUpdate</h3>
 
     <p>
         This function should be called to send updates on the Websocket connection.
     </p>
     
-    <h3 class="fnhead"><a name="AppFilterClose">AppFilterClose</a></h3>
+    <h3 class="fnhead" id="AppFilterClose">AppFilterClose</h3>
 
     <p>
         Function which may be called to explictly close a filter on a given session. The filter
@@ -180,14 +180,14 @@ public:
         used to identify the type of filter.
     </p>
 
-    <h3 class="fnhead"><a name="sessionId">sessionId</a></h3>
+    <h3 class="fnhead" id="sessionId">sessionId</h3>
     
     <p>
         unique session id. Maybe used in filters for example to avoid sending updates to sessions
         which originated the action causing the update.
     </p>
 
-    <h2><a name="AppUpdate">AppUpdate</a></h2>
+    <h2 id="AppUpdate">AppUpdate</h2>
 
     <pre><code class="C++">class AppUpdate : public istd::listElement&lt;AppUpdate&gt; {
     friend class AppUpdates;
@@ -202,14 +202,14 @@ public:
     virtual ~AppUpdate();
 };</code></pre>
 
-    <h3 class="fnhead"><a name="AppUpdate">AppUpdate</a></h3>
+    <h3 class="fnhead" id="AppUpdate">AppUpdate</h3>
 
     <p>
         Constructor. filters and usersTree should be used from the corresponding AppFilters class.
         sip is used to identify the user, if the update is to be sent to session of this user only.
     </p>
 
-    <h2><a name="AppUpdatesQueued">AppUpdatesQueued</a></h2>
+    <h2 id="AppUpdatesQueued">AppUpdatesQueued</h2>
 
     <pre><code class="C++">class AppUpdatesQueued : public AppUpdatesQueuedSession, public AppUpdatesQueuedFilter {
     friend class AppUpdates;
@@ -226,7 +226,7 @@ public:
         Internal class to queue updates on a session.
     </p>
 
-    <h2><a name="AppUpdatesUser">AppUpdatesUser</a></h2>
+    <h2 id="AppUpdatesUser">AppUpdatesUser</h2>
 
     <pre><code class="C++">class AppUpdatesUser : public btree {
     friend class AppUpdates;
@@ -250,7 +250,7 @@ public:
         Internal class to determine the first session of a given user.
     </p>
 
-    <h2><a name="AppUpdatesFilterY">AppUpdatesFilterY</a></h2>
+    <h2 id="AppUpdatesFilterY">AppUpdatesFilterY</h2>
 
     <pre><code class="C++">class AppUpdatesFilterY : public istd::listElement&lt;AppUpdatesFilterY&gt;, public btree {
     friend class AppUpdates;
@@ -289,7 +289,7 @@ public:
         Internal class used as base class for filters.
     </p>
 
-    <h2><a name="AppUpdatesFilter">AppUpdatesFilter</a></h2>
+    <h2 id="AppUpdatesFilter">AppUpdatesFilter</h2>
 
     <pre><code class="C++">template &lt;class U&gt; class AppUpdatesFilter : public AppUpdatesFilterY {
     bool Test(class AppUpdate * update) { return Test((U *)update); };
@@ -306,33 +306,33 @@ public:
         Internal class used as base class for filters.
     </p>
 
-    <h3 class="fnhead"><a name="AppUpdatesFilter">AppUpdatesFilter</a></h3>
+    <h3 class="fnhead" id="AppUpdatesFilter">AppUpdatesFilter</h3>
 
     <p>
         Constructor. src is a string identifying the filter. If a filter with this name already
         exists for the session, the old filter is deleted.
     </p>
 
-    <h3 class="fnhead"><a name="AppUpdatesFilter">AppUpdatesFilter</a></h3>
+    <h3 class="fnhead" id="AppUpdatesFilter">AppUpdatesFilter</h3>
 
     <p>
         Constructor. <b>src</b> is the unique identifier for the filter on a given session of a given type.
         Use <b>sip</b> to identify users, if there are updates sent to single users only.
     </p>
 
-    <h3 class="fnhead"><a name="Test">Test</a></h3>
+    <h3 class="fnhead" id="Test">Test</h3>
 
     <p>
         Function to test if an update needs to be sent.
     </p>
 
-    <h3 class="fnhead"><a name="Send">Send</a></h3>
+    <h3 class="fnhead" id="Send">Send</h3>
 
     <p>
         Function called when the update is to be sent.
     </p>
 
-    <h2><a name="AppUpdatesFilters">AppUpdatesFilters</a></h2>
+    <h2 id="AppUpdatesFilters">AppUpdatesFilters</h2>
 
     <pre><code class="C++">template &lt;class U&gt; class AppUpdatesFilters {
 public:
@@ -343,7 +343,7 @@ public:
     class btree * usersTree;
 };</code></pre>
 
-    <h1><a name="Tutorial">Tutorial</a></h1>
+    <h1 id="Tutorial">Tutorial</h1>
 
     <p>
         The following steps have to be done to use the app_update library in an App.

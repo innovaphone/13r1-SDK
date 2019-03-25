@@ -81,8 +81,8 @@ enum MediaType {
 
 enum ConnectionType {
     REMOTE_RTP = 0,
-    LOCAL_WEBCAM_WEBRTC,
-    LOCAL_REMOTE_WEBRTC,
+    REMOTE_VIDEO_STREAM,
+    LOCAL_VIDEO_STREAM,
 };
 
 #define CoderMediaType(c) (((c) < ((int) VideoCoder::H264)) ? MediaType::AUDIO : (((c) < ((int) AppSharingCoder::JRFB)) ? MediaType::VIDEO : MediaType::APPSHARING))
@@ -251,6 +251,7 @@ public:
     virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, byte * certificateFingerprint, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, int dropMediaTx, int dropMediaRx) = 0;
     virtual void Connect(class MediaConfig *remoteMediaConfig, bool iceControlling) = 0;
     virtual void RtpSend(const void * buf, size_t len, dword timestamp) = 0;
+    virtual void RtpDtmf(char digit, byte pt) = 0;
     virtual void SctpSend(const void * buf, size_t len, unsigned num) = 0;
     virtual void Recv(void * buf, size_t len, bool recvPartial = false) = 0;
     virtual void Close() = 0;
@@ -271,6 +272,9 @@ public:
     virtual void MediaSctpRecvAck(IMedia * const media, unsigned num) {};
     virtual void MediaCloseComplete(IMedia * const media) {};
     virtual void MediaEventReceived(IMedia * const media, enum MediaEndpointEvent event) {};
+    virtual void MediaRtpRecv(IMedia * const media, const char * src_addr, word src_port, dword ssrc, word pt) {};
+    virtual void MediaRtpDtmfNearStart(char digit) {};
+    virtual void MediaRtpDtmfNear(char digit) {};
 };
 
 class IMediaEndpoint {
@@ -321,8 +325,9 @@ public:
 
 class UDeviceIo {
 public:
-    virtual void MediaIoDeviceAdded(void * context, const char *deviceId, int deviceType, unsigned deviceCapabilities, const char *deviceName) = 0;
-    virtual void MediaIoDeviceRemoved(void * context, const char *deviceId) = 0;
+    virtual void MediaIoDeviceAdded(IDeviceIo * deviceIo, void * context, const char *deviceId, int deviceType, unsigned deviceCapabilities, const char *deviceName) = 0;
+    virtual void MediaIoDeviceRemoved(IDeviceIo * deviceIo, void * context, const char *deviceId) = 0;
+    virtual void MediaIoQueryDevicesResult(IDeviceIo * deviceIo, void * context) = 0;
 };
 
 class IAudioIoChannel : public IMediaIoChannel {
@@ -369,6 +374,8 @@ public:
     virtual void StopHookDevice(const char *deviceId) = 0;
     virtual void SendHookKey(const char *deviceId, byte key) = 0;
 
+    virtual void Mute(bool microphone, bool speaker) = 0;
+
     virtual void StartDualTones(dword toneFlags, unsigned toneCount, const struct AudioIoDualTone *tones) = 0;
     virtual void StopDualTones() = 0;
 
@@ -384,7 +391,7 @@ public:
 
 class UAudioIo {
 public:
-    virtual void HookKeyReceived(const char *deviceId, byte key) = 0;
+    virtual void HookKeyReceived(IAudioIo * audioIo, const char *deviceId, byte key) = 0;
     virtual void CloseAudioIoComplete() = 0;
 };
 
@@ -573,6 +580,7 @@ class UWebcamProvider {
 public:
     virtual void WebcamLost(class IWebcam * const webcam, void * context) = 0;
     virtual void WebcamAdded(class IWebcam * const webcam, void * context) = 0;
+    virtual void WebcamQueryResult(void * context) = 0;
     virtual void WebcamClosed(class IWebcam * const webcam) = 0;
     virtual void WebcamProviderCloseResult() = 0;
 };

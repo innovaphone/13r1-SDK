@@ -69,9 +69,9 @@
         </tr>
     </table>
 
-    <a name="classes"><h1>Classes</h1></a>
+    <h1 id="classes">Classes</h1>
     <!-- ---------------------------------------------------------------------- -->
-    <a name="class-IPdfProvider"><h2>IPdfProvider</h2></a>
+    <h2 id="class-IPdfProvider">IPdfProvider</h2>
     <!-- ---------------------------------------------------------------------- -->
     <pre><code class="C++">class IPdfProvider {
 public:
@@ -79,16 +79,16 @@ public:
     virtual class IPdf * CreatePdf() = 0;
 };</code></pre>
 
-    <a name="IPdfProvider-members"><h3>Public functions</h3></a>
+    <h3 id="IPdfProvider-members">Public functions</h3>
     <dl>
-        <dt><div class="fnhead"><a name="IPdfProvider-CreatePdf">CreatePdf</a></div></dt>
+        <div class="fnhead" id="IPdfProvider-CreatePdf">CreatePdf</div></dt>
         <dd>
             Creates an IPdf object. This object is to be deleted after use.
         </dd>
     </dl>
 
     <!-- ---------------------------------------------------------------------- -->
-    <a name="class-IPdf"><h2>IPdf</h2></a>
+    <h2 id="class-IPdf">IPdf</h2>
     <!-- ---------------------------------------------------------------------- -->
     <pre><code class="C++">class IPdf {
 public:
@@ -120,9 +120,9 @@ public:
     
     <p>
     </p>
-    <a name="IPdf-members"><h3>Public functions</h3></a>
+    <h3 id="IPdf-members">Public functions</h3>
     <dl>
-        <dt><div class="fnhead"><a name="IPdf-SetCompressionMode">SetCompressionMode</a></div></dt>
+        <div class="fnhead" id="IPdf-SetCompressionMode">SetCompressionMode</div></dt>
         <dd>The function sets the compression mode of the PDF document.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -132,7 +132,7 @@ public:
                 </tr>
             </table>
         </dd>
-        <dt><div class="fnhead"><a name="IPdf-AddPage">AddPage</a></div></dt>
+        <div class="fnhead" id="IPdf-AddPage">AddPage</div></dt>
         <dd>Add a new page to the document.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -148,9 +148,9 @@ public:
             <h4>Return value</h4>
             Returns the pointer to the internally used class IPdfPage.
         </dd>
-        <dt><div class="fnhead"><a name="IPdf-Complete">Complete</a></div></dt>
+        <div class="fnhead" id="IPdf-Complete">Complete</div></dt>
         <dd>The function is to be called if the document is completly defined and should be rendered.</dd>
-        <dt><div class="fnhead"><a name="IPdf-Get">Get</a></div></dt>
+        <div class="fnhead" id="IPdf-Get">Get</div></dt>
         <dd>
             Get the document data. The data pointer is set to a pointer allocated by IPdf. The end of the document is reached if length is zero or last is true.
             <h4>Parameters</h4>
@@ -173,7 +173,7 @@ public:
     </dl>
 
     <!-- ---------------------------------------------------------------------- -->
-    <a name="class-IPdfPage"><h2>IPdfPage</h2></a>
+    <h2 id="class-IPdfPage">IPdfPage</h2></a>
     <!-- ---------------------------------------------------------------------- -->
     <pre><code class="C++">class IPdfPage {
 public:
@@ -189,9 +189,9 @@ public:
 
     <p>
     </p>
-    <a name="IPdfPage-members"><h3>Public functions</h3></a>
+    <h3 id="IPdfPage-members">Public functions</h3>
     <dl>
-        <dt><div class="fnhead"><a name="IPdfPage-SetSize">SetSize</a></div></dt>
+        <div class="fnhead" id="IPdfPage-SetSize">SetSize</div></dt>
         <dd>Set the page size.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -201,7 +201,7 @@ public:
                 </tr>
             </table>
         </dd>
-        <dt><div class="fnhead"><a name="IPdfPage-SetDirection">SetDirection</a></div></dt>
+        <div class="fnhead" id="IPdfPage-SetDirection">SetDirection</div></dt>
         <dd>Set the page direction.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -211,17 +211,17 @@ public:
                 </tr>
             </table>
         </dd>
-        <dt><div class="fnhead"><a name="IPdfPage-GetWidth">GetWidth</a></div></dt>
+        <div class="fnhead" id="IPdfPage-GetWidth">GetWidth</div></dt>
         <dd>Get the page width.
             <h4>Return value</h4>
             Returns the width of the page.
         </dd>
-        <dt><div class="fnhead"><a name="IPdfPage-GetHeight">GetHeight</a></div></dt>
+        <div class="fnhead" id="IPdfPage-GetHeight">GetHeight</div></dt>
         <dd>Get the page height.
             <h4>Return value</h4>
             Returns the height of the page.
         </dd>
-        <dt><div class="fnhead"><a name="IPdfPage-AddImageStream">AddImageStream</a></div></dt>
+        <div class="fnhead" id="IPdfPage-AddImageStream">AddImageStream</div></dt>
         <dd>Add an image stream to the page.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -233,7 +233,7 @@ public:
             <h4>Return value</h4>
             Returns the pointer to the internally used class IPdfImageStream.
         </dd>
-        <dt><div class="fnhead"><a name="IPdfPage-Complete">Complete</a></div></dt>
+        <div class="fnhead" id="IPdfPage-Complete">Complete</div></dt>
         <dd>The function is to be called if the page is complete. After this, IPdfPage is invalid.</dd>
     </dl>
 
@@ -251,9 +251,9 @@ public:
 
     <p>
     </p>
-    <a name="IPdfImageStream-members"><h3>Public functions</h3></a>
+    <h3 id="IPdfImageStream-members">Public functions</h3>
     <dl>
-        <dt><div class="fnhead"><a name="IPdfImageStream-Write">Write</a></div></dt>
+        <div class="fnhead" id="IPdfImageStream-Write">Write</div></dt>
         <dd>The function is to be called to write data into the image stream.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -267,7 +267,7 @@ public:
                 </tr>
             </table>
         </dd>
-        <dt><div class="fnhead"><a name="IPdfImageStream-SetStreamWidth">SetStreamWidth</a></div></dt>
+        <div class="fnhead" id="IPdfImageStream-SetStreamWidth">SetStreamWidth</div></dt>
         <dd>This function must be called to set the internal width parameter to the width of the written image.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -277,7 +277,7 @@ public:
                 </tr>
             </table>
         </dd>
-        <dt><div class="fnhead"><a name="IPdfImageStream-SetStreamHeight">SetStreamHeight</a></div></dt>
+        <div class="fnhead" id="IPdfImageStream-SetStreamHeight">SetStreamHeight</div></dt>
         <dd>This function must be called to set the internal height parameter to the height of the written image.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
@@ -287,7 +287,7 @@ public:
                 </tr>
             </table>
         </dd>
-        <dt><div class="fnhead"><a name="IPdfImageStream-Draw">Draw</a></div></dt>
+        <div class="fnhead" id="IPdfImageStream-Draw">Draw</div></dt>
         <dd>
             The function is to be called if the stream is complete. After this, IPdfImageStream is invalid.
             <h4>Parameters</h4>

@@ -196,7 +196,7 @@ public:
 class HTTPHeaderField {
 protected:
     friend class HTTPParser;
-    HTTPHeaderField() : values(NULL), valueCount(0) {}
+    HTTPHeaderField() : values(nullptr), valueCount(0) {}
     ~HTTPHeaderField() {}
 
     const char ** values;
@@ -208,18 +208,9 @@ public:
 };
 
 
-class HTTPHeaderLine {
-public:
-    HTTPHeaderLine() : line(NULL), next(NULL) {}
-    ~HTTPHeaderLine() { free(line); }
-    char * line;
-    HTTPHeaderLine * next;
-};
-
-
 class HTTPRange {
 public:
-    HTTPRange() { this->next = NULL; }
+    HTTPRange() { this->next = nullptr; }
     virtual ~HTTPRange() {}
 
     enum {
@@ -242,8 +233,8 @@ public:
 
 
 class HTTPParser {
-    HTTPHeaderLine * headerLineStart;
-    HTTPHeaderLine * headerLineEnd;
+    class HTTPHeaderLine * headerLineStart;
+    class HTTPHeaderLine * headerLineEnd;
     char * curLineTmpBuf;
     size_t curLineTmpBufSize;
     int parserState;
@@ -280,12 +271,12 @@ class HTTPParser {
     int parseResult;
 
     void Reset();
-    HTTPHeaderLine * CreateNewLine();
+    class HTTPHeaderLine * CreateNewLine();
     size_t AddHeaderLines(char * data, size_t len);
 
     bool ParseResponseLine();
     bool ParseRequestLine(UHTTPParser * user);
-    void ParseFieldLines(HTTPHeaderLine * curLine);
+    void ParseFieldLines(class HTTPHeaderLine * curLine);
     void SetFieldValue(const char * field, const char * value);
 
 public:
@@ -329,7 +320,5 @@ public:
 
     const HTTPLib::http_result_t * GetHTTPResultCode() const { return httpResultCode; }
 
-    size_t GetHeaderSize() const { return 0; }
-    char * MakeHeaderCopy() const { return nullptr; };
     void GetFieldListCopy(byte * & buffer, size_t & bufferSize) const;
 };
