@@ -67,6 +67,7 @@ public:
     virtual void SendEvent(dword code, AlarmSeverity severtiy, ulong64 time, const char * text, const char * details, const char * src);
     virtual void ResetConnection(char * url, char * username, char * pwd);
     virtual void Shutdown();
+    virtual void ChangeAlarmTimeout(unsigned int timeout);
 };</code></pre>
 
     <h3>Overview</h3>
@@ -163,6 +164,10 @@ public:
         <h4>Callbacks</h4>
         After the connection is gracefully closed, UAlarmClient::AlarmClientShutdown() will be called.
 
+    </dd>
+    <div class="fnhead">ChangeAlarmTimeout</div>
+    <dd>
+        Changes the default timeout of the alarms. This function is used only for test purposes.
     </dd>
 
     <a name="UAlarmClient"><h2>UAlarmClient</h2></a>

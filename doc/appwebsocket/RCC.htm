@@ -153,6 +153,31 @@
         <dd>
             Type of user
         </dd>
+        <dt>regs[<a href="#regInfo">regInfo]</a></dt>
+    </dl>
+
+	<h2><a name="Devices">Devices</a></h2>
+
+    <p>
+        Retrieve the list of devices of a given user
+    </p>
+
+    <div class="fnhead">Properties</div>
+
+    <dl>
+        <dt>cn:string</dt>
+        <dd>
+            common name of the user
+        </dd>
+    </dl>
+
+    <div class="fnhead">Result</div>
+
+    <dl>
+        <dt>devices:[<a href="#device">device</a>]</dt>
+        <dd>
+            Array of the devices.
+        </dd>
     </dl>
 
 	<h2><a name="UserInitialize">UserInitialize</a></h2>
@@ -164,7 +189,7 @@
     <div class="fnhead">Properties</div>
 
     <dl>
-        <dt>user:string</dt>
+        <dt>cn:string</dt>
         <dd>
             common name of the user
         </dd>
@@ -183,6 +208,15 @@
         </dd>
     </dl>
 
+    <div class="fnhead">Result</div>
+
+    <dl>
+        <dt>user:integer</dt>
+        <dd>
+            The handle which can be used for the other User... requests.
+        </dd>
+    </dl>
+
     <div class="fnhead">CallInfo</div>
 
     <p>
@@ -191,30 +225,33 @@
 
     <dl>
         <dt>user:integer</dt>
-        <dt>call:integer</dt>
-        <dt>conf:string</dt>
-        <dt>state:integer</dt>
-        <dt>peer:object</dt>
         <dd>
-            <dl>
-                <dt>cn</dt>
-                <dt>dn</dt>
-                <dt>h323</dt>
-                <dt>e164</dt>
-                <dt>norm</dt>
-            </dl>
+            Handle of the user
         </dd>
-        <dt>no:[object]</dt>
+        <dt>call:integer</dt>
         <dd>
-            <dl>
-                <dt>type</dt>
-                <dt>cn</dt>
-                <dt>dn</dt>
-                <dt>h323</dt>
-                <dt>e164</dt>
-            </dl>
+            Handle of the call
+        </dd>
+        <dt>conf:string</dt>
+        <dd>
+            Conference Id of the call. This is a guid which identifies all call legs belonging to the same call
+        </dd>
+        <dt>state:integer</dt>
+        <dd>
+            State
+        </dd>
+        <dt>peer:<a href="#connector">connector</a></dt>
+        <dd>
+            Identifies the peer of the call, which may be called or calling party
+        </dd>
+        <dt>no:[<a href="#connector">connector</a>]</dt>
+        <dd>
+            More endpoints related to the same call, like diverting, transfering, ...
         </dd>
         <dt>msg</dt>
+        <dd>
+            Name of signaling message related to this update
+        </dd>
         <dt>info:[object]</dt>
         <dd>
             <dl>
@@ -254,6 +291,15 @@
         <dt>cn:string</dt>
         <dt>h323:string</dt>
         <dt>srce164:string</dt>
+    </dl>
+
+    <div class="fnhead">Result</div>
+
+    <dl>
+        <dt>call:integer</dt>
+        <dd>
+            Handle of the call, which can be used with the other requests to control calls.
+        </dd>
     </dl>
 
 	<h2><a name="UserClear">UserClear</a></h2>
@@ -378,6 +424,15 @@
         <dt>call:integer</dt>
         <dt>cn:string</dt>
     </dl>
+
+    <div class="fnhead">Properties</div>
+
+    <dl>
+        <dt>call:interger</dt>
+        <dd>
+            The handle of the new resulting call
+        </dd>
+    </dl>
 	
     <h2><a name="UserRedirect">UserRedirect</a></h2>
 
@@ -393,6 +448,15 @@
         <dt>cn:string</dt>
         <dt>h323:string</dt>
         <dt>e164:string</dt>
+    </dl>
+
+    <div class="fnhead">Result</div>
+
+    <dl>
+        <dt>error:string</dt>
+        <dd>
+            Indicating an error if the operation failed
+        </dd>
     </dl>
 	
     <h2><a name="UserReroute">UserReroute</a></h2>
@@ -410,6 +474,15 @@
         <dt>e164:string</dt>
     </dl>
 	
+    <div class="fnhead">Result</div>
+
+    <dl>
+        <dt>error:string</dt>
+        <dd>
+            Indicating an error if the operation failed
+        </dd>
+    </dl>
+
     <h2><a name="UserCtrlCall">UserCtrlCall</a></h2>
 
     <p>
@@ -461,11 +534,21 @@
     <dl>
         <dt>call:integer</dt>
     </dl>
+
 	<h2><a name="UserPark">UserPark</a></h2>
 
     <p>
 
     </p>
+
+    <div class="fnhead">Result</div>
+
+    <dl>
+        <dt>call:integer</dt>
+        <dd>
+            The call handle of the parked call
+        </dd>
+    </dl>
 
     <div class="fnhead">Properties</div>
 
@@ -473,6 +556,68 @@
         <dt>call:integer</dt>
         <dt>cn:string</dt>
         <dt>position:integer</dt>
+    </dl>
+
+	<h1><a name="Objects">Objects</a></h1>
+
+    <p>
+        Common data objects used by the different messages
+    </p>
+
+    <div class="fnhead"><a id="regInfo">regInfo</a></div>
+
+    <dl>
+        <dt>hw:string</dt>
+        <dd>
+            The hardware id identifying the registered device
+        </dd>
+    </dl>
+
+    <div class="fnhead"><a id="device">device</a></div>
+
+    <dl>
+        <dt>hw:string</dt>
+        <dd>
+            The hardware id identifying the device
+        </dd>
+        <dt>text:string</dt>
+        <dd>
+            Text which is display in the user interface whenever the device has to be identified
+            to the user
+        </dd>
+    </dl>
+
+    <div class="fnhead"><a id="connector">connector</a></div>
+
+    <p>
+        Common data object used for information to the endpoint of a connection
+    </p>
+
+    <dl>
+        <dt>type</dt>
+        <dd>
+            Type of the connector
+        </dd>
+        <dt>cn</dt>
+        <dd>
+            The Long Name of the object/user
+        </dd>
+        <dt>dn</dt>
+        <dd>
+            The display name of the endpoint
+        </dd>
+        <dt>h323</dt>
+        <dd>
+            h323/sip id of the endpoint
+        </dd>
+        <dt>e164</dt>
+        <dd>
+            Number of the endpoint
+        </dd>
+        <dt>norm</dt>
+        <dd>
+            Normalized number
+        </dd>
     </dl>
 </body>
 </html>

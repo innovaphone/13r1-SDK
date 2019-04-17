@@ -184,6 +184,7 @@ public:
     static word xml_to_latin1(char * buffer, const char * in, bool latin1);
     static class packet * str_packet_to_xml_packet(class packet * data);
     static class packet * latin1_packet_to_xml_packet(class packet * data);
+    static int wellformed(const char * xml, unsigned maxlen);
 };
 
 NAMESPACE_END

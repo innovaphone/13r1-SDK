@@ -202,7 +202,7 @@ public:
 
 class IScreenSink {
 public:
-    static IScreenSink * Create(class IIoMux * const iomux, class UScreenSink * const user, class IScreenBuffer * const screenBuffer, byte sessionId, int bitrate, int waitingMsForAck, const char * appName, const char * appDesc, class IInstanceLog * const log);
+    static IScreenSink * Create(class IIoMux * const iomux, class UScreenSink * const user, class IScreenBuffer * const screenBuffer, byte sessionId, int bitrate, int waitingMsForAck, const char * appName, const char * appDesc, const char * senderName, class IInstanceLog * const log);
     virtual ~IScreenSink() {}
 
     // Notification that a new version of a block is ready for displaying / transmission
@@ -234,7 +234,7 @@ public:
     virtual ~IRemoteControl() {}
 
     virtual void SendCommand(word coorX, word coorY, int aspectRatio, const char * cmd, int len) = 0;
-    virtual void MouseMove(word coorX, word coorY, word posX, word posY) = 0;
+    virtual void MouseMove(word coorX, word coorY, word rPosX, word rPosY, word posX, word posY, int aspectRatio) = 0;
     virtual void Close() = 0;
 };
 

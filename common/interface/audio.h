@@ -28,6 +28,9 @@ enum AudioDeviceMode {
 #define KEY_EHS_REDIAL	0x83		// redial last number dialled (if any)
 #define KEY_OFFHOOK     0x93		// handset up
 #define KEY_ONHOOK      0x94		// handset down
+#define KEY_DISC	    0x8E		// Disconnect
+#define KEY_MIC         0x8F        // toggle microphone
+#define KEY_INCALL      0xFE
 
 
 NAMESPACE_BEGIN
@@ -89,6 +92,7 @@ public:
     virtual void StartHookDevice(const char *deviceId) = 0;
     virtual void StopHookDevice(const char *deviceId) = 0;
     virtual void SendHookKey(const char *deviceId, byte key) = 0;
+    virtual void SetMicrophoneMute(bool mute) {};
 
     virtual void Close() = 0;
 };

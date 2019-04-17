@@ -71,16 +71,17 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         return false;
     }
 
-    function httpGet(url, funcComplete, funcFailed) {
+    function httpGet(url, funcComplete, funcFailed, usr, pwd) {
         var xmlReq = new window.XMLHttpRequest();
         if (xmlReq) {
             xmlReq.open("GET", url, funcComplete ? true : false);
+            if (usr) xmlReq.setRequestHeader("Authorization", "Basic " + btoa(usr + ':' + pwd));
             xmlReq.send(null);
             if (funcComplete) {
                 xmlReq.onreadystatechange = function () {
                     if (this.readyState == 4) {
                         if (this.status == 200) {
-                            funcComplete(this.responseText);
+                            funcComplete(this.responseText, this.responseXML);
                         }
                         else {
                             if (funcFailed) funcFailed(this);
@@ -229,6 +230,17 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         head.appendChild(link);
     }
 
+    var dummyFrame = null;
+
+    function openLink(url) {
+        if (!dummyFrame) {
+            dummyFrame = document.createElement("iframe");
+            dummyFrame.style = "visibility: collapse; position: absolute;";
+            document.body.appendChild(dummyFrame);
+        }
+        dummyFrame.src = url;
+    }
+
     function fireEvent(element, eventName, memo) {
         var event;
         event = document.createEvent("HTMLEvents");
@@ -291,6 +303,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         start.args = {};
         start.margs = {};
         start.apis = {};
+        start.prepareReloadCallback = null;
         start.onapiupdate = onapiupdate;
         start.onlangchanged = new Event(start);
         start.onschemechanged = new Event(start);
@@ -302,11 +315,21 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         start.show = function (value) {
             start.postClientMessage({ mt: "Action", type: "ShowApp", value: value });
         };
+        start.bringToFront = function () {
+            start.postClientMessage({ mt: "Action", type: "BringToFront" });
+        };
         start.close = function () {
             start.postClientMessage({ mt: "Action", type: "CloseApp" });
         };
         start.home = function () {
             start.postClientMessage({ mt: "Action", type: "ShowApp", value: "@home" });
+        };
+        start.requestPrepareReload = function (callback) {
+            start.postClientMessage({ mt: "RequestPrepareReload" });
+            start.prepareReloadCallback = callback;
+        };
+        start.prepareReloadComplete = function() {
+            start.postClientMessage({ mt: "PrepareReloadComplete" });
         };
         start.setArgs = function (args, title) {
             start.postClientMessage({ mt: "Action", type: "SetArgs", args: args, title: title });
@@ -543,6 +566,10 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                     case "SetMenuState":
                         start.onmenustatechanged.notify(obj.value);
                         break;
+                    case "PrepareReload":
+                        if (start.prepareReloadCallback) start.prepareReloadCallback();
+                        else start.prepareReloadComplete();
+                        break;
                     case "getLogin":
                         logins.push(e.source);
                         (parent ? parent : opener).postMessage(e.data, "*");
@@ -641,9 +668,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         };
 
         this.text = function (id, args) {
-            var t = texts[that.current][id] || texts["en"][id];
+            var t = texts[that.current][id] || texts["en"][id] || (id ? "{" + id + "}" : "");
             if (t && args) args.forEach(function (e, i) { t = t.replace(new RegExp("\\$" + i.toString(), "g"), e); });
-            return t || "";
+            return t;
         };
 
         this.create = function (node, property, id, args) {
@@ -653,6 +680,10 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         this.clear = function (node) {
             if (node && node.container) node = node.container;
             that.onnoderemoved.notify(node);
+        };
+
+        this.supported = function (lang) {
+            return texts[lang] != undefined;
         };
     }
 
@@ -697,6 +728,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         loadObjectScript: loadObjectScript,
         loadObjectScripts: loadObjectScripts,
         loadCss: loadCss,
+        openLink: openLink,
         fireEvent: fireEvent,
         addClass: addClass,
         removeClass: removeClass,

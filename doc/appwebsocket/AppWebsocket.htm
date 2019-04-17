@@ -159,6 +159,11 @@
             operations are allowed on this session. This way by granting access to a given App
             to a user on the PBX, the user can only access what is defined for this App.
         </dd>
+        <dd>
+            In case the login is done to a PBX Api, which is assigned to an App Object, this property should
+            contain the Name of the App object. The properties 'domain', 'sip', 'guid' or 'dn' need not to be
+            set in this case.
+        </dd>
         <dt>domain</dt>
         <dd>
             The domain of the logged in user
@@ -179,7 +184,7 @@
         <dd>
             The digest calculated to verify the knowledge of the shared secret. It is calculated as
             SHA256 hash over the string
-            <pre><code class="json">&gt;app&lt;:&gt;domain&lt;:&gt;sip&lt;:&gt;guid&lt;:&gt;dn&lt;:&gt;info&lt;:&gt;challenge&lt;:&gt;password&lt;</code></pre>
+            <pre><code class="json">&lt;app&gt;:&lt;domain&gt;:&lt;sip&gt;:&lt;guid&gt;:&lt;dn&gt;:&lt;info&gt;:&lt;challenge&gt;:&lt;password&gt;</code></pre>
         </dd>
         <dt>pbxObj</dt>
         <dd>

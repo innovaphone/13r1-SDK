@@ -46,6 +46,7 @@ innovaphone.ui1.nodePrototype = {
 
         this.type = type;
         this.handler = handler;
+        this.obj = obj;
     },
 
     addEvent: function (type, handler, obj) {
@@ -106,6 +107,10 @@ innovaphone.ui1.nodePrototype = {
         this.container.style.webkitUserSelect = "none";
         this.container.style.webkitTouchCallout = "none";
         this.container.setAttribute("unselectable", "on");
+    },
+
+    setDisabled: function (state) {
+        this.container.disabled = state !== false;
     },
 
     createNode: function (type, style, content, cl) {
@@ -210,7 +215,17 @@ innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, c
         that.container.style.cursor = that.container.disabled ? "" : "pointer";
     }
     that.getValue = function () { return that.container.checked }
-    that.setValue = function (value) { that.container.checked = value ? true : false; draw() }
+    that.setValue = function (value) {
+        if (value) {
+            that.container.checked = true;
+            that.container.setAttribute("checked", "on");
+        }
+        else {
+            that.container.checked = false;
+            that.container.removeAttribute("checked");
+        }
+        draw();
+    }
     that.setDisabled = function (value) { that.container.disabled = value ? true : false; draw() }
     that.setTooltip = function (value) { that.container.setAttribute("title", value) }
     var box = that.createNode("div", "display:flex;align-items:center;justify-content:center;width:20px;height:20px;" + style, null, cl);
@@ -218,11 +233,10 @@ innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, c
 
     function click(e) {
         if (!that.container.disabled) {
-            that.container.checked = that.container.checked ? false : true;
-            draw();
+            that.setValue(that.container.checked ? false : true);
             // call user's "change" handler (if any)
             var onchange = that.events.find(function (v) { return (v.type == "change") && v.handler });
-            if (onchange) onchange.handler(e);
+            if (onchange) onchange.handler(e, onchange.obj);
         }
     }
 

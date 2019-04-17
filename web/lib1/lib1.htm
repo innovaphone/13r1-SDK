@@ -12,6 +12,18 @@
         The library has no dependencies on other Javascript files.
     </p>
 
+
+    <h2>Static helper functions</h2>
+    <p>
+        Functionality that is often needed in apps.
+    </p>
+    <dl>
+        <dt>innovaphone.lib1.openLink(url)</dt>
+        <dd>
+            Used for opening mailto-Links.
+        </dd>
+    </dl>
+
     <h2>Events</h2>
     <p>
         innovaphone.lib1.Event defines an interface for events. Listeners can attach an detach to an event. Attached listeners are called when the event fires.
@@ -94,6 +106,10 @@
     <dl>
         <dt>show()</dt>
         <dd>Tells the client to bring the app to the front.</dd>
+        <dt>show(applink)</dt>
+        <dd>Opens the specified app link that might be the same app or a different app.</dd>
+        <dt>bringToFront()</dt>
+        <dd>Tells the client that the window of the app (detached app window or main window of the client) should be brought to the front and get the focus. Depending on the operating system this function might not have an effect.</dd>
         <dt>close()</dt>
         <dd>Tells the client to close the app.</dd>
         <dt>home()</dt>
@@ -114,6 +130,10 @@
         <dd>Can be used inside the <code>onopenchannel</code> callback to accept an incoming channel. Returns an object that encapsulates the handling of that channel.</dd>
         <dt>rejectChannel(channel)</dt>
         <dd>Can be used inside the <code>onopenchannel</code> callback to reject an incoming channel.</dd>
+        <dt>requestPrepareReload(callback)</dt>
+        <dd>Registers a callback that is called before the app is closed and reloaded in a new iframe by the client. For example this happens when the app is attached or detached from the main window of myApps for windows. When the app has finished its preparations for reloading it should call start.prepareReloadComplete().</dd>
+        <dt>prepareReloadComplete()</dt>
+        <dd>Tells the client that the app has finished its preparations for reloading the app in a new iframe and that the current iframe can be closed now.</dd>
     </dl>
     <h3>Example</h3>
     <p>

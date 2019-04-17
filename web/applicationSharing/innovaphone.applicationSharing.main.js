@@ -153,12 +153,12 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
     }
 
-    _Session = function (sessionId, appName, onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, getNewInfoSeq, queueInfoMsg, dataChannel) {
+    _Session = function (sessionId, appName, senderName, onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, getNewInfoSeq, queueInfoMsg, dataChannel) {
         var image_data = null;
         var img_h = 0;
         var img_w = 0;
         var have_control = false;
-        var token = 0;
+        var rtoken = 0;
         var scale_image = true;
         var m_offset_x = 0;
         var m_offset_y = 0;
@@ -168,6 +168,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         var last_mouse_sent_y = -1;
         var session_id = sessionId;
         var app_name = appName;
+        var sender_name = senderName;
         var container_id = null;
         var onUpdateApp = onUpdateApp;
         var onResizeApp = onResizeApp;
@@ -419,14 +420,17 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
 
             var coord = onMouseMove(e.clientX, e.clientY, rect);
             if (coord) {
-                console.log('AppSharing: mouseMoveHandle coordinates y=' + e.clientY + ' x=' + e.clientX + ' -> y=' + coord[1] + ' -> x=' + coord[0] + ' canvas t=' + rect.top + ' b=' + rect.bottom + ' l=' + rect.left + ' r=' + rect.right);
+                console.log('AppSharing: mouseMoveHandle coordinates y=' + e.clientY + ' x=' + e.clientX + ' -> y=' + coord[1] + ' -> x=' + coord[0] + ' canvas t=' + rect.top + ' b=' + rect.bottom + ' l=' + rect.left + ' r=' + rect.right + ' token=' + rtoken);
 
                 var arrayInfoMsg = new ArrayBuffer(10);
                 var dmsg = new Uint8Array(arrayInfoMsg);
 
                 dmsg[0] = MOUSE_MOVE;
                 dmsg[1] = session_id + 128;
-                dmsg[2] = dmsg[3] = dmsg[4] = dmsg[5] = 0;
+                dmsg[2] = (rtoken >> 24) & 0xff;
+                dmsg[3] = (rtoken >> 16) & 0xff;
+                dmsg[4] = (rtoken >> 8) & 0xff;
+                dmsg[5] = (rtoken >> 0) & 0xff;
                 dmsg[6] = (coord[0] >> 8) & 0xff;
                 dmsg[7] = coord[0] & 0xff;
                 dmsg[8] = (coord[1] >> 8) & 0xff;
@@ -529,7 +533,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 dmsg[2] = getNewInfoSeq();
                 dmsg[3] = 5 + jsonMsg.length + 1;
                 dmsg[4] = 0x6; // Info(Mouse)
-                dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+                dmsg[5] = (rtoken >> 24) & 0xff;
+                dmsg[6] = (rtoken >> 16) & 0xff;
+                dmsg[7] = (rtoken >>  8) & 0xff;
+                dmsg[8] = (rtoken >>  0) & 0xff;
                 var off = 9;
                 for (var i = 0; i < jsonMsg.length; i++) {
                     dmsg[off++] = jsonMsg[i].charCodeAt();
@@ -633,7 +640,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 dmsg[2] = getNewInfoSeq();
                 dmsg[3] = 5 + jsonMsg.length + 1;
                 dmsg[4] = 0x6; // Info(Mouse)
-                dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+                dmsg[5] = (rtoken >> 24) & 0xff;
+                dmsg[6] = (rtoken >> 16) & 0xff;
+                dmsg[7] = (rtoken >>  8) & 0xff;
+                dmsg[8] = (rtoken >>  0) & 0xff;
                 var off = 9;
                 for (var i = 0; i < jsonMsg.length; i++) {
                     dmsg[off++] = jsonMsg[i].charCodeAt();
@@ -675,7 +685,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             dmsg[2] = getNewInfoSeq();
             dmsg[3] = 5 + jsonMsg.length + 1;
             dmsg[4] = 0x6; // Info(Mouse)
-            dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+            dmsg[5] = (rtoken >> 24) & 0xff;
+            dmsg[6] = (rtoken >> 16) & 0xff;
+            dmsg[7] = (rtoken >>  8) & 0xff;
+            dmsg[8] = (rtoken >>  0) & 0xff;
             var off = 9;
             for (var i = 0; i < jsonMsg.length; i++) {
                 dmsg[off++] = jsonMsg[i].charCodeAt();
@@ -702,7 +715,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             dmsg[2] = getNewInfoSeq();
             dmsg[3] = 5 + jsonMsg.length + 1;
             dmsg[4] = 0x6; // Info(Mouse)
-            dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+            dmsg[5] = (rtoken >> 24) & 0xff;
+            dmsg[6] = (rtoken >> 16) & 0xff;
+            dmsg[7] = (rtoken >>  8) & 0xff;
+            dmsg[8] = (rtoken >>  0) & 0xff;
             var off = 9;
             for (var i = 0; i < jsonMsg.length; i++) {
                 dmsg[off++] = jsonMsg[i].charCodeAt();
@@ -754,7 +770,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             dmsg[2] = getNewInfoSeq();
             dmsg[3] = 5 + jsonMsg.length + 1;
             dmsg[4] = 0x6; // Info(Mouse)
-            dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+            dmsg[5] = (rtoken >> 24) & 0xff;
+            dmsg[6] = (rtoken >> 16) & 0xff;
+            dmsg[7] = (rtoken >>  8) & 0xff;
+            dmsg[8] = (rtoken >>  0) & 0xff;
             var off = 9;
             for (var i = 0; i < jsonMsg.length; i++) {
                 dmsg[off++] = jsonMsg[i].charCodeAt();
@@ -823,7 +842,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     dmsg[2] = getNewInfoSeq();
                     dmsg[3] = 5 + jsonMsg.length + 1;
                     dmsg[4] = 0x6; // Info(Mouse)
-                    dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+                    dmsg[5] = (rtoken >> 24) & 0xff;
+                    dmsg[6] = (rtoken >> 16) & 0xff;
+                    dmsg[7] = (rtoken >>  8) & 0xff;
+                    dmsg[8] = (rtoken >>  0) & 0xff;
                     var off = 9;
                     for (var i = 0; i < jsonMsg.length; i++) {
                         dmsg[off++] = jsonMsg[i].charCodeAt();
@@ -876,7 +898,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     dmsg[2] = getNewInfoSeq();
                     dmsg[3] = 5 + jsonMsg.length + 1;
                     dmsg[4] = 0x6; // Info(Mouse)
-                    dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+                    dmsg[5] = (rtoken >> 24) & 0xff;
+                    dmsg[6] = (rtoken >> 16) & 0xff;
+                    dmsg[7] = (rtoken >>  8) & 0xff;
+                    dmsg[8] = (rtoken >>  0) & 0xff;
                     var off = 9;
                     for (var i = 0; i < jsonMsg.length; i++) {
                         dmsg[off++] = jsonMsg[i].charCodeAt();
@@ -1503,6 +1528,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
             return app_name;
         }
 
+        this.getSenderName = function () {
+            return sender_name;
+        }
+
         this.getSessionId = function () {
             return session_id;
         }
@@ -1581,7 +1610,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         }
 
         this.setRemoteControl = function (session_token, control) {
-            token = session_token;
+            rtoken = session_token;
             have_control = control;
             if (have_control) {
                 if (container_id) {
@@ -1702,7 +1731,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
 
         this.setUpdateFunction = function (updateFunc) {
             onUpdateApp = updateFunc;
-            if (app_name != null) onUpdateApp(session_id, app_name);
+            if (app_name != null) onUpdateApp(session_id, app_name, sender_name);
         }
 
         this.setResizeFunction = function (resizeFunc) {
@@ -1752,6 +1781,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
         var onDeleteParticipant = null;
         var onRequestRemoteControl = null;
         var num_packets_rx = 0;
+        var stoken = Math.random() * 0x1000000;
 
         function getNewInfoSeq() {
             return infoMsgSeq++;
@@ -1804,7 +1834,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     onCreateApp = data;
                     if (onCreateApp) {
                         for (var i = 0; i < sessions.length; i++) {
-                            onCreateApp(sessions[i].getSessionId(), sessions[i].getAppName());
+                            onCreateApp(sessions[i].getSessionId(), sessions[i].getAppName(), sessions[i].getSenderName());
                         }
                     }
                     break;
@@ -1883,8 +1913,11 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 dmsg[1] = receiver.getSessionId();
                 dmsg[2] = getNewInfoSeq();
                 dmsg[3] = 1 + 4 + jsonEncoded.length + 1;
-                dmsg[4] = 0x2; // Info(GiveControl)
-                dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+                dmsg[4] = 0x2; // Info(GiveControl)                
+                dmsg[5] = (stoken >> 24) & 0xff;
+                dmsg[6] = (stoken >> 16) & 0xff;
+                dmsg[7] = (stoken >>  8) & 0xff;
+                dmsg[8] = (stoken >>  0) & 0xff;
                 var off = 9;
                 for (var i = 0; i < jsonEncoded.length; i++) {
                     dmsg[off++] = jsonEncoded[i].charCodeAt();
@@ -1911,7 +1944,10 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                 dmsg[2] = getNewInfoSeq();
                 dmsg[3] = 1 + 4 + jsonEncoded.length + 1;
                 dmsg[4] = 0x3; // Info(TakeControl)
-                dmsg[5] = dmsg[6] = dmsg[7] = dmsg[8] = 0;
+                dmsg[5] = (stoken >> 24) & 0xff;
+                dmsg[6] = (stoken >> 16) & 0xff;
+                dmsg[7] = (stoken >>  8) & 0xff;
+                dmsg[8] = (stoken >>  0) & 0xff;
                 var off = 9;
                 for (var i = 0; i < jsonEncoded.length; i++) {
                     dmsg[off++] = jsonEncoded[i].charCodeAt();
@@ -2063,11 +2099,11 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     if (uint8View.length > 6) {
                         var encodedString = String.fromCharCode.apply(null, uint8View.subarray(6));
                         appInfo = JSON.parse(encodedString);
-                        console.log('AppSharing: received CREATE_SESSION appName=' + appInfo.name + ' desc=' + appInfo.description);
+                        console.log('AppSharing: received CREATE_SESSION appName=' + appInfo.name + ' desc=' + appInfo.description + ' sender=' + appInfo.sender);
                     }
-                    var session = new _Session(uint8View[SESSION_ID], (appInfo != null ? appInfo.name : null), onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, getNewInfoSeq, queueInfoMsg, dataChannel);
+                    var session = new _Session(uint8View[SESSION_ID], (appInfo != null ? appInfo.name : null), (appInfo != null ? appInfo.sender : null), onUpdateApp, onResizeApp, onRemoveApp, onRemoteControl, onRequestRemoteControl, getNewInfoSeq, queueInfoMsg, dataChannel);
                     sessions.push(session);
-                    onCreateApp(uint8View[SESSION_ID], (appInfo != null ? appInfo.name : null));
+                    onCreateApp(uint8View[SESSION_ID], (appInfo != null ? appInfo.name : null), (appInfo != null ? appInfo.sender : null));
                     session.updateSession((uint8View[2] << 8 | uint8View[3]), (uint8View[4] << 8 | uint8View[5]));
                 }
 
@@ -2238,10 +2274,11 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                     if (uint8View[3] > 1) {
                         var tmpName = uint8View.slice(9, uint8View.length - 1);
                         var jsonString = String.fromCharCode.apply(null, tmpName);
-                        console.log("AppSharing: InfoMessage Give-TakeControl" + jsonString);
                         var obj = JSON.parse(jsonString);
                         var receiverName = obj.participant;
                         var token = uint8View[5] << 24 | uint8View[6] << 16 | uint8View[7] << 8 | uint8View[8];
+
+                        console.log("AppSharing: InfoMessage Give-TakeControl" + jsonString + " token=" + token);
 
                         for (var i = 0; i < sessions.length; i++) {
                             if (sessions[i].getSessionId() == uint8View[SESSION_ID]) {
@@ -2263,7 +2300,7 @@ innovaphone.applicationSharing.main = innovaphone.applicationSharing.main || (fu
                         if (uint8View[4] == 4) {
                             // Remote Side sends this info message
                             for (var i = 0; i < receivers.length; i++) {
-                                if (receivers[i].hasSessionId(uint8View[SESSION_ID] - 128) == 1) {
+                                if ((receivers[i].hasSessionId(uint8View[SESSION_ID] - 128) == 1) && (receivers[i].getRemoteName() == receiverName)) {
                                     onRequestRemoteControl(receivers[i].getReceiverGuid());
                                 }
                             }

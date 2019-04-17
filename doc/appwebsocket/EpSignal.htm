@@ -95,7 +95,12 @@
     "stun": string,
     "turn": string,
     "turnUsr": string,
-    "turnPwd": string
+    "turnPwd": string,
+    "prefixIntl":string,
+    "prefixNtl":string,
+    "prefixSubs":string,
+    "area":string,
+    "country":string,
 }</code></pre>
 
     <p>
@@ -122,6 +127,26 @@
         <dt>turnPwd</dt>
         <dd>
             The password to be used with TURN
+        </dd>
+        <dt>prefixIntl</dt>
+        <dd>
+            Prefix to be used to dial an international number from this node, including any trunk prefix
+        </dd>
+        <dt>prefixNtl</dt>
+        <dd>
+            Prefix to be used to dial a national number from this node, including any trunk prefix
+        </dd>
+        <dt>prefixSubs</dt>
+        <dd>
+            Prefix to be used to dial a subscriber number from this node, including any trunk prefix
+        </dd>
+        <dt>area</dt>
+        <dd>
+            Area code to be assumed for the user
+        </dd>
+        <dt>country</dt>
+        <dd>
+            Country code to be assumed for the user
         </dd>
     </dl>
 

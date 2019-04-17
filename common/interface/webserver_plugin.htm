@@ -966,7 +966,8 @@ public:
     virtual size_t GetDataSize();
     virtual bool DataIsChunkEncoded();
 
-    virtual void SetContentLength(size_t len);
+    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr);
+    virtual void ForceDownloadResponse(const char * fileName = nullptr);
     virtual void Cancel(wsr_cancel_type_t reason);
     virtual void Send(void * buffer, size_t len);
     virtual void Recv(void * buffer = nullptr, size_t len = 0);
@@ -1001,20 +1002,46 @@ public:
 		True if the data to receive is chunk encoded, else false.
     </dd>
 
-    <div class="fnhead">SetContentLength</div>
+    <div class="fnhead">SetTransferInfo</div>
     <dd>
-		When data should be send to respond the POST request, the length of the data need to be set. This will be done by calling SetContentLength(). If the length of the data to send is unkown, it can be send in chunk encoded transfaer mode, too.
+        Before responding for a POST request, the type of the request must set first by calling SetTransferInfo().
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED  to enabled chunk enconded transfer.</td></tr>
+            <tr>
+                <td class="param">wsr_type_t <b>resourceType</b></td>
+                <td>
+                    The type of the reosurce the application is going to send. Dis should combine with the type of resource requested. The helper functon
+                    <a href="#GetResponseTypeForFileName">GetResponseTypeForFileName</a> can be used to get the right resource type depending on the resource sufix.
+                </td>
+            </tr>
+            <tr><td class="param">size_t <b>dataSize</b></td><td>The data size of the requests data. If unkown, the application must used chunked encoding by setting dataSize to WS_RESPONSE_CHUNKED.</td></tr>
+            <tr><td class="param">wsr_flags_t <b>flags</b></td><td><i>(Default WSP_FLAG_NONE)</i>Optional, additional flags. See <a href="wsr_flags_t ">wsr_flags_t </a> for details.</td></tr>
+            <tr><td class="param">const char * <b>etag</b></td><td><i>(Default nullptr)</i> An optional etag used for caching purposed of an HTTP client.</td></tr>
         </table>
-		
+
         <h4>Remarks</h4>
-		The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
-		In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized. This all is transparent for the application and handled by the Webserver.
+        When passing an etag value, the HTTP clients caching mechanism will be activated.  The default validity for a file with browser caching enabled is 5 minutes. So in that time, the HTTP client won't ask again for the file but loads
+        it from it's local cache. The time period is fixed and cannot be changed.
     </dd>
-	
+
+    <div class="fnhead">ForceDownloadResponse</div>
+    <dd>
+        Generally, when requesting a file with the POST request, the HTTP client will save the file under the requested name. Somethimes there is need to save the file under an other name. This can be realized
+        using ForeceDownloadResponse() to set the file name.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">const char * <b>fileName</b></td>
+                <td>
+                    <i>(Default nullptr)</i> The filename the HTTP client should use. If set to nullptr, the same filename as requested will be used. That's practically the same as
+                    not calling ForceDownloadResponse().
+                </td>
+            </tr>
+        </table>
+    </dd>
+
     <div class="fnhead">Cancel</div>
     <dd>
 		Cancels the POST request. If the application already started to send data, the transfare will be canceled. If not, calling Cancel() will be the same as calling IWebserverPlugin::Cancel() when receiveing the request.
@@ -1035,7 +1062,7 @@ public:
 
     <div class="fnhead">Send</div>
     <dd>
-		Sends the give data to the client. Before calling Send(), SetContentLength() must be called. And if not called to enabled chunk encoded transfer, the application had to send the number of bytes as given to SetContentLength().
+		Sends the give data to the client. Before calling Send(), SetTransferInfo() must be called. And if not called to enabled chunk encoded transfer, the application had to send the number of bytes as given to SetTransferInfo().
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -1240,7 +1267,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -1468,7 +1495,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -1688,7 +1715,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -1703,7 +1730,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -1862,7 +1889,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -1880,7 +1907,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -2038,7 +2065,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -2195,7 +2222,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -2353,7 +2380,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -2568,7 +2595,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     
@@ -2725,7 +2752,7 @@ public:
         
         <h4>Remarks</h4>
         SetResultCode() must be called before sending data or, in case that no data will be send, before closing the request.<br/>
-        The application must send the exact number of bytes using Send(), as given to SetContentLength(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
+        The application must send the exact number of bytes using Send(), as given to SetTransferInfo(). If not, the HTTP client may be waiting for ever or ending up in an HTTP parsing error.<br/>
         In chunk encoded mode, the application simply can send data as long as needed. When calling Close(), the chunk encoded transfer will be finalized.
     </dd>
     

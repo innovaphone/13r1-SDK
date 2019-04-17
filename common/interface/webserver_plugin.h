@@ -383,8 +383,9 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
     virtual size_t GetDataSize() = 0;
     virtual bool DataIsChunkEncoded() = 0;
-
-    virtual void SetContentLength(size_t len) = 0;
+    
+    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = NULL) = 0;
+    virtual void ForceDownloadResponse(const char * fileName = NULL) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;

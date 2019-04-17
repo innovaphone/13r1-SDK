@@ -64,11 +64,24 @@
                 <dd>The phone number to be dialed.</dd>
                 <dt>txt (optional)</dt>
                 <dd>Unclassified dialstring. Phoneapp will check and take it as 'num' or 'sip'</dd>
+                <dt>adjust (obtional)</dt>
+                <dd>Bool that tells that the number might not contain the external line prefix and might need to be adjusted by the provider before dialing.</dd>
             </dl>
         </dd>
         <dd>Example: <code>{ mt: "StartCall", num: "200" }</code></dd>
         <dd>Example: <code>{ mt: "StartCall", sip: "bob@example.com" }</code></dd>
         <dd>Example: <code>{ mt: "StartCall", txt: "+49 (7031) 73009 - 0" }</code></dd>
+        <dt>PrepareCall</dt>
+        <dd>Provides a phone number or text that should be copied to the dial input field of the provider, so the user can verify it before initiating the call.</dd>
+        <dd>
+            <dl>
+                <dt>txt</dt>
+                <dd>Unclassified dialstring. Phoneapp will check and take it as 'num' or 'sip'</dd>
+                <dt>adjust (obtional)</dt>
+                <dd>Bool that tells that the number might not contain the external line prefix and might need to be adjusted by the provider before dialing.</dd>
+            </dl>
+        </dd>
+        <dd>Example: <code>{ mt: "PrepareCall", txt: "07031/73009(0)", adjust: true }</code></dd>
     </dl>
     <h3>Responses</h3>
     <p>

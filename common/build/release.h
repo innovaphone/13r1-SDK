@@ -1,5 +1,8 @@
 
+#if !defined(RELEASE_STATE)
 #define RELEASE_STATE "dvl "
+#endif
+
 #define VERSION_STR_MAJOR "13r1"
 #define VERSION_STR "13r1"
 #define VERSION_SOAP 1300
@@ -23,7 +26,7 @@
   || ((BUILD_CONCATENATE(0x1,BUILD) >= 0x1a000000) && (BUILD_CONCATENATE(0x1,BUILD) <= 0x1fffffff)))
 #error BUILD must start with a digit 0..9
 #elif (BUILD_CONCATENATE(0x1,BUILD) == 0x1)
-#define BUILD_STRING              "13A000"
+#define BUILD_STRING              "131741"
 #else
 #define BUILD_STRING              BUILD_QUOTE(BUILD)
 #endif

@@ -28,7 +28,7 @@ typedef enum {
 class ISocket {
 public:
     virtual ~ISocket() {};
-    virtual void Connect(const char * address) = 0;
+    virtual void Connect(const char * address, const char * serverName = NULL) = 0;
     virtual void Bind(const char * localAddr = NULL, word localPort = 0) = 0;
     virtual void Bind(const char * localAddr, word localPort, bool reuseAddr) {};
     virtual void Listen() = 0;

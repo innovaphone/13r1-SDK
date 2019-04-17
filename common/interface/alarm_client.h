@@ -42,6 +42,7 @@ public:
     virtual void SendEvent(dword code, AlarmSeverity severtiy, ulong64 time, const char * text, const char * details, const char * src) = 0;
     virtual void ResetConnection(char * url, char * username, char * pwd) = 0;
     virtual void Shutdown() = 0;
+    virtual void ChangeAlarmTimeout(unsigned int timeout) = 0;
 };
 
 class UAlarmClient {

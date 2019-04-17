@@ -6,11 +6,13 @@
 
 class LocalAddr : public istd::listElement<LocalAddr> {
 public:
+    bool preferred;
     bool iPv6;
     char * addr;
-    LocalAddr(char * addr, bool iPv6) { 
-        this->addr = addr; 
+    LocalAddr(char * addr, bool iPv6, bool preferred) { 
+        this->addr = addr;
         this->iPv6 = iPv6; 
+        this->preferred = preferred;
     };
     ~LocalAddr() { if(addr) free(addr); };
 };
