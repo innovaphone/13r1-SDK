@@ -284,8 +284,15 @@
 
     <dl>
         <dt>user:integer</dt>
-        <dt>fty-no-cf:bool</dt>
+        <dt>ftyNoCF:bool</dt>
+        <dd>
+            Send the call with a innovaphone proprietary facility to override any configured call diversion
+        </dd>
         <dt>audio:bool</dt>
+        <dd>
+            Initiate an audio call instead of a voice call. On ISDN networks this prohibits the use of speech
+            compression, which would affect modem protocols.
+        </dd>
         <dt>rc:integer</dt>
         <dt>e164:string</dt>
         <dt>cn:string</dt>

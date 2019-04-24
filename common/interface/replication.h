@@ -38,7 +38,9 @@ public:
     virtual void ReplicatorDeletedConfirm(ulong64 id) = 0;
     virtual void ReplicatorDeletedConfirmComplete(ulong64 id) = 0;
     virtual void ReplicatorUpdated(ulong64 id, ulong64 mask) = 0;
+    virtual void ReplicatorSessionInitializing() {}
     virtual void ReplicatorSessionInitialized() {}
+    virtual void ReplicatorSessionClosed() {}
     virtual void ReplicatorStopped() = 0;
 
     virtual void ReplicatorUpdate(class json_io & msg, word base, bool initial) {};

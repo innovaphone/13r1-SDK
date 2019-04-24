@@ -26,7 +26,7 @@
   || ((BUILD_CONCATENATE(0x1,BUILD) >= 0x1a000000) && (BUILD_CONCATENATE(0x1,BUILD) <= 0x1fffffff)))
 #error BUILD must start with a digit 0..9
 #elif (BUILD_CONCATENATE(0x1,BUILD) == 0x1)
-#define BUILD_STRING              "131741"
+#define BUILD_STRING              "13A000"
 #else
 #define BUILD_STRING              BUILD_QUOTE(BUILD)
 #endif

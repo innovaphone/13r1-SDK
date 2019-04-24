@@ -10,7 +10,10 @@ enum RingerDeviceType {
 };
 
 enum RingerDeviceMode {
-    RingerModeAllowVibrate
+    RingerModeNone,
+    RingerModeAllowVibrate,
+    RingerModeOnlyBaseStation,
+    RingerModeWithBaseStation,
 };
 
 

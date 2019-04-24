@@ -10,6 +10,7 @@
     <h2>Table of content</h2>
     <h4><a href="#getting_started">Getting started</a></h4>
     <ul>
+        <li><a href="#fixvs2017">Fix Visual Studio 2017 intellisense</a></li>
         <li><a href="#start">Run Visual Studio</a></li>
         <li><a href="#new_project">Creating an new project</a></li>
         <li><a href="#remoteconnection">Assign a remote connection</a></li>
@@ -49,6 +50,26 @@
     <p>
         The following parts will guide you step-by-step through the process from creating an app, setting up the connections needed and run your app to debug it. It is recommended
         to read this document to understand how to use the innovaphone SDK and the Visual Studio integration. <br/>
+    </p>
+    
+    <br/>
+    <h3><a name="fixvs2017">Fix Visual Studio 2017 intellisense</a></h3>
+    <p>
+        Intellisense for Linux nmake projects is broken in VS2017 due to a buggy file of the installation. This bug is fixed in VS2019. If you're running VS2017, backup the following file and edit the original:<br>
+        <i>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Application Type\Linux\1.0\Linux.Makefile.targets</i> (the installation directory may vary of course) <br/><br/>
+        Search for <b>&#x3C;Target Name=&#x22;_FixupRemoteIntelliSenseIncludes&#x22;</b> and replace the inner <b>ComputeHeaders</b> tag with:<br/><br/> 
+    &#x3C;ComputeHeaders<br/> 
+      &nbsp;&nbsp;ProjectDir=&#x22;$(ProjectDir)&#x22; <br/> 
+      &nbsp;&nbsp;RemoteProjectDir=&#x22;$(RemoteProjectDir)&#x22; <br/> 
+      &nbsp;&nbsp;TargetLinuxPlatform=&#x22;$(TargetLinuxPlatform)&#x22; <br/> 
+      &nbsp;&nbsp;WiringPiIncludePath=&#x22;$(wiringPiIncludePath)&#x22; <br/> 
+      &nbsp;&nbsp;IncludePath=&#x22;$(NMakeIncludeSearchPath)&#x22; <br/> 
+      &nbsp;&nbsp;LinuxIncludePath=&#x22;$(LinuxIncludePath)&#x22; <br/> 
+      &nbsp;&nbsp;RemoteTargetId=&#x22;$(ResolvedRemoteTargetId)&#x22; <br/> 
+      &nbsp;&nbsp;Sources=&#x22;@(ClCompile)&#x22;&#x3E; <br/> 
+      &nbsp;&nbsp;&nbsp;&nbsp;&#x3C;Output TaskParameter=&#x22;CIntelliSenseIncludePath&#x22; PropertyName=&#x22;CIntelliSenseIncludePath&#x22;/&#x3E; <br/> 
+      &nbsp;&nbsp;&nbsp;&nbsp;&#x3C;Output TaskParameter=&#x22;CppIntelliSenseIncludePath&#x22; PropertyName=&#x22;CppIntelliSenseIncludePath&#x22;/&#x3E; <br/> 
+    &#x3C;/ComputeHeaders&#x3E;
     </p>
     
     <br/>
@@ -306,7 +327,7 @@
     </p>
     
     <br/>
-    <h4><a href="#faq">FAQ</a></h4>
+    <h4><a name="faq">FAQ</a></h4>
     <p>
         Q: I installed everything and started Visual Studio, but cannot find the innovaphone App template when creating a new project.<br/>
         A: Somethimes Visual Studio needs to take its time. So close all Visual Studio instances and reopen it. Then the template should apear.<br/>

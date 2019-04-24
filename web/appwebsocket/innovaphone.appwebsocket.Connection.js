@@ -41,7 +41,7 @@ innovaphone.appwebsocket = innovaphone.appwebsocket || {};
 innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || function (url, app, password, domain, fonconnected, fonmessage, fonerror, fonclosed, fgetlogin) {
     console.log("AppWebsocket(" + app + ") " + url);
     var TIMEOUT_MIN = 1000,
-        TIMEOUT_MAX = 8000,
+        TIMEOUT_MAX = 32000,
         states = { "CONNECT": 1, "OPENED": 2, "LOGIN2": 3, "CONNECTED": 4, "CLOSED": 5 };
 
     var instance = this,
@@ -65,6 +65,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
             ws = null;
         }
     });
+    window.addEventListener("unload", function () { console.log("close unload"); });
 
     function onopen() {
         timeout = TIMEOUT_MIN;
