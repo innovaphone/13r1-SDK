@@ -1,6 +1,7 @@
 
 IP_SRC   = sdk
 HTTPFILES-FLAGS = -k -s 0,HTTP_GZIP
+HTTPFILES-WEB-FLAGS = -k -r web -s 0,HTTP_GZIP
 
 SYSROOT  =
 INCLUDES = -I sdk

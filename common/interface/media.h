@@ -114,7 +114,8 @@ enum ConnectionType {
 
 class MediaConfiguration {
 public:
-    MediaConfiguration(bool turnOnly, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx) {
+    MediaConfiguration(bool turnOnly, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx,
+                       byte * cert = NULL, size_t certLen = 0) {
         this->turnOnly = turnOnly;
         this->appSharingNumUpdates = appSharingNumUpdates;
         this->appSharingCaptureTimer = appSharingCaptureTimer;
@@ -124,8 +125,18 @@ public:
         this->appSharingWaitMsForAck = appSharingWaitMsForAck;
         this->mediaDropPacketsTx = mediaDropPacketsTx;
         this->mediaDropPacketsRx = mediaDropPacketsRx;
+        this->certLen = certLen;
+        if (cert) {
+            this->cert = (byte *)(malloc(certLen));
+            memcpy(this->cert, cert, certLen);
+        }
+        else {
+            this->cert = NULL;
+        }
     }
-    ~MediaConfiguration() {};
+    ~MediaConfiguration() {
+        if (cert) free(cert);
+    };
 
     bool turnOnly;
     int appSharingNumUpdates;
@@ -136,6 +147,8 @@ public:
     int appSharingWaitMsForAck;
     int mediaDropPacketsTx;
     int mediaDropPacketsRx;
+    byte * cert;
+    size_t certLen;
 };
 
 // Codecs: h264, vp8, FB
@@ -372,7 +385,7 @@ public:
 
     virtual void StartHookDevice(const char *deviceId) = 0;
     virtual void StopHookDevice(const char *deviceId) = 0;
-    virtual void SendHookKey(const char *deviceId, byte key) = 0;
+    virtual void SendHookKey(const char *deviceId, byte key, byte callId) = 0;
 
     virtual void Mute(bool microphone, bool speaker) = 0;
 

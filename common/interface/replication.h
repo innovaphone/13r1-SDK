@@ -10,6 +10,7 @@ enum ReplicationType {
     ReplicationULong64,
     ReplicationUnsigned,
     ReplicationBool,
+    ReplicationTristate,
     ReplicationArray
 };
 

@@ -30,7 +30,9 @@ enum AudioDeviceMode {
 #define KEY_ONHOOK      0x94		// handset down
 #define KEY_DISC	    0x8E		// Disconnect
 #define KEY_MIC         0x8F        // toggle microphone
-#define KEY_INCALL      0xFE
+#define KEY_INCALL      0xFE        // from softphone
+#define KEY_HOLD        0xFD        // from softphone
+#define KEY_RETRIEVE      0xFC        // from softphone
 
 
 NAMESPACE_BEGIN
@@ -91,7 +93,7 @@ public:
     virtual void StopMonitoring(const char *deviceId) = 0;
     virtual void StartHookDevice(const char *deviceId) = 0;
     virtual void StopHookDevice(const char *deviceId) = 0;
-    virtual void SendHookKey(const char *deviceId, byte key) = 0;
+    virtual void SendHookKey(const char *deviceId, byte key, byte callId) = 0;
     virtual void SetMicrophoneMute(bool mute) {};
 
     virtual void Close() = 0;

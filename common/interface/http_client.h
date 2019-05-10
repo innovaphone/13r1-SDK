@@ -59,14 +59,16 @@ typedef enum {
     HTTP_RESULT_OK,
     HTTP_RESULT_NOT_FOUND,
     HTTP_RESULT_BAD_REQUEST,
-    HTTP_RESULT_INTERNAL_SERVER_ERROR
+    HTTP_RESULT_REDIRECT,
+    HTTP_RESULT_INTERNAL_SERVER_ERROR,
 } http_result_t;
 
 
 typedef enum {
     HTTP_CL_ERR_NOT_FOUND           = 0x0001,
     HTTP_CL_ERR_BAD_REQUEST         = 0x0002,
-    HTTP_CL_ERR_INTERNAL_SERVER     = 0x0004
+    HTTP_CL_ERR_INTERNAL_SERVER     = 0x0004,
+    HTTP_CL_ERR_REDIRECT            = 0x0008
 } http_error_t;
 
 
@@ -91,11 +93,14 @@ public:
     virtual void Shutdown() = 0;
     virtual void Reconnect() = 0;
     virtual void PassErrorToUser(http_error_t err) = 0;
+    virtual void SendContentForAuthentication(bool doSend) = 0;
 
     virtual void SetRequestType(http_request_type_t reqType, const char * resourceName, size_t contentLength = 0, const char * contentType = "text/xml; charset=utf-8") = 0;
     virtual void SetCustomHeaderField(const char * field, const char * value) = 0;
     virtual http_result_t GetHTTPResult() = 0;
     virtual size_t GetContentLength(bool & chunked) = 0;
+    virtual size_t GetHeaderFieldValueCount(const char * headerField) = 0;
+    virtual const char * GetHeaderFieldValue(const char * headerField, size_t index = 0) = 0;
 
     virtual bool Connected() = 0;
 };
