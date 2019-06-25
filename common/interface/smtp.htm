@@ -144,6 +144,8 @@ public:
 public:
     virtual void AddAttachment(const char *attachmentUrl) = 0;
     virtual void AddTo(const char *rcpt) = 0;
+    virtual void AddCc(const char *rcpt) = 0;
+    virtual void AddBcc(const char *rcpt) = 0;
     virtual void AddBody(const char *data, const char *format, const char *charset) = 0;
     virtual void Start(class UTask * user) = 0;
 };</code></pre>
@@ -165,6 +167,28 @@ public:
     <div class="fnhead">AddTo</div>
     <dd>
         Adds a new receiver to the recipients list.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>rcpt</b></td><td>The receiver's email address.</td></tr>
+        </table>
+        <h4>Remarks</h4>
+        It should be called at least once before Start(). The email will be sent to every rcpt if they are reachable (for example, it could be unreachable if your SMTP server is on "Relay Access denied" mode).
+        If none of the receivers is reachable, the email will not be sent.
+    </dd>
+    <div class="fnhead">AddCc</div>
+    <dd>
+        Adds a new receiver to the recipients list. The email will be sent as a Carbon Copy to this receiver.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>rcpt</b></td><td>The receiver's email address.</td></tr>
+        </table>
+        <h4>Remarks</h4>
+        It should be called at least once before Start(). The email will be sent to every rcpt if they are reachable (for example, it could be unreachable if your SMTP server is on "Relay Access denied" mode).
+        If none of the receivers is reachable, the email will not be sent.
+    </dd>
+    <div class="fnhead">AddBcc</div>
+    <dd>
+        Adds a new receiver to the recipients list. The email will be sent as a Blind Carbon Copy to this receiver.
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">const char * <b>rcpt</b></td><td>The receiver's email address.</td></tr>

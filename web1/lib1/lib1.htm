@@ -138,6 +138,8 @@
         <dd>Tells the client that the app has finished its preparations for reloading the app in a new iframe and that the current iframe can be closed now.</dd>
         <dt>setMenuState(state)</dt>
         <dd>Tells the client if the optional hamburger menu of the app is open or closed. Possible states are "open" and "closed". The function needs to be called once to tell the client that the app provides a menu.</dd>
+        <dt>setBadge(value)</dt>
+        <dd>Sets a badge at the app icon in the start bar and on home. Usually value is a number, but you can use any UTF8-Character to indicate states of the running app. Note that this function is only useful to indicate states while the app is running. If badge counts should appear also while it's not running the badge count should be set from the backend.</dd>
     </dl>
     <h3>Example</h3>
     <p>
@@ -200,7 +202,8 @@ innovaphone.Example = innovaphone.Example || function (start) {
 };
 </pre>
 
-    <h2>App APIs</h2>
+    <a name="clientapis"></a>
+    <h2>Client APIs</h2>
     <p>
         Apps can communicate with other apps using APIs. Each API is identified using a string constant (e.g. "com.innovaphone.phone").
         Apps can both provide APIs and consume APIs that are provided by another app.

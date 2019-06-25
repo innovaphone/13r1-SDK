@@ -1,7 +1,7 @@
 
 /*---------------------------------------------------------------------------*/
 /* config.h                                                                  */
-/* copyright (c) innovaphone 2017                                            */
+/* copyright (c) innovaphone 2017 - 2019                                     */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
@@ -112,7 +112,7 @@ public:
 
     const char * GetName() const { return this->name; }
     bool Changed() const { return this->changed; }
-    virtual bool HasDefaultValue() = 0;
+    virtual bool HasDefaultValue() const = 0;
     virtual void Reset() = 0;
 };
 
@@ -141,7 +141,7 @@ public:
     const char * Value() const { return (this->valueIdx < this->optionsCount ? this->choiceValues[this->valueIdx] : NULL); }
     void SetValue(const char * option);
     void SetValueIdx(size_t valudIdx);
-    bool HasDefaultValue() override;
+    bool HasDefaultValue() const override;
     void Reset() override;
 };
 
@@ -166,7 +166,7 @@ public:
 
     bool Value() const { return this->value; }
     void SetValue(bool value);
-    bool HasDefaultValue() override;
+    bool HasDefaultValue() const override;
     void Reset() override;
 };
 
@@ -193,7 +193,7 @@ public:
 
     int Value() const { return this->value; }
     void SetValue(int value);
-    bool HasDefaultValue() override;
+    bool HasDefaultValue() const  override;
     void Reset() override;
 };
 
@@ -220,7 +220,7 @@ public:
 
     dword Value() const { return this->value; }
     void SetValue(dword value);
-    bool HasDefaultValue() override;
+    bool HasDefaultValue() const override;
     void Reset() override;
 };
 
@@ -247,7 +247,7 @@ public:
 
     long64 Value() const { return this->value; }
     void SetValue(long64 value);
-    bool HasDefaultValue() override;
+    bool HasDefaultValue() const override;
     void Reset() override;
 };
 
@@ -274,7 +274,7 @@ public:
 
     ulong64 Value() const { return this->value; }
     void SetValue(ulong64 value);
-    bool HasDefaultValue() override;
+    bool HasDefaultValue() const override;
     void Reset() override;
 };
 
@@ -302,7 +302,7 @@ public:
 
     const char * Value() const { return this->value; }
     void SetValue(const char * value);
-    bool HasDefaultValue() override;
+    bool HasDefaultValue() const override;
     void Reset() override;
     static void Encrypt(const char * seed, const char * password, char * out, size_t len);
     static void Decrypt(const char * seed, const char * password, char * out, size_t len);

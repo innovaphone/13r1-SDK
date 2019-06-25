@@ -35,5 +35,7 @@ class ISmtpSend : public ITask {
 public:
     virtual void AddAttachment(const char *attachmentUrl) = 0;
     virtual void AddTo(const char *rcpt) = 0;
+    virtual void AddCc(const char *rcpt) = 0;
+    virtual void AddBcc(const char *rcpt) = 0;
     virtual void AddBody(const char *data, const char *format, const char *charset) = 0;
 };

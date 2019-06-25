@@ -360,11 +360,17 @@
         A: Open the innovaphone SDK Connection Manager, delete every entry depending on the deleted Linux connection and create them again. Note that you also need to reasign that connection to
            your project.<br/>
         <br/>
-        Q: The menu items or toolbar buttons for opening a Linux SSH terminal or usign WinSCP are grayed out.<br/>
+        Q: The menu items or toolbar buttons for opening a Linux SSH terminal or using WinSCP are grayed out.<br/>
         A: You must define the applications to use for them during the innovaphone SDK setup. Just run the setup again to change that settings.<br/>
         <br/>
         Q: I've created a project an not assigned a remote connection. But according to the Visual Studio run button, there is an assigned connection but it doesn't work.<br/>
         A: When not assigning a remote connection, Visual Studio will take the first connection available. But this won't work, so you need to assign it before you try to run and debug your app.<br/>
+        <br/>
+        Q: When I try to run the app, it take a long time trying to upload the binary and finally I get an error message.<br/>
+        A: Make sure the AppPlatform is available. Also the Developermode must be enabled. To check this, open the AppPlatform Admin (using the innovaphone SDK menu in Visual Studio - the default apssword is pwd), go to Settings - General and check, if 'Enable developer mode' and 'Disable App security' are checked (note that 'Disable App security is only evailable, until 'Enable developer mode' has been enabled and the change had been saved).<br/>
+        <br/>
+        Q: I run the app, but in myApps on my developer PBX, the app is not available.<br/>
+        A: Maybe the app is not connected to the PBX or not assinged to the PBX user you use for development. Open the PBX Admin (using the innovaphone SDK menu in Visual Studio), go to PBX - Objects and click on show. Click on the user you're using for development, select Apps and make sure, that the app you're want to use is selected. If not, click on OK (maybe you need to scrill down a little). Note: If you're opening the PBX Admin and there is the install UI, select on manuall configuration and click on continue.<br/>
         <br/>
         Q: I've some problems or other questions regarding the innovaphone SDK or the Visual Studio extension, so where can I ask them?<br/>
         A: Go to the innovaphone forum at <a href="http://forum.innovaphone.com/">http://forum.innovaphone.com</a> - there is a forum for the SDK. Be welcome, we're glad to hear from you.<br/>

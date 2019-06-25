@@ -278,11 +278,14 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     }
 
     function encrypt(seed, data) {
-        return innovaphone.crypto.str2hex(innovaphone.crypto.rc4(seed + ":" + sessionKey, data));
+        var keyBytes = new TextEncoder("utf-8").encode(seed + ":" + sessionKey);
+        var strBytes = new TextEncoder("utf-8").encode(data);
+        return innovaphone.crypto.str2hex(innovaphone.crypto.rc4Bytes(keyBytes, strBytes));
     }
 
     function decrypt(seed, data) {
-        var arr = innovaphone.crypto.rc4(seed + ":" + sessionKey, innovaphone.crypto.hex2str(data));
+        var keyBytes = new TextEncoder("utf-8").encode(seed + ":" + sessionKey);
+        var arr = innovaphone.crypto.rc4Bytes(keyBytes, innovaphone.crypto.hex2bin(data));
         return byteArrayToString(arr);
     }
 
@@ -514,26 +517,26 @@ innovaphone.crypto.sha256 = innovaphone.crypto.sha256 || function (s) {
     return binb2hex(coreSha256(str2binb(s), s.length * chrsz));
 }
 
-innovaphone.crypto.rc4 = innovaphone.crypto.rc4 || function (key, str) {
+innovaphone.crypto.rc4Bytes = innovaphone.crypto.rc4Bytes || function (keyBytes, strBytes) {
     var s = [], j = 0, x, res = '';
     for (var i = 0; i < 256; i++) {
         s[i] = i;
     }
     for (i = 0; i < 256; i++) {
-        j = (j + s[i] + key.charCodeAt(i % key.length)) % 256;
+        j = (j + s[i] + keyBytes[i % keyBytes.length]) % 256;
         x = s[i];
         s[i] = s[j];
         s[j] = x;
     }
     i = 0;
     j = 0;
-    for (var y = 0; y < str.length; y++) {
+    for (var y = 0; y < strBytes.length; y++) {
         i = (i + 1) % 256;
         j = (j + s[i]) % 256;
         x = s[i];
         s[i] = s[j];
         s[j] = x;
-        res += String.fromCharCode(str.charCodeAt(y) ^ s[(s[i] + s[j]) % 256]);
+        res += String.fromCharCode(strBytes[y] ^ s[(s[i] + s[j]) % 256]);
     }
     return res;
 }
@@ -549,13 +552,13 @@ innovaphone.crypto.str2hex = innovaphone.crypto.str2hex || function (input) {
     return str;
 }
 
-innovaphone.crypto.hex2str = innovaphone.crypto.hex2str || function (input) {
+innovaphone.crypto.hex2bin = innovaphone.crypto.hex2bin || function (input) {
     var hex = input.toString();
-    var str = '';
+    var arr = [];
     for (var i = 0; i < hex.length; i += 2) {
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        arr.push(parseInt(hex.substr(i, 2), 16));
     }
-    return str;
+    return arr;
 }
 
 innovaphone.crypto.randomString = innovaphone.crypto.randomString || function (length) {

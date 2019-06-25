@@ -334,6 +334,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         start.setArgs = function (args, title) {
             start.postClientMessage({ mt: "Action", type: "SetArgs", args: args, title: title });
         };
+        start.setBadge = function (val) {
+            start.postClientMessage({ mt: "Action", type: "SetBadge", value: val });
+        };
         start.startActivity = function () {
             start.postClientMessage({ mt: "Action", type: "StartActivity" });
         };

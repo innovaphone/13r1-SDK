@@ -114,9 +114,10 @@ enum ConnectionType {
 
 class MediaConfiguration {
 public:
-    MediaConfiguration(bool turnOnly, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx,
+    MediaConfiguration(bool turnOnly, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx, bool phoneLoad,
                        byte * cert = NULL, size_t certLen = 0) {
         this->turnOnly = turnOnly;
+        this->phoneLoad = phoneLoad; 
         this->appSharingNumUpdates = appSharingNumUpdates;
         this->appSharingCaptureTimer = appSharingCaptureTimer;
         this->appSharingBitrate = appSharingBitrate;
@@ -147,6 +148,7 @@ public:
     int appSharingWaitMsForAck;
     int mediaDropPacketsTx;
     int mediaDropPacketsRx;
+    bool phoneLoad;
     byte * cert;
     size_t certLen;
 };
