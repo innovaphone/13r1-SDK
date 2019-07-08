@@ -12,7 +12,7 @@ public:
     static int GetOwnPID(class IInstanceLog * const log);
     static int GetParentPID(class IInstanceLog * const log);
     static bool SetProcessGroupID(int pid, int pgid, class IInstanceLog * const log);                               // sets the pgid of the process specified by pid
-    static void GetOwnName(const char * buffer, size_t len, class IInstanceLog * const log);                        // stores the name of the current process into the buffer
+    static void GetOwnName(char * buffer, size_t len, class IInstanceLog * const log);                        // stores the name of the current process into the buffer
     static int System(class IInstanceLog * const log, const char * command, ...);
 };
 

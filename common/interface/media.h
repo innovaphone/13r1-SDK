@@ -279,7 +279,7 @@ enum MediaEndpointEvent {
 class UMedia {
 public:
     virtual void MediaInitializeComplete(IMedia * const media, class MediaConfig *localMediaConfig) {};
-    virtual void MediaConnectResult(IMedia * const media, bool error) {};
+    virtual void MediaConnectResult(IMedia * const media, const char * error) {};
     virtual void MediaRtpSendResult(IMedia * const media) {};
     virtual void MediaSctpSendResult(IMedia * const media) {};
     virtual void MediaRtpRecvResult(IMedia * const media, void * buf, size_t len, dword timestamp) {};

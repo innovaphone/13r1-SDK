@@ -7,10 +7,12 @@ innovaphone.ui1 = innovaphone.ui1 || {};
 innovaphone.ui1.nodePrototype = {
     addText: function (text) {
         this.container.innerText = text || "";
+        return this;
     },
 
     addHTML: function (html) {
         this.container.innerHTML = html;
+        return this;
     },
 
     add: function (node, before) {
@@ -27,6 +29,7 @@ innovaphone.ui1.nodePrototype = {
 
     clear: function () {
         this.container.innerHTML = "";
+        return this;
     },
 
     firstChild: function () {
@@ -63,18 +66,22 @@ innovaphone.ui1.nodePrototype = {
                 this.events.splice(index, 1);
             }
         }
+        return this;
     },
 
     setClass: function (className) {
         this.container.className = className;
+        return this;
     },
 
     addClass: function (className) {
         this.container.classList.add(className);
+        return this;
     },
 
     remClass: function (className) {
         this.container.classList.remove(className);
+        return this;
     },
 
     hasClass: function (className) {
@@ -100,6 +107,7 @@ innovaphone.ui1.nodePrototype = {
         this.container.style.draggable = false;
         this.container.onselectstart = function () { return false; }
         this.container.ondragstart = function () { return false; }
+        return this;
     },
     
     makeUnselectable: function () {
@@ -107,10 +115,12 @@ innovaphone.ui1.nodePrototype = {
         this.container.style.webkitUserSelect = "none";
         this.container.style.webkitTouchCallout = "none";
         this.container.setAttribute("unselectable", "on");
+        return this;
     },
 
     setDisabled: function (state) {
         this.container.disabled = state !== false;
+        return this;
     },
 
     createNode: function (type, style, content, cl) {

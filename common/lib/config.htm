@@ -2,7 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>innovaphone SDK - Socket implementation</title>
+    <title>innovaphone SDK - config implementation</title>
     <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
     <link rel="stylesheet" href="../../web1/doc/vs.css">
 </head>
@@ -14,7 +14,7 @@
     <h1>Config</h1>
     <p>
         The config library supports Apps to store configuration options in a config database table. To access the config options
-		from within a JavaScript App, the C++ config library communicates with the <a href="../../web/config/config.htm">JavaScript config library</a> using JSON messages. See the
+		from within a JavaScript App, the C++ config library communicates with the <a href="../../web1/config/config.htm">JavaScript config library</a> using JSON messages. See the
 		JS config library documentation for more informations.
 	</p>
     <p>
@@ -35,7 +35,7 @@
     
     <h2>File information</h2>
     <table style="margin-left:-12px">
-        <tr><td><b>File</b></td><td>common/interface/socket.h<br><br></td></tr>
+        <tr><td><b>File</b></td><td>common/interface/config.h<br><br></td></tr>
         <tr><td><b>Classes</b></td><td>
                                        <a href="#ConfigContext">ConfigContext</a><br>
                                        <a href="#ConfigItem">ConfigItem</a><br>
@@ -925,7 +925,7 @@ public:
 	<h2>Overview</h2>
 	Below is the description of the JSON messages the ConfigContext shares with the JavaScript config library. Note that some of the fields are optional end depend on the value
 	of other fields. You are free to implement your only config javascript library, but note that this messages only will be accepted after sucessfully logging into an appservice
-	using the AppWebsocket javascript library. See <a href="../../web/config/config.htm">JavaScript config library</a> for details.
+	using the AppWebsocket javascript library. See <a href="../../web1/config/config.htm">JavaScript config library</a> for details.
     
     <p>
         The Config protocol supports the AppWebsocket "src" mechanism.

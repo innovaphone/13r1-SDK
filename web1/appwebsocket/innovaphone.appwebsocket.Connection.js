@@ -79,8 +79,8 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                 case "AppChallengeResult":
                     if (obj.sysClient) password = "";
                     if (password || obj.sysClient) passwordLogin(obj.challenge);
-                    else if (window.self == window.top) adminLogin(obj.challenge);
                     else if (fgetlogin) fgetlogin(app, obj.challenge);
+                    else if (window.self == window.top) adminLogin(obj.challenge);
                     else window.parent.postMessage(JSON.stringify({ mt: "getLogin", app: app, challenge: obj.challenge }), "*");
                     break;
                 case "AppLoginResult":

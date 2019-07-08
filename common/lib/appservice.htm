@@ -114,7 +114,7 @@ public:
         <dd>
             You <b>can</b> override this function inside your class which implements the AppService class if your app provides app instance plugins (PBX manager plugins).<br />
             Push your provided plugins to the pluginList. Each app has to be an instance of class AppInstancePlugin.<br />
-            See <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin">publish manager plugins</a> for further reference.
+            See <a href="../../web1/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin">publish manager plugins</a> for further reference.
             <h4>Parameters</h4>
             <table style="margin-left:-12px">
                 <tr><td class="param">istd::list&lt;AppInstancePlugin&gt; * <b>pluginList </b></td><td>A list to add all <a href="#AppInstancePlugin">AppInstancePlugins</a>.</td></tr>
@@ -381,18 +381,18 @@ public:
     The class AppInstancePlugin is used to describe an app instance plugin.
     <pre><code class="language-cpp">class AppInstancePlugin {    
 public:
-    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">AppInstancePlugin(const char * plugin, const char * icon, const char * langFile, bool wildcard = false, const char * api = NULL);</a>
+    <a href="../../web1/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">AppInstancePlugin(const char * plugin, const char * icon, const char * langFile, bool wildcard = false, const char * api = NULL);</a>
     
     bool wildcard;
 
-    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetIcon();</a>
-    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetApi();</a>
-    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetPlugin();</a>
-    <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetLangFile();</a>
+    <a href="../../web1/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetIcon();</a>
+    <a href="../../web1/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetApi();</a>
+    <a href="../../web1/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetPlugin();</a>
+    <a href="../../web1/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin" style="text-decoration:none;">const char * GetLangFile();</a>
 };</code></pre>
 
     <h3>Public functions</h3>
-    See <a href="../../web/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin">publish manager plugins</a> for further reference.
+    See <a href="../../web1/com.innovaphone.manager/pbx_manager_plugin.htm#publish-manager-plugin">publish manager plugins</a> for further reference.
 
     <a name="AppServiceSocket"><h2>AppServiceSocket</h2></a>
     This class is just used internally inside the manager and webserver.
