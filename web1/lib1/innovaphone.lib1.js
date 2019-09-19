@@ -303,6 +303,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
         start.args = {};
         start.margs = {};
         start.apis = {};
+        start.defaultApiProviders = {};
         start.prepareReloadCallback = null;
         start.onapiupdate = onapiupdate;
         start.onlangchanged = new Event(start);
@@ -355,6 +356,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
 
                 this.onmessage = new Event(this);
                 this.onconsumerclosed = new Event(this);
+                this.isDefaultApiProvider = function () { return start.defaultApiProviders[api] == start.name; }
                 this.send = function (msg, consumer, src) { start.postClientMessage({ mt: "ApiResult", api: api, consumer: consumer, src: src, msg: msg }); };
                 this.update = function (model) { start.postClientMessage({ mt: "ApiModel", api: api, model: model }); };
 
@@ -369,6 +371,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
 
                 this.model = {};
                 this.providers = [];
+                this.defaultApiProvider = null;
                 this.onupdate = new Event(this);
                 this.onmessage = new Event(this);
                 this.send = function (msg, provider, src, title) { start.postClientMessage({ mt: "ApiRequest", api: api, provider: provider, src: src, title: title, msg: msg }); }
@@ -382,13 +385,20 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                 }
 
                 function update() {
+                    var changed = false;
+                    if (that.defaultApiProvider != start.defaultApiProviders[api]) {
+                        that.defaultApiProvider = start.defaultApiProviders[api];
+                        console.log("API consumer(" + api + "): defaultApiProvider = " + that.defaultApiProvider);
+                        changed = true;
+                    }
                     var newModel = start.apis[api] || {};
                     if (JSON.stringify(newModel) != JSON.stringify(that.model)) {
                         that.model = newModel;
                         that.providers = [];
                         for (var key in newModel) that.providers.push(key);
-                        that.onupdate.notify();
+                        changed = true;
                     }
+                    that.onupdate.notify();
                 }
 
                 this.Src = function (onmessage) {
@@ -551,6 +561,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                     case "ApiUpdate":
                         if (e.source == opener || e.source == parent) {
                             start.apis = obj.apis;
+                            start.defaultApiProviders = obj.defaultApiProviders;
                             onapiupdate.notify(obj);
                         }
                         break;

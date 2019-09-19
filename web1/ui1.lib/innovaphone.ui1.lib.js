@@ -212,16 +212,16 @@ innovaphone.ui1.Input = innovaphone.ui1.Input || function (style, value, placeHo
 }
 innovaphone.ui1.Input.prototype = innovaphone.ui1.nodePrototype;
 
-innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, cl, background, foreground, backgroundOff) {
+innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, cl, background, foreground, backgroundOff, inherit) {
     var that = this;
     that.background = background ? background : "gray";
     that.foreground = foreground ? foreground : "white";
     that.backgroundOff = backgroundOff ? backgroundOff : that.background;
     var svg = '<svg style="position:relative;width:14px;fill:' + that.foreground + ';" viewBox="0 0 20 20"><path d="M6.67,17.5,0,10.81,1.62,9.18l5.05,5.06L18.38,2.5,20,4.13Z"></path></svg>';
     function draw() {
-        that.container.checked ? that.addHTML(svg) : that.clear();
-        box.container.style.backgroundColor = that.container.checked ? that.background : that.backgroundOff;
-        that.container.style.filter = that.container.disabled ? "grayscale(50%) contrast(50%)" : "";
+        that.container.checked || (that.container.checked == undefined && inherit) ? that.addHTML(svg) : that.clear();
+        box.container.style.backgroundColor = that.container.checked || (that.container.checked == undefined && inherit) ? that.background : that.backgroundOff;
+        that.container.style.filter = that.container.disabled || that.container.checked == undefined ? "grayscale(50%) contrast(50%)" : "";
         that.container.style.cursor = that.container.disabled ? "" : "pointer";
     }
     that.getValue = function () { return that.container.checked }
@@ -230,8 +230,12 @@ innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, c
             that.container.checked = true;
             that.container.setAttribute("checked", "on");
         }
-        else {
+        else if(!value && inherit == undefined) {
             that.container.checked = false;
+            that.container.removeAttribute("checked");
+        }
+        else {
+            that.container.checked = value;
             that.container.removeAttribute("checked");
         }
         draw();
@@ -243,7 +247,7 @@ innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, c
 
     function click(e) {
         if (!that.container.disabled) {
-            that.setValue(that.container.checked ? false : true);
+            that.setValue(that.container.checked ? false : (that.container.checked == undefined || inherit == undefined ? true : undefined));
             // call user's "change" handler (if any)
             var onchange = that.events.find(function (v) { return (v.type == "change") && v.handler });
             if (onchange) onchange.handler(e, onchange.obj);

@@ -47,6 +47,15 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         this.isScrollBottom = function () { return (inner.container.scrollTop >= (sizer.container.offsetHeight - outer.container.offsetHeight)); };
         this.isScrollTop = function () { return (inner.container.scrollTop == 0); };
         this.contentHeight = function () { return sizer.container.offsetHeight; };
+        this.scrollIntoView = function (node, scrollIntoViewOptions) {
+            var e = node.container || node;
+            if (content.container.style.position == "relative") {
+                inner.container.scrollTop = e.offsetTop;
+            }
+            else {
+                inner.container.scrollTop = e.offsetTop - inner.container.offsetTop;
+            }
+        }
     }
     else {
         if (!mx) mx = 0;
@@ -74,6 +83,11 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         this.isScrollBottom = function () {  return (this.container.scrollTop >= (content.container.offsetHeight - this.container.clientHeight)); };
         this.isScrollTop = function () { return (this.container.scrollTop == 0); };
         this.contentHeight = function () { return content.container.offsetHeight; };
+        this.scrollIntoView = function (node, scrollIntoViewOptions) {
+            var e = node.container || node;
+            e.scrollIntoView(scrollIntoViewOptions);
+        }
+        
     }
 
     function onScrollX() {

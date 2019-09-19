@@ -278,15 +278,27 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     }
 
     function encrypt(seed, data) {
-        var keyBytes = new TextEncoder("utf-8").encode(seed + ":" + sessionKey);
-        var strBytes = new TextEncoder("utf-8").encode(data);
+        var keyBytes = new textEncode(seed + ":" + sessionKey);
+        var strBytes = new textEncode(data);
         return innovaphone.crypto.str2hex(innovaphone.crypto.rc4Bytes(keyBytes, strBytes));
     }
 
     function decrypt(seed, data) {
-        var keyBytes = new TextEncoder("utf-8").encode(seed + ":" + sessionKey);
+        var keyBytes = new textEncode(seed + ":" + sessionKey);
         var arr = innovaphone.crypto.rc4Bytes(keyBytes, innovaphone.crypto.hex2bin(data));
         return byteArrayToString(arr);
+    }
+
+    function textEncode(str) {
+        if (window.TextEncoder) {
+            return new TextEncoder('utf-8').encode(str);
+        }
+        var utf8 = unescape(encodeURIComponent(str));
+        var result = new Uint8Array(utf8.length);
+        for (var i = 0; i < utf8.length; i++) {
+            result[i] = utf8.charCodeAt(i);
+        }
+        return result;
     }
 
     function hash(seed, data) {

@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>httpfile</title>
+    <title>database</title>
     <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
     <link rel="stylesheet" href="../../web1/doc/vs.css">
 </head>
@@ -354,9 +354,10 @@ public:
 
         <h4>Remarks</h4>
         Note that there is a limit of a maximum length for SQL commands of 250*1024-1 (255999) characters. This is the size for the finaly SQL query string,
-        after parsing all placeholders and inserting the values for them at the prorpriate place.<br/><br/>
+        after parsing all placeholders and inserting the values for them at the prorpriate place.<br/>
         To make it work, it is necessary that the data base table you're going to address with an InsertSQL() call, has a field named id, wich must be an 64bit, autoincrement
-        primary key field. Read the PostgreSQL or MySQL documentation to know how to create such a field.
+        primary key field. Read the PostgreSQL or MySQL documentation to know how to create such a field. For PostgreSQL there is no need to add the 'RETURNING id' part to the query, because
+        it will be added by the InsertSQL() function.
     </dd>
 
     <div class="fnhead">InsertSQL (overloaded)</div>
@@ -377,7 +378,8 @@ public:
 
         <h4>Remarks</h4>
         To make it work, it is necessary that the data base table you're going to address with an InsertSQL() call, has a field named id, wich must be an 64bit, autoincrement
-        primary key field. Read the PostgreSQL or MySQL documentation to know how to create such a field.
+        primary key field. Read the PostgreSQL or MySQL documentation to know how to create such a field. For PostgreSQL, the 'RETURNING id' part must be added to the query when creating
+        the prepared statement via IDatabase::PrepareQuery.
     </dd>
     
     <div class="fnhead">InsertSQLV</div>
@@ -476,6 +478,9 @@ public:
         <h4>Callbacks</h4>
         After creating the prepares tatement, UDatabase::DatabasePrepareStatementResult() will be called. The IPraparedStatement instance given to that callback must
         be deleted if no longer needed. In case of an error, the IDatabase will call UDatabase::DatabaseError().
+        
+        <h4>Remarks</h4>
+        For PostgreSQL, if the created perpared statement is an INSERT statement and so will be passed to IDatabase::InsertSQL(), the "RETURNING id" statement must be added to the query!
     </dd>
     
     <div class="fnhead">GetLastErrorMessage</div>

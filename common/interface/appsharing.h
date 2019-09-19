@@ -240,5 +240,5 @@ public:
 
 class URemoteControl {
 public:
-    virtual void CloseComplete() = 0;
+    virtual void RemoteControlCloseComplete() = 0;
 };

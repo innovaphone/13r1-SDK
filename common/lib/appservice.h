@@ -85,7 +85,6 @@ class AppServiceSocket : public IShutdownHandler, public USocket, public IInstan
     void AppSocketShutdown();
     void AppSocketMessageSend(class json_io & send, char * buff);
     void SocketRecv(size_t len, bool partial);
-    void Shutdown() override;
     void ShutdownTimeout() override;
     void TryShutdown();
 
@@ -100,6 +99,7 @@ public:
     ~AppServiceSocket();
 
     void Connect(const char * address, const char * serviceID);
+    void Shutdown() override;
     void AppSendStatus(const char * appName, const char * appDomain, bool status, const char * webserverPath);
     void AppSendAlarm(ServiceAlarmType type, ServiceAlarmSeverity severity, word code, const char * text, const char * details, const char * serviceID, const char * appName, const char * appDomain);
     void AppServiceShutdownComplete();

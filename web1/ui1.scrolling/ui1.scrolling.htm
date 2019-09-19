@@ -130,9 +130,15 @@ scrolling.content.addHTML("Line1=======================================" +
         <dd>
             Returns true if scroll is at top
         </dd>
-        <dt>contentHeight()()</dt>
+        <dt>contentHeight()</dt>
         <dd>
             Returns the height of the content
+        </dd>
+        <dt>scrollIntoView(node, scrollIntoViewOptions)</dt>
+        <dd>
+            Scrolls to the specified node, which is either an innovaphone.ui1.Node or a dom node.<br />
+            The parameter scrollIntoViewOptions is currently just used in webkit browsers, as the dom node scrollIntoView function is directly used.<br />
+            For other browsers, the own scrollbar implementation is used until these browsers support styling of a scrollbar.
         </dd>
     </dl>
     <hr/>

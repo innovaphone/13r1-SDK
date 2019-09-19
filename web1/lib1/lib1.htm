@@ -258,6 +258,8 @@ innovaphone.Example = innovaphone.Example || function (start) {
         </dd>
         <dt>update(model)</dt>
         <dd>Publishes an arbitrary model object, that can be observed by the consumers of the API.</dd>
+        <dt>isDefaultApiProvider()</dt>
+        <dd>Returns true, if the app is the default provider of the API.</dd>
     </dl>
     <h4>Example</h4>
 <pre>
@@ -296,6 +298,8 @@ phoneApi.update({ calls: [] });
                 <dd>An object that contains static info provided by the app service of the provider. The format is defined by the API.</dd>
                 <dt>model</dt>
                 <dd>An object that contains dynamic info published by the app provider. The format is defined by the API.</dd>
+                <dt>defaultApiProvider</dt>
+                <dd>The name of the current defaultApiProvider (can be null).</dd>
                 <dt>restart</dt>
                 <dd>A counter that reflects how many times the API provider was restarted. This information can be used to detect restarts in order to renew subscriptions to that provider.
                 Note that the initial value is undefined and changes to 0 when the provider was started the first time. So a change to 0 does not indicate a restart.</dd>

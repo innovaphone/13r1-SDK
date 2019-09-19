@@ -249,6 +249,7 @@ class HTTPParser {
     int httpVersion;
 
     class HTTPFieldList * fieldList;
+    size_t fieldListBufferSize;
     HTTPLib::http_encoding_t acceptEncoding;
     size_t contentLength;
     int connectionType;

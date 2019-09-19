@@ -243,13 +243,14 @@ public:
 
 class MediaConfig {
 public:
-    MediaConfig() { this->ice = NULL; this->defAddr = NULL; };
+    MediaConfig() { this->ice = NULL; this->defAddr = NULL; this->mcAddr = NULL; this->mcPort = 0; };
     ~MediaConfig() { 
         if(ice) delete ice;
         while(this->codecList.front()) {
             delete this->codecList.front();
         }
         if(defAddr) free(defAddr);
+        if(mcAddr) free(mcAddr);
     };
 
 public:
@@ -258,6 +259,8 @@ public:
     word defPort;
     class IceCandidates * ice;
     istd::list<class Codec> codecList;
+    char * mcAddr;
+    word mcPort;
 };
 
 class IMedia {
