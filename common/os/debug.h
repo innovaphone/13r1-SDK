@@ -70,6 +70,7 @@ public:
     virtual void SetLogging(bool on) = 0;
     virtual void SetHexdump(bool on) = 0;
     virtual void SetLogFileSize(off_t size) {};
+    virtual void ClearLogFiles() {};
     virtual ulong64 IsCoreDumped() { return 0; };
 };
 

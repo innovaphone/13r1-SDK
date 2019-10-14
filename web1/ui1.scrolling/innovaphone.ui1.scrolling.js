@@ -7,7 +7,7 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
     var init = true;
     this.createNode("div", style, null, cl);
     var that = this;
-    if (navigator.platform.startsWith("Win") && !innovaphone.ui1.lib.browser.webkit) {
+    if (navigator.platform.startsWith("Win") && !innovaphone.ui1.lib.browser.webkit && innovaphone.ui1.lib.browser.name != "Firefox") {
         var bars = this.container;
         if (!width) width = 8;
         if (!color) color = "red";
@@ -65,6 +65,10 @@ innovaphone.ui1.Scrolling = innovaphone.ui1.Scrolling || function (style, mx, my
         this.container.style.overflowX = mx == -1 ? "hidden" : "auto";
         this.container.style.overflowY = my == -1 ? "hidden" : "auto";
         this.container.style.overflowScrolling = this.container.style.WebkitOverflowScrolling = "touch";
+        if (innovaphone.ui1.lib.browser.name == "Firefox") {
+            this.container.style.scrollbarColor = color + " transparent";
+            this.container.style.scrollbarWidth = "thin";
+        }
         var content = this.add(new innovaphone.ui1.Div(cstyle));
 
         content.container.style.boxSizing = "border-box";

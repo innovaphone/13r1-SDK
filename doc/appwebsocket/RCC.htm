@@ -2,7 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>innovaphone SDK - EpSignal protocol</title>
+    <title>innovaphone SDK - RCC API</title>
     <link rel="stylesheet" href="../../web1/doc/innovaphone.doc.css" type="text/css" />
     <link rel="stylesheet" href="../../web1/doc/vs.css">
     <script src="../../web1/doc/highlight.pack.js"></script>
@@ -214,6 +214,31 @@
         <dt>user:integer</dt>
         <dd>
             The handle which can be used for the other User... requests.
+        </dd>
+        <dt>prefixIntl:string</dt>
+        <dd>
+            Prefix to be used to dial an international number from this node, including any trunk prefix
+        </dd>
+        <dt>prefixNtl:string</dt>
+        <dd>
+            Prefix to be used to dial a national number from this node, including any trunk prefix
+        </dd>
+        <dt>prefixSubs:string</dt>
+        <dd>
+            Prefix to be used to dial a subscriber number from this node, including any trunk prefix
+        </dd>
+        <dt>area:string</dt>
+        <dd>
+            Area code to be assumed for the user
+        </dd>
+        <dt>country:string</dt>
+        <dd>
+            Country code to be assumed for the user
+        </dd>
+        <dt><a href="#mobile">mobile:object</a></dt>
+        <dd>
+            If hw identifies a mobile endpoint, this is a object with the information about the
+            mobile endpoint
         </dd>
     </dl>
 
@@ -624,6 +649,26 @@
         <dt>norm</dt>
         <dd>
             Normalized number
+        </dd>
+    </dl>
+    <div class="fnhead"><a id="mobile">mobile</a></div>
+
+    <p>
+        Information about a monitored mobile endpoint
+    </p>
+
+    <dl>
+        <dt>e164</dt>
+        <dd>
+            The configured mobile number
+        </dd>
+        <dt>h323</dt>
+        <dd>
+            The configured SIP/H323 name of mobile endpoint
+        </dd>
+        <dt>off</dt>
+        <dd>
+            True if mobile endpoint is configured off.
         </dd>
     </dl>
 </body>

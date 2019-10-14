@@ -40,16 +40,6 @@ class xml_io {
     word base;
     const char * namespc;
 
-    struct {
-        word count;
-        byte type;
-        byte href;
-        word base;
-        byte flags;
-        byte spare;
-        const char * info;
-    } content[XML_MAX_TAG];
-
     char * current_id;
     word current_id_tag;
     struct xml_id_content * id_list;
@@ -59,6 +49,17 @@ class xml_io {
     char * encoding;
 
     bool keep_whitespaces;
+
+    // should be last to permit direct access to preceeding members
+    struct {
+        word count;
+        byte type;
+        byte href;
+        word base;
+        byte flags;
+        byte spare;
+        const char * info;
+    } content[XML_MAX_TAG + 1/*overrun buffer*/];
 
     bool whitespace(char c) {
         return c==' ' || c=='\r' || c=='\n' || c=='\t';

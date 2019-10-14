@@ -45,7 +45,8 @@ scrolling.content.addHTML("Line1=======================================" +
     <h1>Interface</h1>
     <p>
         Scrolling provides a simple stylable scrollbar, by using a scrollable div and hiding
-        the browser provided scrollbars.
+        the browser provided scrollbars.<br />
+        Native browser scrollbar styling is used for webkit and firefox browsers.
     </p>
     <h2>innovaphone.ui1.Scrolling(style, maxWidth, maxHeight, width, color, cstyle)</h2>
     <p>
@@ -200,5 +201,24 @@ scrolling.content.addHTML("Line1=======================================" +
             the application can use it to put content into scrolling.
         </dd>
     </dl>
+    <h1>CSS styling for webkit and firefox</h1>
+    <h2>Webkit</h2>
+    <p>You can put the following CSS to your CSS file to style the scrollbars in Webkit browsers:</p>
+    <p>
+        div::-webkit-scrollbar { <br />
+            &nbsp;&nbsp;width:9px;<br />
+        &nbsp;&nbsp;height:9px;<br />
+        }<br />
+        div::-webkit-scrollbar-thumb {<br />
+        &nbsp;&nbsp;background-color: var(--accent); /* or whatever color you want */<br />
+        }<br />
+    </p>
+    <h2>Firefox</h2>
+    <p>
+        div {<br />
+        &nbsp;&nbsp;scrollbar-color: var(--accent) transparent !important; /* !important overrides the javascript default setting */<br />
+        &nbsp;&nbsp;scrollbar-width: thin !important;<br />
+        }<br />
+    </p>
 </body>
 </html>

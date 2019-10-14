@@ -114,10 +114,11 @@ enum ConnectionType {
 
 class MediaConfiguration {
 public:
-    MediaConfiguration(bool turnOnly, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx, bool phoneLoad,
+    MediaConfiguration(bool turnOnly, bool iceNoHost, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx, bool phoneLoad,
                        byte * cert = NULL, size_t certLen = 0) {
         this->turnOnly = turnOnly;
-        this->phoneLoad = phoneLoad; 
+        this->iceNoHost = iceNoHost;
+        this->phoneLoad = phoneLoad;
         this->appSharingNumUpdates = appSharingNumUpdates;
         this->appSharingCaptureTimer = appSharingCaptureTimer;
         this->appSharingBitrate = appSharingBitrate;
@@ -140,6 +141,7 @@ public:
     };
 
     bool turnOnly;
+    bool iceNoHost;
     int appSharingNumUpdates;
     int appSharingCaptureTimer;
     int appSharingBitrate;
@@ -266,7 +268,7 @@ public:
 class IMedia {
 public:
     virtual ~IMedia() {};
-    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, byte * certificateFingerprint, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, int dropMediaTx, int dropMediaRx) = 0;
+    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, byte * certificateFingerprint, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, bool iceNoHost, int dropMediaTx, int dropMediaRx) = 0;
     virtual void Connect(class MediaConfig *remoteMediaConfig, bool iceControlling) = 0;
     virtual void RtpSend(const void * buf, size_t len, dword timestamp) = 0;
     virtual void RtpDtmf(char digit, byte pt) = 0;
@@ -569,6 +571,8 @@ struct VideoFrameFormat {
     struct VideoRatio aspectRatio;
 };
 
+#define WEBCAM_CAPABILITY_FACING_FRONT  0x00010000
+
 class IWebcam {
 public:
     virtual ~IWebcam() {};
@@ -576,6 +580,7 @@ public:
     virtual void Stop() = 0;
     virtual void Close() = 0;
     virtual const char * GetWebcamId() = 0;
+    virtual unsigned GetWebcamCapabilities() = 0;
     virtual const char * GetWebcamName() = 0;
     virtual void FullIntraRequest() {};
 };

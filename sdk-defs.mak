@@ -1,3 +1,4 @@
+SHELL = cmd
 
 IP_SRC   = sdk
 HTTPFILES-FLAGS = -k -s 0,HTTP_GZIP
