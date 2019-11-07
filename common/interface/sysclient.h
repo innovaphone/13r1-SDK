@@ -20,6 +20,7 @@ public:
     virtual void SetProvisioningCode(const char * provisioningCode) = 0;
     virtual void SetManagerSysClientPassword(const char * password) = 0;
     virtual void SetPasswords(const char * admin_pwd) = 0;
+    virtual void SetConfig(char * buffer) = 0;
     virtual const char * GetManagerSysClientPassword() = 0;
     virtual void SysClientClosed(class ISysclient * sysclient) = 0;
 };

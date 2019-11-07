@@ -28,6 +28,7 @@
             <td><b>Data types</b></td>
             <td>
                 <a href="#MAC_ADDRESS_SIZE">MAC_ADDRESS_SIZE</a><br>
+                <a href="#IP_ADDRESS_SIZE">IP_ADDRESS_SIZE</a><br>
                 <br>
             </td>
         </tr>
@@ -47,6 +48,7 @@
     <pre><code class="language-cpp">class IEthernet {
 public:
     <a href="#GetMACAddress" style="text-decoration:none;">static bool GetMACAddress(byte * mac, class IInstanceLog * const log)</a>;
+    <a href="#GetIpAddress" style="text-decoration:none;">static bool GetIpAddress(char * buffer, size_t bufferLen, bool ipv6, class IInstanceLog * const log)</a>;
 };</code></pre>
     
     <h3>Public functions</h3>
@@ -60,10 +62,24 @@ public:
             <tr><td class="param">byte * <b>mac </b></td><td>A <code>byte</code> pointer to store the MAC address bytes. It needs to be of size <code>MAC_ADDRESS_SIZE</code> (6 bytes)</td></tr>
             <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
             </table>
-            <h4><a name="ExampleGenerateUUID">Code Example</a> </h4>
+            <h4><a name="ExampleMAC">Code Example</a> </h4>
             <pre class="sample" style="height:auto;"><code class="language-cpp">byte mac[MAC_ADDRESS_SIZE];
 IEthernet::GetMACAddress(mac, log);
                 </code></pre>
+        </dd>
+    </dl>
+
+    <div id="GetMACAddress" class="fnhead">GetMACAddress (static function)</div>
+    <dl>
+        <dd>
+            The function writes the IP address of the first ethernet adapter into the char array of size IP_ADDRESS_SIZE.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">char * <b>buffer </b></td><td>A <code>byte</code> pointer to store the IP address. It needs to be of size <code>IP_ADDRESS_SIZE</code> (46 bytes)</td></tr>
+                <tr><td class="param">size_t <b>bufferLen </b></td><td>The length of the <code>char</code> pointer.</td></tr>
+                <tr><td class="param">bool <b>ipv6</b></td><td>If true, the IPv6 address is fetched.</td></tr>
+                <tr><td class="param">IInstanceLog * <b>log </b></td><td>An <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> pointer to the logging interface.</td></tr>
+            </table>
         </dd>
     </dl>
 
@@ -73,5 +89,11 @@ IEthernet::GetMACAddress(mac, log);
 
     <h3>Overview</h3>
     The <code class="laguage-cpp">#define MAC_ADDRESS_SIZE</code> is used to define the size of the byte * mac array.
+
+    <h2 id="IP_ADDRESS_SIZE">IP_ADDRESS_SIZE</a></h2>
+    <pre><code class="laguage-cpp">#define IP_ADDRESS_SIZE    46</code></pre>
+
+    <h3>Overview</h3>
+    The <code class="laguage-cpp">#define IP_ADDRESS_SIZE</code> is used to define the maximum length of the char array for an IP address.
 </body>
 </html>

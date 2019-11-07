@@ -398,7 +398,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                         for (var key in newModel) that.providers.push(key);
                         changed = true;
                     }
-                    that.onupdate.notify();
+                    if (changed) that.onupdate.notify();
                 }
 
                 this.Src = function (onmessage) {

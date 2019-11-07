@@ -21,6 +21,9 @@ public:
     virtual void MessageComplete() = 0;
     virtual void MessageSend(class json_io & msg, char * buffer) = 0;
     virtual void MessageSendText(const char * buffer) = 0;
+    virtual void Encrypt(const char * seed, const char * data, char * out, size_t outLen) = 0;
+    virtual void Decrypt(const char * seed, const char * data, char * out, size_t outLen) = 0;
+    virtual void Hash(const char * seed, const char * data, char * out, size_t outLen) = 0;
     virtual void Close() = 0;
 };
 

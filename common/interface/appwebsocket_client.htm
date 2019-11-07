@@ -52,6 +52,9 @@ public:
     <a href="#MessageComplete" style="text-decoration:none;">void MessageComplete();</a>
     <a href="#MessageSend" style="text-decoration:none;">void MessageSend(class json_io & msg, char * buffer);</a>
     <a href="#MessageSendText" style="text-decoration:none;">void MessageSendText(const char * buffer);</a>
+    <a href="#Encrypt">void Encrypt(const char * seed, const char * data, char * out, size_t outLen);</a>
+    <a href="#Decrypt">void Decrypt(const char * seed, const char * data, char * out, size_t outLen);</a>
+    <a href="#Hash">void Hash(const char * seed, const char * data, char * out, size_t outLen);</a>
     <a href="#Close" style="text-decoration:none;">void Close();</a>
 };</code></pre>
     
@@ -137,6 +140,116 @@ public:
             </table>
         </dd>
     </dl>
+
+    <div class="fnhead" id="Encrypt">Encrypt</div>
+
+    <dd>
+        Can be used to encrypt a text send on the AppWebsocket connection, using the session
+        key
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">const char * seed<b>seed</b></td>
+                <td>
+                    Seed, which can be used so that the result of the encryption is different even
+                    if the data is the same.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">const char * <b>data</b></td>
+                <td>
+                    Buffer containing the data to be encrypted as zero terminated string
+                </td>
+            </tr>
+            <tr>
+                <td class="param">char * <b>out</b></td>
+                <td>
+                    Buffer for the encrypted output as hex string.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">size_t <b>outLen</b></td>
+                <td>
+                    Length of the buffer for the output. Must be 2 times the length of
+                    the data string.
+                </td>
+            </tr>
+        </table>
+    </dd>
+
+    <div class="fnhead" id="Decrypt">Decrypt</div>
+
+    <dd>
+        Can be used to dencrypt a text send on the AppWebsocket connection, using the session
+        key
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">const char * seed<b>seed</b></td>
+                <td>
+                    Seed, which can be used so that the result of the encryption is different even
+                    if the data is the same.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">const char * <b>data</b></td>
+                <td>
+                    Buffer containing the hex string of encryped data
+                </td>
+            </tr>
+            <tr>
+                <td class="param">char * <b>out</b></td>
+                <td>
+                    Buffer for the decrypted output
+                </td>
+            </tr>
+            <tr>
+                <td class="param">size_t <b>outLen</b></td>
+                <td>
+                    Length of the buffer for the output. Must be half the length of
+                    the data string.
+                </td>
+            </tr>
+        </table>
+    </dd>
+
+
+    <div class="fnhead" id="Hash">Hash</div>
+
+    <dd>
+        Calculate a SHA256 hash using the session key
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">const char * seed<b>seed</b></td>
+                <td>
+                    Seed, which can be used so that the result of the encryption is different even
+                    if the data is the same.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">const char * <b>data</b></td>
+                <td>
+                    Buffer containing a zero terminated string over which the hash shall be calculated
+                </td>
+            </tr>
+            <tr>
+                <td class="param">char * <b>out</b></td>
+                <td>
+                    Buffer for the hash
+                </td>
+            </tr>
+            <tr>
+                <td class="param">size_t <b>outLen</b></td>
+                <td>
+                    Length of the buffer for the output. Must be 64 bytes, 2* HASH_SIZE_SHA256
+                </td>
+            </tr>
+        </table>
+    </dd>
     
     <a name="Close"></a>
     <div class="fnhead">Close</div>

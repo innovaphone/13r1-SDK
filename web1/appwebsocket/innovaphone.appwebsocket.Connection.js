@@ -89,8 +89,13 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                         instance.onconnected(domain, user, dn, obj.domain);
                     }
                     else {
-                        var login_info = instance.logindata ? instance.logindata.info : {};
-                        close(login_info.unlicensed ? "UNLICENSED" : "LOGIN_FAILURE");
+                        var error = "LOGIN_FAILURE";
+                        if (instance.logindata) {
+                            if (instance.logindata.info && instance.logindata.info.unlicensed) error = "UNLICENSED";
+                            else if (instance.logindata.errorText) error = instance.logindata.info.errorText;
+                            else if (instance.logindata.error) error = "Error " + instance.logindata.error;
+                        }
+                        close(error);
                     }
                     break;
                 case "CheckBuildResult":
