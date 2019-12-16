@@ -23,7 +23,7 @@ $(OUTDIR)/obj/innovaphone.manifest: $(STARTHTMLS) $(APPWEBSRC)
 	echo } >>$(OUTDIR)/obj/innovaphone.manifest
 	echo --^> >>$(OUTDIR)/obj/innovaphone.manifest
 	$(foreach htmlfile,$(STARTHTMLS),type $(subst /,\,$(OUTDIR)/obj/innovaphone.manifest) >$(OUTDIR)/obj/$(subst $(APPWEBPATH)/,,$(htmlfile)) &)
-	$(foreach htmlfile,$(STARTHTMLS),type $(subst /,\,$(htmlfile)) >>$(OUTDIR)/obj/$(subst $(APPWEBPATH)/,,$(htmlfile)) &)
+	$(foreach htmlfile,$(STARTHTMLS),$(IP_SRC)\exe\bomremover $(subst /,\,$(htmlfile)) >>$(OUTDIR)/obj/$(subst $(APPWEBPATH)/,,$(htmlfile)) &)
 
 WINBINS := $(subst /,\,$(bins))
 # we create the directories with a shell command before any target is executed, 

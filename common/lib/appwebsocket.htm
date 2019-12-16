@@ -190,6 +190,24 @@ public:
         that the AppWebsocket connection had been established.
         The default implementation is just an empty function, which returns true
 
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">class json_io & <b>msg</b></td>
+                <td>
+                    The message as JSON data structure.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">word <b>info</b></td>
+                <td>
+                    Indicates the location of the info structure inside the message. The info structure contains additional user, app and licensing information.
+                    For Details see the protocol definition: <a href="../../doc/protocol/appwebsocket.htm">AppWebsocket</a>.
+                </td>
+            </tr>
+        </table>
+    </dd>
+
         <h4>Return value</h4>
 
             The application should return true to indicate, that it is ready

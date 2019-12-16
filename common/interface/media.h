@@ -268,9 +268,11 @@ public:
 class IMedia {
 public:
     virtual ~IMedia() {};
-    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, byte * certificateFingerprint, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, bool iceNoHost, int dropMediaTx, int dropMediaRx) = 0;
+    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, bool iceNoHost, int dropMediaTx, int dropMediaRx, const char * hostPbx) = 0;
     virtual void Connect(class MediaConfig *remoteMediaConfig, bool iceControlling) = 0;
     virtual void RtpSend(const void * buf, size_t len, dword timestamp) = 0;
+    virtual void RtpForward(const void * buf, size_t len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;
+    virtual void RtcpSend(const void * buf, size_t len) = 0;
     virtual void RtpDtmf(char digit, byte pt) = 0;
     virtual void SctpSend(const void * buf, size_t len, unsigned num) = 0;
     virtual void Recv(void * buf, size_t len, bool recvPartial = false) = 0;
@@ -287,7 +289,7 @@ public:
     virtual void MediaConnectResult(IMedia * const media, const char * error) {};
     virtual void MediaRtpSendResult(IMedia * const media) {};
     virtual void MediaSctpSendResult(IMedia * const media) {};
-    virtual void MediaRtpRecvResult(IMedia * const media, void * buf, size_t len, dword timestamp) {};
+    virtual void MediaRtpRecvResult(IMedia * const media, void * buf, size_t len, dword timestamp, short sequenceNumberDiff, bool marker) {};
     virtual void MediaSctpRecvResult(IMedia * const media, void * buf, size_t len) {};
     virtual void MediaSctpRecvAck(IMedia * const media, unsigned num) {};
     virtual void MediaCloseComplete(IMedia * const media) {};
@@ -306,9 +308,9 @@ public:
 
 class UMediaEndpoint {
 public:
-    virtual void RtpRecvResult(char * buf, int len, dword timestamp) {};
+    virtual void RtpRecvResult(char * buf, int len, dword timestamp, short sequenceNumberDiff, bool marker) {};
     virtual void RtpSendResult() {};
-    virtual void RtpSend(char * buf, int len, dword timestamp, bool marker = false) = 0;
+    virtual void RtpSend(char * buf, int len, dword timestamp, short sequenceNumberDiff = 0, bool marker = false) = 0;
     virtual void RtcpSend(char * buf, int len) = 0;
     virtual void SctpRecvResult(char * buf, int len) {};
     virtual void SctpRecvAck(unsigned num) {};
@@ -320,7 +322,7 @@ class IMediaIoChannel {
 public:
     virtual ~IMediaIoChannel() {};
     virtual void Open() = 0;
-    virtual void RtpRecv(void * buf, size_t len, dword timestamp) = 0;
+    virtual void RtpRecv(void * buf, size_t len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;
     virtual void RtpSendResult() {};
     virtual void SctpRecv(void * buf, size_t len) = 0;
     virtual void SctpRecvAck(unsigned num) {};
@@ -332,6 +334,8 @@ public:
 class UMediaIoChannel {
 public:
     virtual void MediaIoRtpSend(const void * buf, size_t len, dword timestamp) = 0;
+    virtual void MediaIoRtpForward(const void * buf, size_t len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;
+    virtual void MediaIoRtcpSend(const void * buf, size_t len) = 0;
     virtual void MediaIoSctpSend(const void * buf, size_t len, unsigned num) = 0;
     virtual void MediaIoCloseComplete(class IMediaIoChannel * const mediaIoChannel) = 0;
 };
@@ -399,6 +403,8 @@ public:
     virtual void StartDualTones(dword toneFlags, unsigned toneCount, const struct AudioIoDualTone *tones) = 0;
     virtual void StopDualTones() = 0;
 
+    virtual void LoopTest(bool on) = 0;
+
     virtual class IAudioIoChannel *CreateChannel(class UMediaIoChannel * const user) = 0;
     virtual void InitializeChannel(class IAudioIoChannel *audioIoChannel, enum AudioCoder coder, bool sc, unsigned mediaPacketizationMs) = 0;
 
@@ -445,8 +451,6 @@ public:
 class UVideoIo {
 public:
     virtual void CloseVideoIoComplete() = 0;
-    virtual void MediaIoVideoContainerSend(const void * buf, size_t len, dword timestamp, const void * context, bool local, enum MediaType type) = 0;
-    virtual void MediaIoVideoContainerInit(const void * context, bool local, enum MediaType type) = 0;
 };
 
 enum AppSharingDeviceType {
@@ -631,7 +635,8 @@ class IMediaDecoder
 public:
     static class IMediaDecoder * Create(class IIoMux * const iomux, class UMediaDecoder * const user, class IInstanceLog * log, enum VideoCoder coder);
     virtual ~IMediaDecoder() {};
-    virtual void Decode(const void *buf, int len, dword timestamp) = 0;
+    virtual void DecodeFrame(const void *buf, int len, dword timestamp) = 0;
+    virtual void DecodeStream(const void *buf, int len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;
     virtual void Close() = 0;
 };
 

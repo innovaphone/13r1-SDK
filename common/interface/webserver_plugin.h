@@ -6,6 +6,8 @@
 
 #define WS_MAX_PATH_LENGTH      8192
 #define WS_MAX_DATA_SIZE        65535
+#define WS_DISABLE_AUTH         nullptr
+
 
 // For additional notes to the structure of wsr_cancel_type_t and ws_webdav_result_t, look to
 // webserver_internal.h, description to wsr_int_type_t. So before changing anything here, first
@@ -174,7 +176,7 @@ static const ws_type_sfx_t suffixes[] = {
 inline wsr_type_t GetResponseTypeForFileName(const char * fileName)
 {
     char * p = strrchr(const_cast<char *>(fileName), '.');
-    if (p != NULL) {
+    if (p != nullptr) {
         p++; // Remove '.'
         for (size_t i = 0; i < sizeof(suffixes) / sizeof(ws_type_sfx_t); i++) {
             if (strcmp(p, suffixes[i].sfx) == 0)
@@ -240,6 +242,15 @@ typedef enum {
 } ws_request_type_t;
 
 
+typedef enum {
+    WS_AUTH_DECACTIVATED,
+    WS_AUTH_DYNAMIC,
+    WS_AUTH_STATIC,
+    WS_AUTH_ERR_PATH_NOT_LISTENING,
+    WS_AUTH_ERR_PATH_INVALID
+} ws_update_auth_result_t;
+
+
 // Give this to SetTransferInfo as dataSize to tell the Webserver that your data
 // will need to be sent chunk encoded.
 static const size_t WS_RESPONSE_CHUNKED = 0xFFFFFFFF;
@@ -262,11 +273,14 @@ class IWebserverPlugin {
 public:
     virtual ~IWebserverPlugin() {};
 
-    virtual void SendCertificate(const char * password, const byte * certBuf, size_t certLen, const char * hostName = NULL, UWebserverPlugin * user = NULL) = 0;
-    virtual void HttpListen(const char * path = NULL, UWebserverPlugin * user = NULL, const char * authUser = NULL, const char * authUserPwd = NULL, const char * staticFilePrefix = NULL) = 0;
-    virtual void HttpListen(const char * path, UWebserverPlugin * user, bool dynamicAuth, const char * staticFilePrefix = NULL) = 0;
-    virtual void PassthroughListen(const char * path = NULL, UWebserverPlugin * user = NULL) = 0;
-    virtual void WebsocketListen(const char * path = NULL, UWebserverPlugin * user = NULL) = 0;
+    virtual void SendCertificate(const char * password, const byte * certBuf, size_t certLen, const char * hostName = nullptr, UWebserverPlugin * user = nullptr) = 0;
+    virtual void HttpListen(const char * path = nullptr, UWebserverPlugin * user = nullptr, const char * authUser = nullptr, const char * authUserPwd = nullptr, const char * staticFilePrefix = nullptr) = 0;
+    virtual void HttpListen(const char * path, UWebserverPlugin * user, bool dynamicAuth, const char * staticFilePrefix = nullptr) = 0;
+    virtual void PassthroughListen(const char * path = nullptr, UWebserverPlugin * user = nullptr) = 0;
+    virtual void WebsocketListen(const char * path = nullptr, UWebserverPlugin * user = nullptr) = 0;
+
+    virtual void SetAuthConfig(const char * path, const char * authUser = nullptr, const char * authPwd = nullptr) = 0;
+    virtual void SetAuthConfig(const char * path, bool enableDynAuth) = 0;
 
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Redirect(const char * newDestination) = 0;
@@ -301,7 +315,7 @@ public:
     {
         if (lastUser) delete plugin;
     }
-    
+
     virtual void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
     {
         plugin->Cancel(WSP_CANCEL_NOT_FOUND);
@@ -314,13 +328,14 @@ public:
 
     virtual void WebserverPluginWebsocketListenResult(IWebserverPlugin * plugin, const char * path, const char * registeredPathForRequest, const char * host)
     {
-        plugin->WebsocketAccept(NULL);
+        plugin->WebsocketAccept(nullptr);
     }
 
     virtual void WebserverPluginConnected() {}
     virtual void WebserverPluginSendCertificateResult(IWebserverPlugin * plugin, byte * certBuffer) {}
     virtual void WebserverPluginRegisterPathResult(IWebserverPlugin * plugin, const char * pathName, wsp_path_type_t pathType) {}
     virtual void WebserverPluginRequestUserPassword(IWebserverPlugin * plugin, dword connectionID, char * resourceName, const char * registeredPathForRequest, const char * host, const char * user) { ASSERT(false, "UWebserverPlugin::WebserverPluginRequestUserPassword() not implemented!"); }
+    virtual void SetAuthConfigResult(const char * path, ws_update_auth_result_t result) {}
 };
 
 
@@ -354,10 +369,10 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
-    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = NULL) = 0;
+    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr) = 0;
     virtual void SetTransferRange(size_t rangeStart, size_t rangeEnd) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
-    virtual void ForceDownloadResponse(const char * fileName = NULL) = 0;
+    virtual void ForceDownloadResponse(const char * fileName = nullptr) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
     virtual void Close() = 0;
 };
@@ -383,13 +398,13 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
     virtual size_t GetDataSize() = 0;
     virtual bool DataIsChunkEncoded() = 0;
-    
-    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = NULL) = 0;
-    virtual void ForceDownloadResponse(const char * fileName = NULL) = 0;
+
+    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr) = 0;
+    virtual void ForceDownloadResponse(const char * fileName = nullptr) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
-    virtual void Recv(void * buffer = NULL, size_t len = 0) = 0;
+    virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
     virtual void Close() = 0;
 };
 
@@ -401,7 +416,7 @@ public:
     virtual void WebserverPostRequestAcceptComplete(IWebserverPost * const webserverPost) = 0;
     virtual void WebserverPostSendResult(IWebserverPost * const webserverPost) {}
     virtual void WebserverPostRecvResult(IWebserverPost * const webserverPost, void * buffer, size_t len) = 0;
-    virtual void * WebserverPostRecvBuffer(size_t len) { return NULL; }
+    virtual void * WebserverPostRecvBuffer(size_t len) { return nullptr; }
     virtual void WebserverPostRecvCanceled(IWebserverPost * const webserverPost, void * buffer) = 0;
     virtual void WebserverPostCloseComplete(IWebserverPost * const webserverPost) = 0;
 };
@@ -419,7 +434,7 @@ public:
 
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t size) = 0;
-    virtual void Recv(void * buffer = NULL, size_t len = 0) = 0;
+    virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
     virtual void Close() = 0;
 };
 
@@ -431,7 +446,7 @@ public:
     virtual void WebserverPassthroughRequestAcceptComplete(IWebserverPassthrough * const webserverPassthrough) = 0;
     virtual void WebserverPassthroughSendResult(IWebserverPassthrough * const webserverPassthrough) = 0;
     virtual void WebserverPassthroughRecvResult(IWebserverPassthrough * const webserverPassthrough, void * buffer, size_t len) = 0;
-    virtual void * WebserverPassthroughRecvBuffer(size_t len) { return NULL; }
+    virtual void * WebserverPassthroughRecvBuffer(size_t len) { return nullptr; }
     virtual void WebserverPassthroughRecvCanceled(IWebserverPassthrough * const webserverPassthrough, void * buffer) = 0;
     virtual void WebserverPassthroughCloseComplete(IWebserverPassthrough * const webserverPassthrough) = 0;
 };
@@ -452,7 +467,7 @@ public:
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
-    virtual void Recv(void * buffer = NULL, size_t len = 0) = 0;
+    virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
     virtual void Close() = 0;
 };
 
@@ -464,7 +479,7 @@ public:
     virtual void WebserverPutRequestAcceptComplete(IWebserverPut * const webserverPut) = 0;
     virtual void WebserverPutSendResult(IWebserverPut * const webserverPut) = 0;
     virtual void WebserverPutRecvResult(IWebserverPut * const webserverPut, void * buffer, size_t len) = 0;
-    virtual void * WebserverPutRecvBuffer(size_t len) { return NULL; }
+    virtual void * WebserverPutRecvBuffer(size_t len) { return nullptr; }
     virtual void WebserverPutRecvCanceled(IWebserverPut * const webserverPut, void * buffer) = 0;
     virtual void WebserverPutCloseComplete(IWebserverPut * const webserverPut) = 0;
 };
@@ -484,7 +499,7 @@ public:
     virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
-    virtual void Recv(void * buffer = NULL, size_t len = 0) = 0;
+    virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
     virtual void Close() = 0;
 };
@@ -498,7 +513,7 @@ public:
     virtual void WebserverPropfindRecvResult(IWebserverPropfind * const webserverPropfind, void * buffer, size_t len) = 0;
     virtual void * WebserverPropfindRecvBuffer(size_t len)
     {
-        return NULL;
+        return nullptr;
     }
     virtual void WebserverPropfindRecvCanceled(IWebserverPropfind * const webserverPropfind, void * buffer) = 0;
     virtual void WebserverPropfindCloseComplete(IWebserverPropfind * const webserverPropfind) = 0;
@@ -623,7 +638,7 @@ public:
     virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
-    virtual void Recv(void * buffer = NULL, size_t len = 0) = 0;
+    virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
     virtual void Close() = 0;
 };
@@ -637,7 +652,7 @@ public:
     virtual void WebserverLockRecvResult(IWebserverLock * const webserverLock, void * buffer, size_t len) = 0;
     virtual void * WebserverLockRecvBuffer(size_t len)
     {
-        return NULL;
+        return nullptr;
     }
     virtual void WebserverLockRecvCanceled(IWebserverLock * const webserverLock, void * buffer) = 0;
     virtual void WebserverLockCloseComplete(IWebserverLock * const webserverLock) = 0;
@@ -682,7 +697,7 @@ public:
     virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
-    virtual void Recv(void * buffer = NULL, size_t len = 0) = 0;
+    virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
     virtual void Close() = 0;
 };
@@ -696,7 +711,7 @@ public:
     virtual void WebserverProppatchRecvResult(IWebserverProppatch * const webserverProppatch, void * buffer, size_t len) = 0;
     virtual void * WebserverProppatchRecvBuffer(size_t len)
     {
-        return NULL;
+        return nullptr;
     }
     virtual void WebserverProppatchRecvCanceled(IWebserverProppatch * const webserverProppatch, void * buffer) = 0;
     virtual void WebserverProppatchCloseComplete(IWebserverProppatch * const webserverProppatch) = 0;
@@ -746,7 +761,7 @@ public:
     virtual bool IsEncryptedConnection() = 0;
 
     virtual void Send(const void * buffer, size_t len, bool text = true) = 0;
-    virtual void Recv(void * buf = NULL, size_t len = 0) = 0;
+    virtual void Recv(void * buf = nullptr, size_t len = 0) = 0;
     virtual void Close() = 0;
 };
 
@@ -757,7 +772,7 @@ public:
     virtual void WebsocketAcceptComplete(class IWebsocket * websocket) = 0;
     virtual void WebsocketSendResult(class IWebsocket * websocket) = 0;
     virtual void WebsocketRecvResult(class IWebsocket * websocket, void * buffer, size_t len, bool text, bool isFragmented) = 0;
-    virtual void * WebsocketRecvBuffer(size_t len) { return NULL; }
+    virtual void * WebsocketRecvBuffer(size_t len) { return nullptr; }
     virtual void WebsocketRecvCanceled(class IWebsocket * websocket, void * buffer) = 0;
     virtual void WebsocketCloseComplete(class IWebsocket * websocket, ws_close_reason_t reason) = 0;
 };

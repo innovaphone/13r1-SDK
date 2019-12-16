@@ -93,6 +93,8 @@ enum AppSharingMessages {
    INFO_MESSAGE,
    INFO_MESSAGE_ACK,
    LOW_QUALITY_IMAGE_MESSAGE,
+   DELETE_IMAGE_MESSAGE,
+   DELETE_IMAGE_MESSAGE_ACK,
 };
 
 class UImageBuffer {
@@ -179,7 +181,6 @@ public:
     // Only trigger calls in IScreenSink for the consistent part of the current block
     //virtual void Set(byte x, byte y, class IImage * image, byte version, byte update) = 0;
     virtual void Set(class IImage * image) = 0;
-
     virtual void Set(class ILowQualityImage * image) = 0;
 
     // Returns the number of updates of the specified block
@@ -189,6 +190,7 @@ public:
     // Returns the current version of the specified block
     // Called by IScreenSink to get the image for displaying or network transmission
     virtual class IImage * Get(byte x, byte y) = 0;
+    virtual class ILowQualityImage * GetLowQuality() = 0;
 
     // Returns the specified update of the specified block
     // Called by IScreenSink to get the image for displaying or network transmission
@@ -198,6 +200,10 @@ public:
     virtual void UnregisterScreenSink(class IScreenSink * sink) = 0;
 
     virtual void UpdateAppResolution(int w, int h) = 0;
+
+    // Clear ScreenBuffer. 
+    // LowQualityImage arrived
+    virtual void Clear() = 0;
 };
 
 class IScreenSink {
@@ -208,7 +214,7 @@ public:
     // Notification that a new version of a block is ready for displaying / transmission
     // Senders should mark this block version in the local state
     virtual void ImageAdded(byte x, byte y, byte version) {};
-    virtual void LowQualityImage(class ILowQualityImage * image) {};
+    virtual void LowQualityImageAdded() {};
 
     // Notification that a new update of a block is ready for displaying / transmission
     // Senders should mark this update in the local state

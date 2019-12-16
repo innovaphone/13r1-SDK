@@ -236,7 +236,7 @@ public:
     virtual void Accept(class USocket * remoteUser);
     virtual void Shutdown();
     virtual void Send(const void * buf, size_t len);
-    virtual void SendTo(const void * buf, size_t len, struct sockaddr_storage * dstAddr) {};
+    virtual void SendTo(const void * buf, size_t len, IPaddr dstAddr, word dstPort) {};
     virtual void Recv(void * buf, size_t len, bool recvPartial = false);
     virtual void SetUser(class USocket * const user);
 };</code></pre>
@@ -439,7 +439,7 @@ public:
     virtual void SocketShutdown(ISocket * const socket, shutdownreason_t reason);
     virtual void SocketSendResult(ISocket * const socket) {};
     virtual void SocketRecvResult(ISocket * const socket, void * buf, size_t len) {};
-    virtual void SocketRecvFromResult(ISocket * const socket, void * buf, size_t len, struct sockaddr_storage * dstAddr) {};
+    virtual void SocketRecvFromResult(ISocket * const socket, void * buf, size_t len, IPaddr dstAddr) {};
     virtual void SocketRecvCanceled(ISocket * const socket, void * buf);
     virtual void SocketUpgradeToTLSComplete(ISocket * const socket) {}
 };</code></pre>

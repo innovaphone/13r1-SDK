@@ -85,7 +85,8 @@ public:
                                 class ISocketProvider * const tcpSocketProvider,
                                 class ISocketProvider * const tlsSocketProvider,
                                 class UHTTPClient * const user,
-                                class IInstanceLog * const log);
+                                class IInstanceLog * const log,
+                                class IDns * const dns = nullptr);
     virtual void Connect(const char * address,
                          const char * user = NULL,
                          const char * pwd = NULL,
@@ -123,6 +124,7 @@ public:
             <tr><td class="param">ISocketProvider * const <b>tlsSocketProvider</b></td><td>A socket provider to create a TLS socket.</td></tr>
             <tr><td class="param">UHTTPClient * const <b>user</b></td><td>An UHTTPClient instance to receive the callbakcs from IHTTPClient.</td></tr>
             <tr><td class="param">IInstanceLog * const <b>log</b></td><td>The log instance for logging.</td></tr>
+            <tr><td class="param">IDns * const <b>dns</b></td><td>The optional dns instance for dns requests. If specified, the same DNS instance is used for DNS requests which saves performance.</td></tr>
         </table>
 
         <h4>Return Value</h4>

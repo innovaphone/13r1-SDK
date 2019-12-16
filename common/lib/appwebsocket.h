@@ -61,9 +61,9 @@ public:
     void AppWebsocketMessageSendBinary(char * buffer, int len);
     void AppWebsocketClose();
 
-    void AppWebsocketEncrypt(const char * seed, const char * data, char * out, size_t outLen);
-    void AppWebsocketDecrypt(const char * seed, const char * data, char * out, size_t outLen);
-    void AppWebsocketHash(const char * seed, const char * data, char * out, size_t outLen);
+    void AppWebsocketEncrypt(const char * seed, const char * data, char * out, size_t outLen) override;
+    void AppWebsocketDecrypt(const char * seed, const char * data, char * out, size_t outLen) override;
+    void AppWebsocketHash(const char * seed, const char * data, char * out, size_t outLen) override;
 
     bool AppWebsocketIsEncryptedConnection() { return websocket->IsEncryptedConnection(); };
 

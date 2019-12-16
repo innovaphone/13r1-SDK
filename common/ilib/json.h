@@ -80,7 +80,8 @@ public:
     word add_object(word base, const char * name);
     word add_array(word base, const char * name);
     void add_string(word base, const char * name, const char * value, word len=0xffff);
-    void add_string(word base, const char * name, const word * value, word len=0xffff);
+    void add_string(word base, const char * name, const word * value, word len, char * & tmp);
+    void add_string(word base, const char * name, const word * value, char * & tmp) { add_string(base, name, value, 0xffff, tmp); };
     void add_replace_string(word base, const char * name, const char * value, word len=0xffff);
     void add_json(word base, const char * name, const char * value, word len=0xffff);
     void add_int(word base, const char * name, int c, char * & tmp);

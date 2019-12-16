@@ -29,6 +29,6 @@ typedef enum {
 class ICertificates {
 public:
     static certificate_error_t ValidateCertificate(class IInstanceLog * log, const byte * cert, size_t certLen);
-    virtual byte * CertificateFingerprint(class IInstanceLog * log, const byte * cert, size_t certLen, fingerprint_t type = FINGERPRINT_SHA256) = 0;
+    virtual byte * CertificateFingerprint(class IInstanceLog * log, const byte * cert, size_t certLen, size_t * length, fingerprint_t type = FINGERPRINT_SHA256) = 0;
     virtual byte * CreateCertificate(class IInstanceLog * log, size_t * certLen, certificate_type_t type = CERTIFICATE_PEM) = 0;
 };

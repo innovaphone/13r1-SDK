@@ -148,7 +148,7 @@ class NewApp1 : public AppInstance, public AppUpdates, public UDatabase, public 
 
     bool stopping;
     class ITask * currentTask;
-    std::list<class NewApp1Session *> sessionList;
+    std::list&lt;class NewApp1Session *&gt; sessionList;
 
 public:
     NewApp1(IIoMux * const iomux, NewApp1Service * service, AppInstanceArgs * args);
@@ -232,6 +232,7 @@ void NewApp1::DatabaseShutdown(IDatabase * const database, db_error_t reason)
     TryStop();
 }
         </code></pre>
+        
         </div>
         
     <h3>Use of the prepared statements inside the already existing class TaskReadWriteCount</h3>
@@ -249,7 +250,7 @@ void NewApp1::DatabaseShutdown(IDatabase * const database, db_error_t reason)
             <li>Do not call Complete in TaskReadWriteCount::DatabaseInsertSQLResult anymore, as EndTransaction is always called instead.</li>
             <li>Implement DatabaseBeginTransactionResult (empty function) and DatabaseEndTransactionResult. Call Complete() inside DatabaseEndTransactionResult.</li>
             <li>There is no need to call EndTransaction in the DatabaseError function, as the database implementation itself rollsback any transaction on errors.</li>
-            <li>There are several calls of the TaskReadWriteCount constructor (MonitorCount, IncrementCount, ResetCount and CountInit). Pass the stmtHistoryInsert pointer of the NewApp1 instance here (e.g. session->instance->stmtHistoryInsert</li>
+            <li>There are several calls of the TaskReadWriteCount constructor (MonitorCount, IncrementCount, ResetCount and CountInit). Pass the stmtHistoryInsert pointer of the NewApp1 instance here (e.g. session->instance->stmtHistoryInsert)</li>
         </ul>
         
         <button name="spoiler" style="height:30px; font-size:14px" onclick="toggleSpoiler('readwrite');">Code spoiler</button>
@@ -413,6 +414,13 @@ public:
         </code></pre>       
         
         <h4>class TaskGetHistory in NewApp1_tasks.cpp</h4>
+        Add the json.h as include after the platform.h include at the top of the cpp file.
+        
+        <pre><code class="language-cpp">
+#include "platform/platform.h"
+#include "common/ilib/json.h"   // tutorial change
+        </code></pre>
+        
         <pre><code class="language-cpp">
 /*-----------------------------------------------------------------------------------------------*/
 /* TaskGetHistory created for this tutorial                                                      */
@@ -479,7 +487,7 @@ void TaskGetHistory::GetItem(class json_io * json, word base, char *& tmp)
         <h4>class NewApp1Session in NewApp1.h after these changes</h4>
         <pre><code class="language-cpp">
 class NewApp1Session : public AppUpdatesSession {
-    UTaskTemplate<NewApp1Session, class TaskGetHistory> taskGetHistory;
+    UTaskTemplate&lt;NewApp1Session, class TaskGetHistory&gt; taskGetHistory;
 
     void AppWebsocketAccept(class UWebsocket * uwebsocket) { instance->webserverPlugin->WebsocketAccept(uwebsocket); };
     char * AppWebsocketPassword() override { return (char *)instance->appPwd(); };

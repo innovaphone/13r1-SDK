@@ -82,7 +82,8 @@ public:
                                 class ISocketProvider * const tcpSocketProvider,
                                 class ISocketProvider * const tlsSocketProvider,
                                 class UHTTPClient * const user,
-                                class IInstanceLog * const log);
+                                class IInstanceLog * const log,
+                                class IDns * const dns = nullptr);
 
     virtual void Connect(const char * address,
                          const char * user = NULL,

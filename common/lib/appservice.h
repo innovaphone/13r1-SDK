@@ -216,6 +216,7 @@ public:
     }
 
     virtual void Stop() = 0;
+    virtual void AppInstanceShutdownTimeout() {};
     virtual void ServerCertificateUpdate(const byte * cert, size_t certLen) {};
 
     void SetAlarm(word code, ServiceAlarmSeverity severity, const char * text, const char * details);

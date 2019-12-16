@@ -286,6 +286,21 @@
             </dl>
         </dd>
     </dl>
+    <p>
+        Example:
+<pre><code class="json">{
+    "mt":"CallInfo",
+    "api":"RCC",
+    "user":1,
+    "call":2,
+    "state":6,
+    "peer":{"e164":"444","h323":""},
+    "msg":"r-disc",
+    "info":[
+        {"type":"cause","vali":1,"vals":"Unallocated (unassigned) number"}
+    ]
+}</code></pre>
+    </p>
 
 	<h2><a name="UserEnd">UserEnd</a></h2>
 
@@ -552,7 +567,10 @@
 
     <dl>
         <dt>call:integer</dt>
-        <dt>hold:bool</dt>
+        <dt>remote:bool</dt>
+        <dd>
+            If added with value <i>true</i>, no MOH is played to local endpoint. Otherwise MOH is played to both endpoints (local and remote).
+        </dd>
     </dl>
 	
     <h2><a name="UserRetrieve">UserRetrieve</a></h2>

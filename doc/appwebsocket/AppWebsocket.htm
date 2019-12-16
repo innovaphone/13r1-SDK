@@ -297,6 +297,7 @@
     "appurl": string,
     "cn": string",
     "unlicensed": bool,
+    "lics": unsigned,
     "apps": [<a href="#info-app">App</a>,...]"
 }</code></pre>
 
@@ -325,6 +326,10 @@
         <dt>unlicensed</dt>
         <dd>
             Present and true if the App is running in an unlicensed mode.
+        </dd>
+        <dt>lics</dt>
+        <dd>
+            The number of service licenses that are assigned to the app instance. This value would be typically evaluated on the AppWebsocket connection from the App Object in the PBX to the App Instance.
         </dd>
         <dt>apps</dt>
         <dd>

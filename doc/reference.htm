@@ -14,6 +14,7 @@
         <tr><td><b><a href="#CPP_library">C++ library for App Services</a></b></td><td>Used to develop the app-service for the app platform itself.</td></tr>
         <tr><td><b><a href="#JS_library">JavaScript library for Apps</a></b></td><td>A library to create the JavaScript UI for an app (if there is any).</td></tr>
         <tr><td><b><a href="#APIs">APIs</a> </b></td><td>There are different kinds of APIs that can be used for communication between different components of the system (app, app service, PBX).</td></tr>
+        <tr><td><b><a href="#Protocols">Protocols</a> </b></td><td>Different protocols used by Apps, e.g. the Sysclient protocol within the Devices App.</td></tr>
         <tr><td><b><a href="#How_to">How to use the AppStore</a> </b></td><td>The AppStore can be used to publish apps.</td></tr>
     </table>
 
@@ -405,6 +406,7 @@
                 In the future this legacy API will be ported to a Websocket interface. Implementations based
                 in the current SOAP interface will remain working.
             </td>
+        </tr>
         <tr>
             <td><b><a href="pbx/cdr.htm">CDR</a></b></td>
             <td>
@@ -422,6 +424,19 @@
         </tr>
     </table>
 
+    <a name="Protocols"></a><h2>Protocols</h2>
+    <p>
+        There are some protocols used by innovaphone Apps.
+    </p>
+    <table>
+        <tr>
+            <td><b><a href="protocol/sysclient.htm">Sysclient</a></b></td>
+            <td>
+                The sysclient protocol is used by devices to register in the Devices App.
+            </td>
+        </tr>
+    </table>
+    
     <a name="How_to"></a><h2>How to use the AppStore</h2>
     <p>
         After an app has been built, it can be published on the AppStore. <a href="howto/AppStore.htm">Here</a> you can find how to use the AppStore for this.

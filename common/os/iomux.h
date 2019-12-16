@@ -24,7 +24,7 @@ public:
 
 class UIoContext {
 protected:
-    int		FDIIoMux;	// File descriptor	
+    IoMuxFd		FDIIoMux;	// File descriptor	
 public:
     bool    isError, isHangup, isOpened;
     class UserDataIoContext * ctx;
@@ -32,8 +32,8 @@ public:
     UIoContext();
     virtual ~UIoContext();
 
-    int	 GetFd();
-    void SetFd(int fd);
+    IoMuxFd GetFd();
+    void SetFd(IoMuxFd fd);
 
     virtual void IoContextNotify(bool indRX, bool indTX) = 0;
 };
@@ -60,9 +60,9 @@ public:
     static IIoMux * Create(bool locking=true, unsigned rlimitNoFile=0);
 
     virtual void Run() = 0;
-    virtual void FDAdd(int fd, UIoContext * context, bool pollOut) = 0;
+    virtual void FDAdd(IoMuxFd fd, UIoContext * context, bool pollOut) = 0;
     virtual void FDClose(UIoContext * context) = 0;
-    virtual void FDUnblock(int fd) = 0;
+    virtual void FDUnblock(IoMuxFd fd) = 0;
     virtual bool CanAcceptFD() = 0;
     virtual void RegisterSignalConsumer(ISignalConsumer * consumer) = 0;
     virtual void RegisterShutdownHandler(IShutdownHandler * shutdownHandler) = 0;

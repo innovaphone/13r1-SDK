@@ -88,6 +88,7 @@
                                           <a href="#wsp_close_reason_t">wsp_close_reason_t</a><br/>
                                           <a href="#ws_close_reason_t">ws_close_reason_t</a><br/>
                                           <a href="#ws_request_type_t">ws_request_type_t</a><br/>
+                                          <a href="#ws_update_auth_result_t">ws_update_auth_result_t</a><br/>
                                           <a href="#IWebserverGetRange_range_type_t">IWebserverGetRange::range_type_t</a><br/>
                                           <br/>
                                       </td></tr>
@@ -219,6 +220,8 @@ public:
     virtual void HttpListen(const char * path, UWebserverPlugin * user, bool dynamicAuth, const char * staticFilePrefix = nullptr);
     virtual void PassthroughListen(const char * path = nullptr, UWebserverPlugin * user = nullptr);
     virtual void WebsocketListen(const char * path = nullptr, UWebserverPlugin * user = nullptr);
+    virtual void SetAuthConfig(const char * path, const char * authUser = nullptr, const char * authPwd = nullptr);
+    virtual void SetAuthConfig(const char * path, bool enableDynAuth);
 
     virtual void Cancel(wsr_cancel_type_t reason);
     virtual void Redirect(const char * newDestination);
@@ -276,8 +279,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">const char * <b>path</b></td><td><i>(Default nullptr)</i> The path to listen to. Note that that path always will be under the applications web root, defined when creating the IWebserverPlugin. If this value is nullptr, the root will be used.</td></tr>
-            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td><i>(Default nullptr)</i> The user to inform about an incoming request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user
-																																					as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
+            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td><i>(Default nullptr)</i> The user to inform about an incoming request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
             <tr><td class="param">const char * <b>authUser</b></td><td><i>(Default nullptr)</i> The user to use for authentication. If not is null, authentication for the given pass will be activated.</td></tr>
             <tr><td class="param">const char * <b>authPassword</b></td><td><i>(Default nullptr)</i> The password to use for authentication.</td></tr>
             <tr><td class="param">const char * <b>staticFilePrefix</b></td><td><i>(Default nullptr)</i> If not is nullptr, the value given will be used as prefix for static files. This can also include '/' to simulate an other path.</td></tr>
@@ -306,8 +308,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">const char * <b>path</b></td><td>The path to listen to. Note that that path always will be under the applications web root, defined when creating the IWebserverPlugin. If this value is nullptr, the applications root will be used.</td></tr>
-            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform about an incoming request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user
-																																					as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
+            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform about an incoming request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
             <tr><td class="param">bool <b>dynamicAuth</b></td><td>If true, dynamic authentication will be activated. That means, that the Webserver asks the application for the password for a user that tries to authenticate.</td></tr>
             <tr><td class="param">const char * <b>staticFilePrefix</b></td><td><i>(Default nullptr)</i> If not is nullptr, the value given will be used as prefix for static files. This can also include '/' to simulate an other path.</td></tr>
         </table>
@@ -330,14 +331,39 @@ public:
 		to the webserver again and also makes the listen calls again, too.<br/>
     </dd>
 	
+    <div class="fnhead">PassthroughListen</div>
+    <dd>
+		An appliction can register itself for passthrough. Y request to that path, whatever kind of request, will be completly redirected to the appliaction. That means, that the application is responsible for handling the HTTP 	header (the incoming
+		and outgoing) as well as all the other HTTP protocoll relarted stuff. The Webserver itself does nothing than passing through the bytestream between the client and the application. This can be done with the help of the
+		<a href="../lib/httplib.htm#HTTPLib_HTTPHeader">HTTPLib::HTTPHeader</a> and <a href="../lib/httplib.htm#HTTPLib_HTTPParser">HTTPLib::HTTPParser</a> classes. PassthroughListen() only should be used if it is really necessary, generally
+		it is recommended to let the Webserver itself handle all of the HTTP related stuff.
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>path</b></td><td>The path to listen to for passthrough. Note that that path always will be under the applications web root, defined when creating the IWebserverPlugin. If this value is nullptr, the applications root will be used.</td></tr>
+            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform about an incoming request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
+        </table>
+
+		<h4>Callbacks</h4>
+		On success, an incoming request will lead to a callback of UWebserverPlugin::WebserverPluginPassthroughListenResult().<br/>
+ 		If an error occurres, USocket::SocketShutdown() will be called. Details of that error can be found inside the log, if logging is activated. Reason can be one of the following values:<br/>
+        <table style="margin-left: 20px">
+            <tr><td><b>WSP_WEBSOCKET_PATH_INVALID</b></td><td>The path given to listen to websocket connection is invalid.</td></tr>
+            <tr><td><b>WSP_WEBSOCKET_PATH_ALREADY_LISTENING</b></td><td>An other application already is listening to that path.</td></tr>
+            <tr><td><b>WSP_ADDRESS_INVALID</b></td><td>The address to connect to the webserver is invalid.</td></tr>
+        </table>
+		
+        <h4>Remarks</h4>
+        Pathrough always will be handled with priority. So if IWebserverPlugin::HttpListen() and IWebserverPlugin::PassthroughListen() will be called with the same path, only the passthrough will be handled.
+    </dd>
+
     <div class="fnhead">WebsocketListen</div>
     <dd>
-
+        Listens for incomming webocket connection to the given path. WebsocketListen() can be called for a path that had been used for HTTPListen() before.
+        
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">const char * <b>path</b></td><td>The path to listen to for websocket conenctions. Note that that path always will be under the applications web root, defined when creating the IWebserverPlugin. If this value is nullptr, the applications root will be used.</td></tr>
-            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform about an incoming websocket request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user
-																																					as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
+            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform about an incoming websocket request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
         </table>
 
 		<h4>Callbacks</h4>
@@ -354,32 +380,41 @@ public:
         It is allowed to use the same path for IWebserverPlugin::WebsocketListen() as used for IWebserverPlugin::HttpListen().
     </dd>
 
-    <div class="fnhead">PassthroughListen</div>
+    <div class="fnhead">SetAuthConfig (overloaded)</div>
     <dd>
-		An appliction can register itself for passthrough. Y request to that path, whatever kind of request, will be completly redirected to the appliaction. That means, that the application is responsible for handling the HTTP 	header (the incoming
-		and outgoing) as well as all the other HTTP protocoll relarted stuff. The Webserver itself does nothing than passing through the bytestream between the client and the application. This can be done with the help of the
-		<a href="../lib/httplib.htm#HTTPLib_HTTPHeader">HTTPLib::HTTPHeader</a> and <a href="../lib/httplib.htm#HTTPLib_HTTPParser">HTTPLib::HTTPParser</a> classes. PassthroughListen() only should be used if it is really necessary, generally
-		it is recommended to let the Webserver itself handle all of the HTTP related stuff.
+        Must be called if the configuration for authentication of a path should be changed. The changes will become active immediately. This overloaded version will be used to enable static authentication with the given username and password. So multiple calls to that function can be used to change the username or password, too. Setting them both to nullptr, will deactivate authentication for the given path, independent whether if static or dynamic authentication is currently active.
+        
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">const char * <b>path</b></td><td>The path to listen to for passthrough. Note that that path always will be under the applications web root, defined when creating the IWebserverPlugin. If this value is nullptr, the applications root will be used.</td></tr>
-            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform about an incoming request. This helps to have different UWebserverPlugin instances for different path to list. If set to nullptr, the same user
-																																					as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
+            <tr><td class="param">const char * <b>path</b></td><td>The path to listen to change the authentication configuration for (without the app web root). If this is nullptr, "/" or "", the app webroot will be used.</td></tr>
+            <tr><td class="param">const char * <b>authUser</b></td><td><i>(Default: nullptr)</i> The user name to use for authentication. If this value is not nullptr, the authentication will be enabled or changed to static authentication.</td></tr>
+            <tr><td class="param">const char * <b>authPwd</b></td><td><i>(Default: nullptr)</i> The password to use for authentication.</td></tr>
         </table>
 
 		<h4>Callbacks</h4>
-		On success, an incoming request will lead to a callback of UWebserverPlugin::WebserverPluginPassthroughListenResult().<br/>
- 		If an error occurres, USocket::SocketShutdown() will be called. Details of that error can be found inside the log, if logging is activated. Reason can be one of the following values:<br/>
-        <table style="margin-left: 20px">
-            <tr><td><b>WSP_WEBSOCKET_PATH_INVALID</b></td><td>The path given to listen to websocket connection is invalid.</td></tr>
-            <tr><td><b>WSP_WEBSOCKET_PATH_ALREADY_LISTENING</b></td><td>An other application already is listening to that path.</td></tr>
-            <tr><td><b>WSP_ADDRESS_INVALID</b></td><td>The address to connect to the webserver is invalid.</td></tr>
-        </table>
+        The call to that function will lead to a UWebserverPlugin::SetAuthConfigResult() callback. The result of the action will be reported with one of the <a href="#ws_update_auth_result_t">ws_update_auth_result_t</a> values.
 		
         <h4>Remarks</h4>
-        Pathrough always will be handled with priority. So if IWebserverPlugin::HttpListen() and IWebserverPlugin::PassthroughListen() will be called with the same path, only the passthrough will be handled.
+        This version activates (or changes the parameters for) static authentication. It also only can be called for a path that had been passed to a previous HTTPListen() call. 
     </dd>
 
+    <div class="fnhead">SetAuthConfig (overloaded)</div>
+    <dd>
+        Must be called if the configuration for authentication of a path should be changed. The changes will become active immediately. This overloaded version will be used to enable dynamic authentication. Passing false as enableDynAuth, will deactivate authentication for the given path, independent whether if static or dynamic authentication is currently active.
+        
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>path</b></td><td>The path to listen to change the authentication configuration for (without the app web root). If this is nullptr, "/" or "", the app webroot will be used.</td></tr>
+            <tr><td class="param">bool <b>enableDynAuth</b></td><td>True, to enable or change to dynamic authentication. If false, authentication will be deactivated.</td></tr>
+        </table>
+
+		<h4>Callbacks</h4>
+        The call to that function will lead to a UWebserverPlugin::SetAuthConfigResult() callback. The result of the action will be reported with one of the <a href="#ws_update_auth_result_t">ws_update_auth_result_t</a> values.
+		
+        <h4>Remarks</h4>
+        SetAuthConfig() only can be called for a path that had been passed to a previous HTTPListen() call. However, it also can be used to switch from dynamic authentication to static authentication, if needed.
+    </dd>
+    
     <div class="fnhead">SendCertificate</div>
     <dd>
 		The Webserver supports TLS encrypted connections. This function let define the certficate to use. Generally there is no need for an application to call this function, becuse the certificate will be set by the Manager.
@@ -389,8 +424,7 @@ public:
             <tr><td class="param">const byte * <b>certBuf</b></td><td>The buffer with the certificate to send. Must not be nullptr.</td></tr>
             <tr><td class="param">size_t <b>certLen</b></td><td>The length of the certificate.</td></tr>
             <tr><td class="param">const char * <b>hostName</b></td><td>Reserved for later use, always should be set to nullptr.</td></tr>
-            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform the result. This helps to have different UWebserverPlugin instances. If set to nullptr, the same user
-																																		as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
+            <tr><td class="param">UWebserverPlugin * <b>user</b></td><td>The user to inform the result. This helps to have different UWebserverPlugin instances. If set to nullptr, the same user as passed to IWebserverPluginProvider::Create() will be used (which hovewer is the default user).</td></tr>
         </table>
 
 		<h4>Callbacks</h4>
@@ -503,8 +537,7 @@ public:
 
     <div class="fnhead">Close</div>
     <dd>
-		Closes the IWebserverPlugin instance. The application must wait until UWebserverPlugin::WebserverPluginClose() had been closed with lastUser set to true, before freeing the IWebserverPlugin instance. See
-		<a href="UWebserverPlugin">UWebserverPlugin</a> for more details.
+		Closes the IWebserverPlugin instance. The application must wait until UWebserverPlugin::WebserverPluginClose() had been closed with lastUser set to true, before freeing the IWebserverPlugin instance. See <a href="#UWebserverPlugin">UWebserverPlugin</a> for more details.
 
         <h4>Remarks</h4>
 		After closed, each still active user passed to one of the functions that accept an aditional UWebserverPlugin instance, will receife a UWebserverPlugin::WebserverPluginClose() callback. It is guaranteed, that the main user will
@@ -540,6 +573,7 @@ public:
     virtual void WebserverPluginSendCertificateResult(IWebserverPlugin * plugin, byte * certBuffer) {}
     virtual void WebserverPluginRegisterPathResult(IWebserverPlugin * plugin, const char * pathName, wsp_path_type_t pathType) {}
     virtual void WebserverPluginRequestUserPassword(IWebserverPlugin * plugin, dword connectionID, char * resourceName, const char * registeredPathForRequest, const char * host, const char * user) { ASSERT(false, "UWebserverPlugin::WebserverPluginRequestUserPassword() not implemented!"); }
+    virtual void SetAuthConfigResult(const char * path, ws_update_auth_result_t result) {}    
 };</code></pre>
 
 	<h3>Overview</h3>
@@ -688,7 +722,18 @@ public:
 		The authentication request can be responded outside of this function. This comes in handy if e. g. the user information must be read from the database, first. The application only need to take care of sending the correct connection id with the
 		user name given for the request.
     </dd>
-	
+
+	<div class="fnhead">SetAuthConfigResult</div>
+    <dd>
+		Will be called after the webserver has changed the authentication configuration because of a previous call to <a href="#IWebserverPlugin">IWebserverPlugin</a>::SetAuthConfig().
+		
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>path</b></td><td>The path the configuration needed to be changed for ("/" for the apps web root). Will always be the same path as used for the previous SetAuthConfig() call.</td></tr>
+            <tr><td class="param">ws_update_auth_result_t <b>result</b></td><td>The result of the config change. See the <a href="#ws_update_auth_result_t">ws_update_auth_result_t enum</a> for details.</td></tr>
+        </table>
+    </dd>
+    
 	<a name="IWebserverGet"><h2>IWebserverGet</h2></a>
 	<pre><code style="laguage-cpp">class IWebserverGet {
 public:
@@ -3587,7 +3632,28 @@ internally and because of this never be passed to UWebserverPlugin::WebserverPlu
     <tr><td><b>WS_REQUEST_PROPPATCH</b></td><td>A WebDAV PROPPATCH request. Must be accepted with an <a href="#UWebserverProppatch">UWebserverProppatch</a> instance.</td></tr>
 </table>
 
+<h2><a name="ws_update_auth_result_t">ws_update_auth_result_t</a></h2>
+<pre><code style="laguage-cpp">typedef enum {
+    WS_AUTH_DECACTIVATED,
+    WS_AUTH_DYNAMIC,
+    WS_AUTH_STATIC,
+    WS_AUTH_ERR_PATH_NOT_LISTENING,
+    WS_AUTH_ERR_PATH_INVALID
+} ws_update_auth_result_t;</code></pre>
+    
+<h3>Overview</h3>
+This are the results received by the webserver when changing the configuration for authentication by using <a href="#IWebserverPlugin">IWebserverPlugin</a>::SetAuthConfig().
 
+<h3>Values</h3>
+<table style="margin-left: 20px">
+    <tr><td><b>WS_AUTH_DECACTIVATED</b></td><td>The authentication for the given path had been deactivated.</td></tr>
+    <tr><td><b>WS_AUTH_DYNAMIC</b></td><td>The given path now uses dynamic authentication, which means that the webserver will ask the app for username / password.</td></tr>
+    <tr><td><b>WS_AUTH_STATIC</b></td><td>The given path now uses static authentication with the username / password passed to the previous SetAuthConfig() call.</td></tr>
+    <tr><td><b>WS_AUTH_ERR_PATH_NOT_LISTENING</b></td><td>SetAuthConfig() had been called for a path without calling IWebserverPlugin::HTTPListen() first.</td></tr>
+    <tr><td><b>WS_AUTH_ERR_PATH_INVALID</b></td><td>SetAuthConfig() had been called for a path which doesn't belong to the IWebserverPlugin instance.</td></tr>
+</table>
+
+    
 <h2><a name="IWebserverGetRange_range_type_t">IWebserverGetRange::range_type_t</a></h2>
 <pre><code style="laguage-cpp">class IWebserverGetRange {
 public:

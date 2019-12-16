@@ -96,7 +96,7 @@ public:
     virtual void MediaConnectResult(IMedia * const media, bool error) {};
     virtual void MediaRtpSendResult(IMedia * const media) {};
     virtual void MediaSctpSendResult(IMedia * const media) {};
-    virtual void MediaRtpRecvResult(IMedia * const media, void * buf, size_t len, dword timestamp) {};
+    virtual void MediaRtpRecvResult(IMedia * const media, void * buf, size_t len, dword timestamp, bool sequenceGap) {};
     virtual void MediaSctpRecvResult(IMedia * const media, void * buf, size_t len) {};
     virtual void MediaCloseComplete(IMedia * const media) {};
     virtual void MediaEventReceived(IMedia * const media, enum MediaEndpointEvent event) {};
@@ -121,7 +121,7 @@ public:
 public:
     virtual void RtpRecvResult(char * buf, int len, dword timestamp) {};
     virtual void RtpSendResult() {};
-    virtual void RtpSend(char * buf, int len, dword timestamp, bool marker = false) = 0;
+    virtual void RtpSend(char * buf, int len, dword timestamp) = 0;
     virtual void RtcpSend(char * buf, int len) = 0;
     virtual void SctpRecvResult(char * buf, int len) {};
     virtual void SctpSendResult() {};
@@ -266,8 +266,6 @@ public:
     <pre><code class="C++">class UVideoIo {
 public:
     virtual void CloseVideoIoComplete() = 0;
-    virtual void MediaIoVideoContainerSend(const void * buf, size_t len, dword timestamp, const void * context, bool local, enum MediaType type) = 0;
-    virtual void MediaIoVideoContainerInit(const void * context, bool local, enum MediaType type) = 0;
 };</code></pre>
 
     <h3>Overview</h3>

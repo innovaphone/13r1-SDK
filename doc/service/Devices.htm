@@ -17,6 +17,13 @@
         All messages are send as JSON strings and must use the <b>mt</b> property which is the message type.
 	</p>
 
+    <h2>Summary</h2>
+    <a href="#GetService" style="text-decoration:none;">GetService</a><br/>
+    <a href="#AppLogin" style="text-decoration:none;">AppLogin</a><br/>
+    <a href="#SysclientComm" style="text-decoration:none;">Communication with connected Sysclients</a><br/>
+    <a href="#MessagesSend" style="text-decoration:none;">Messages send to the service</a><br/>
+    <a href="#MessagesReceived" style="text-decoration:none;">Messages received by the service</a><br/>
+        
 	<a name="GetService"><h2>GetService</h2></a>
     
     <p>
@@ -29,20 +36,54 @@
 </code></pre>
     </p>
     
-    <h2>AppLogin</h2>
+    <a name="AppLogin"><h2>AppLogin</h2></a>
     <p>
         If you do not work with IServices and you know the intance password of the Devices instance, you can also use the standard AppLogin mechanism to login to Devices.<br>
         In a multi domain environment in Devices, you're automatically admin with access to all domains, if you login with the instance password and the instance domain.<br>
-        If you login with the domain password from a domain different than the instance domain, you just have access to your own domain or domains, where you got access to.
+        If you login with the domain password from a domain different than the instance domain, you just have access to your own domain or domains, where you got access to.<br>
     </p>
     
-    <h2>Messages send to the service</h2></a>
+    <a name="SysclientComm"><h2>Communication with connected Sysclients</h2></a>
+    After having successfully established an AppWebsocket connection to Devices and queried the session key with the <a href="#GetLoginInfo">GetLoginInfo</a> message,
+    you can start communicating with connected devices.<br>
+    The URL is always built after the same scheme:<br>
+    <br>
+    https://domain.com/domain/devices-instance/passthrough/SERIAL/SESSION-KEY/...<br>
+    <br>
+    SERIAL is a MAC address, e.g. 009033020202 and the session key is a GUID like 0e6ff4c7-7a88-40c4-98eb-8c91903933e6.<br>
+    The part before the passthrough can be retrieved from your Devices App object URL inside the PBX.<br>
+    The session key is just valid as long as the AppWebsocket session is open.
+    
+    <a name="MessagesSend"><h2>Messages send to the service</h2></a>
+    <a href="#GetLoginInfo" style="text-decoration:none;">GetLoginInfo</a><br/>
     <a href="#GetProvisioningCategories" style="text-decoration:none;">GetProvisioningCategories</a><br/>
     <a href="#GetProvisioningCode" style="text-decoration:none;">GetProvisioningCode</a><br/>
     <a href="#GetProvisionedDevice" style="text-decoration:none;">GetProvisionedDevice</a><br/>
+    <a href="#FurtherMessages" style="text-decoration:none;">Not yet documented messages</a><br/>
     
-    <h2>Messages received by the service</h2></a>
+    <a name="MessagesReceived"><h2>Messages received by the service</h2></a>
     <a href="#DeviceProvisioned" style="text-decoration:none;">DeviceProvisioned</a><br/>
+    
+    <a name="GetLoginInfo"><h3>GetLoginInfo</h3></a>
+
+    <p>
+        Query the login info of the logged in user.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>src </b></td><td>Will be echoed in the result message (optional).</td></tr>
+    </table>
+
+    <h3>GetLoginInfoResult</h3>    
+    <p>
+        The result message for the GetLoginInfo request.
+    </p>
+    <h4>Parameters</h4>
+    <table style="margin-left:-12px">
+        <tr><td class="param">string <b>key </b></td><td>The session key which is used to talk to devices.</td></tr>
+        <tr><td class="param">boolean <b>admin </b></td><td>If true, the user has access to all domains.</td></tr>
+        <tr><td class="param">string <b>src </b></td><td>Echoed (optional).</td></tr>
+    </table>
     
     <a name="GetProvisioningCategories"><h3>GetProvisioningCategories</h3></a>
 
@@ -177,7 +218,10 @@
 }
 </code></pre>
 
-    <h3>DeviceProvisioned</h3>    
+    <a name="FurtherMessages"><h3>FurtherMessages</h3>    </a>
+    As long as not all messages are documented here, you can always open the Devices App and your browser console (F12) and take a look at the sent and received messages to the Devices App!
+
+    <a name="DeviceProvisioned"><h3>DeviceProvisioned</h3></a>    
     <p>
         Message from the service if a device has been provisioned after the GetProvisioningCode request.
     </p>

@@ -56,4 +56,7 @@ public:
     virtual void JsonApiMessage(class json_io & msg, char * buffer) = 0;
     virtual void JsonApiMessageComplete() = 0;
     virtual bool JsonApiPermission(const char * api) = 0;
+    virtual void AppWebsocketEncrypt(const char * seed, const char * data, char * out, size_t outLen) = 0;
+    virtual void AppWebsocketDecrypt(const char * seed, const char * data, char * out, size_t outLen) = 0;
+    virtual void AppWebsocketHash(const char * seed, const char * data, char * out, size_t outLen) = 0;
 };

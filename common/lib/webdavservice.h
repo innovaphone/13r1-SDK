@@ -101,7 +101,7 @@ public:
     WebdavService(class IIoMux * const iomux, class UWebdavService * service, class IDbFiles * dbFiles, class IDatabase * database, class IInstanceLog * const log, const char * webserverPath, const char * rootFolder = 0);
     virtual ~WebdavService();
 
-    bool WebRequestWebdavService(IWebserverPlugin * const webserverPlugin, ws_request_type_t requestType, char * resourceName, size_t dataSize);
+    bool WebRequestWebdavService(IWebserverPlugin * const webserverPlugin, ws_request_type_t requestType, char * resourceName, size_t dataSize, bool decoded = false);
     bool GetCompleted() { return completed; }
     void Start();
     void RegisterforNotification(class UWebdavNotification * notification, const char * appName);
@@ -117,6 +117,7 @@ enum GetStates
 {
     GETPATHREQUEST = 0,
     GETREADFILE,
+    GETSTOPREADFILE,
     GETCLOSE
 };
 
@@ -160,6 +161,7 @@ public:
 
     void LookPath(char * path);
     void GetFile(ulong64 id, unsigned int offset);
+    void StopReadFile();
     void ReadFile();
     void Close() override;
 };
@@ -173,6 +175,7 @@ class WebdavServiceGet : public IWebdavServiceTask, public UWebdavServiceTask {
     bool pendingRequestDBFiles;
     size_t requestedLength;
     size_t sendedLength;
+    byte * sendBuffer;
 public:
     WebdavServiceGet(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path);
     ~WebdavServiceGet();
@@ -180,6 +183,7 @@ public:
     void AcceptReceived();
     void PathCompleted(bool completed, ulong64 id, const char * name, unsigned length, bool isFolder, ulong64 created, ulong64 modified);
     void GetCompleted(bool completed);
+    void StopReadFileCompleted();
     void GetProgress(const byte * data, unsigned len);
     void SendResult();
     void Close() override;
@@ -461,7 +465,7 @@ class WebdavServiceMove : public IWebdavServiceTask, public UWebdavServiceTask {
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
     dword GetDepthHeader();
-    const char * GetDestinationHeader();
+    char * GetDestinationHeader();
     const char * GetHostHeader();
     bool GetOverwriteHeader();
 

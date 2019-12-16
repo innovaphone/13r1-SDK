@@ -130,8 +130,9 @@ public:
     static ulong64 to_id(const char * str);
 	static bool  to_tm(const char * s, char ** ptr, struct tm & tm);
     static char * from_hexmem(const byte * mem, const dword len, char * s);
-#if !defined(PLATFORM_NO_IPADDR)
     static IPaddr to_ip(const char * s, char ** ptr=0, word * prefix=0);
+    static unsigned from_ip(char * buffer, unsigned size, IPaddr * addr, bool brackets=false);
+#if !defined(PLATFORM_NO_IPADDR)
     static IP4addr to_ip4(const char * s, char ** ptr);
     static bool to_ip6(const char * str, IPaddr * addr, word * prefix, char ** ptr);
     static bool to_eaddr(const char * str, char ** ptr, Eaddr * eaddr);

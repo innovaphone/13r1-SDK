@@ -291,8 +291,17 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                 if ((typeof(window.parent.console) != "undefined") && window.parent.console.custom) {
                     window.console = window.parent.console;
                 }
-                if (window.parent.webkit && window.parent.webkit.messageHandlers && window.parent.webkit.messageHandlers.console_message_) {
-                    window.webkit.messageHandlers.console_message_ = window.parent.webkit.messageHandlers.console_message_;
+                if ((typeof(window.parent.custom_saved_window_open_) != "undefined") && (typeof(window.custom_saved_window_open_) == "undefined")) {
+                    window.custom_saved_window_open_ = window.open;
+                    window.open = window.parent.open;
+                }
+                if (window.parent.webkit && window.parent.webkit.messageHandlers) {
+                    if (window.parent.webkit.messageHandlers.console_message_) {
+                        window.webkit.messageHandlers.console_message_ = window.parent.webkit.messageHandlers.console_message_;
+                    }
+                    if (window.parent.webkit.messageHandlers.window_open_) {
+                        window.webkit.messageHandlers.window_open_ = window.parent.webkit.messageHandlers.window_open_;
+                    }
                 }
             }
             catch (e) {

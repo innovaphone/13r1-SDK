@@ -21,19 +21,12 @@ typedef float __float128;
 #define _GLIBCXX_STDLIB_H 1
 #endif
 
-#include <stddef.h>
 #include <stdarg.h>
-#include <stdint.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <errno.h>
 #include <signal.h>
-#include <time.h>
 #include <assert.h>
-#include <dlfcn.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 #include <deque>
 #include <queue>
 #include <set>
@@ -97,6 +90,8 @@ typedef intptr_t intp;
 typedef uintptr_t uintp;
 typedef int int32;
 
+typedef int IoMuxFd;
+
 typedef dword interrupt_mask;
 
 #define PLATFORM_VIRTUAL virtual
@@ -154,3 +149,4 @@ extern "C" void * malloc_uncached(size_t size);
 
 #include "common/os/debug.h"
 #include "common/ilib/ilist.h"
+#include "common/ilib/ipaddr.h"

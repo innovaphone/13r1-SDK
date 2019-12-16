@@ -86,6 +86,7 @@ innovaphone.Config = innovaphone.Config || function() {
                 if (obj.value != v) {
                     obj.value = v;
                     obj.changed = true;
+                    obj.passwordSet = v != "";
                 }
             }
         });
@@ -146,10 +147,8 @@ innovaphone.Config = innovaphone.Config || function() {
             var curItem = itemInfos[names[i]];
             if (curItem.password == true) {
                 if (curItem.changed == true) {
-                    if (that[curItem.name] != "") {
-                        var seed = Math.random().toString(36);
-                        data[curItem.name] = { value: appWebsocket.encrypt(seed, that[curItem.name]), key: seed };
-                    }
+                    var seed = Math.random().toString(36);
+                    data[curItem.name] = { value: appWebsocket.encrypt(seed, that[curItem.name]), key: seed };
                 }
             }
             else data[curItem.name] = that[curItem.name];
@@ -160,6 +159,18 @@ innovaphone.Config = innovaphone.Config || function() {
             "api": "Config",
             "mt": "WriteConfig",
             "ConfigItems": data });
+    }
+
+    function isPasswordItem(itemName)
+    {
+        var result = itemInfos[itemName];
+        return result == null ? false : result.password;
+    }
+
+    function isPasswordSet(itemName)
+    {
+        var result = itemInfos[itemName];
+        return result == null ? false : result.passwordSet;
     }
 
     function getItemChoices(itemName)
@@ -174,6 +185,8 @@ innovaphone.Config = innovaphone.Config || function() {
     this.evOnConfigSaveResult = evOnConfigSaveResult;
     this.save = save;
     this.getItemChoices = getItemChoices;
+    this.isPasswordItem = isPasswordItem;
+    this.isPasswordSet = isPasswordSet;
     this.initialized = initialized;
     this.init = init;
 };

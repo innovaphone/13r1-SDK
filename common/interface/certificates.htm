@@ -48,7 +48,7 @@
     <pre><code class="language-cpp">class ICertificates {
 public:
     <a href="#ValidateCertificate" style="text-decoration:none;">static certificate_error_t ValidateCertificate(class IInstanceLog * log, const byte * cert, size_t certLen);</a>;
-    <a href="#CertificateFingerprint" style="text-decoration:none;">virtual byte * CertificateFingerprint(class IInstanceLog * log, const byte * cert, size_t certLen, fingerprint_t type = FINGERPRINT_SHA256) = 0;</a>;
+    <a href="#CertificateFingerprint" style="text-decoration:none;">virtual byte * CertificateFingerprint(class IInstanceLog * log, const byte * cert, size_t certLen, size_t * length, fingerprint_t type = FINGERPRINT_SHA256) = 0;</a>;
     <a href="#CreateCertificate" style="text-decoration:none;">virtual byte * CreateCertificate(class IInstanceLog * log, size_t * certLen, certificate_type_t type = CERTIFICATE_PEM) = 0;</a>;
 };</code></pre>
 
@@ -138,7 +138,8 @@ public:
 byte * pemBuffer = ICertificates::CreateCertificate(logIf, &pemBufferLen, CERTIFICATE_PEM);
 if(pemBuffer) {
     if(ICertificates::ValidateCertificate(logIf, pemBuffer, pemBufferLen) == CERTIFICATE_OK) {
-        byte * fingerPrint = CertificateFingerprint(logIf, pemBuffer, pemBufferLen, FINGERPRINT_SHA512);
+        size_t certFplength;
+        byte * fingerPrint = CertificateFingerprint(logIf, pemBuffer, pemBufferLen, &certFplength, FINGERPRINT_SHA512);
         debug->printf("fingerprint of new certificate: %s", fingerPrint);
         free(fingerPrint);
     }

@@ -31,11 +31,12 @@ public:
     virtual void Connect(const char * address, const char * serverName = NULL) = 0;
     virtual void Bind(const char * localAddr = NULL, word localPort = 0) = 0;
     virtual void Bind(const char * localAddr, word localPort, bool reuseAddr) {};
+    virtual void GetLocalAddress(char * localAddr, unsigned size, word * localPort) {};
     virtual void Listen() = 0;
     virtual void Accept(class USocket * remoteUser) = 0;
     virtual void Shutdown() = 0;
     virtual void Send(const void * buf, size_t len) = 0;
-    virtual void SendTo(const void * buf, size_t len, struct sockaddr_storage * dstAddr) {};
+    virtual void SendTo(const void * buf, size_t len, IPaddr dstAddr, word dstPort) {};
     virtual void Recv(void * buf, size_t len, bool recvPartial = false) = 0;
     virtual void SetQoS(qostraffictype_t type) {};
     virtual void SetUser(class USocket * const user) = 0;
@@ -51,7 +52,7 @@ public:
     virtual void SocketShutdown(ISocket * const socket, shutdownreason_t reason) = 0;
     virtual void SocketSendResult(ISocket * const socket) {};
     virtual void SocketRecvResult(ISocket * const socket, void * buf, size_t len) {};
-    virtual void SocketRecvFromResult(ISocket * const socket, void * buf, size_t len, struct sockaddr_storage * dstAddr) {};
+    virtual void SocketRecvFromResult(ISocket * const socket, void * buf, size_t len, IPaddr dstAddr, word dstPort) {};
     virtual void SocketRecvCanceled(ISocket * const socket, void * buf) = 0;
     virtual void SocketUpgradeToTLSComplete(ISocket * const socket) {};
 };
@@ -62,6 +63,7 @@ public:
     virtual void EnableDTLS(bool useSrtp) {};
     virtual void SetServerCertificate(const byte * cert, size_t certLen, const char * hostName = NULL) {};
     virtual void SetClientCertificate(const byte * cert, size_t certLen, const char * hostName = NULL) {};
+    virtual const byte * GetCertificateFingerprint(size_t * length) { return NULL; };
 };
 
 class ISocketProvider {
