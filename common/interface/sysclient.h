@@ -11,6 +11,7 @@ public:
     //virtual void GetHostByName(const char * host, class USysclient * const user, class IInstanceLog * const log, bool all = false) = 0;
     virtual void SendIdentify(const char * challenge, const char * provisioningCode, const char * mac, const char * product, const char * version, const char * type) = 0;
     virtual void SendCustomIdentify(const void * buff, size_t len) = 0;
+    virtual void SetAdminPassword(const char * password) = 0;
     virtual void Close() = 0;
     virtual void Encrypt(const char * seed, const char * data, char * out, size_t outLen) = 0;
     virtual void Decrypt(const char * seed, const char * data, char * out, size_t outLen) = 0;

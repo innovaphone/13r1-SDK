@@ -403,8 +403,9 @@
             <td>
                 The PBX provides an Api for call-control and administration features with the standard SOAP
                 protocol. With a wsdl file this SOAP API can be integrated in many development environment.
-                In the future this legacy API will be ported to a Websocket interface. Implementations based
-                in the current SOAP interface will remain working.
+
+                Please note that the functionality of that legacy API is available using the Websocket APIs <a href="appwebsocket/RCC.htm">RCC</a> and <a href="appwebsocket/PbxAdminApi.htm">PbxAdminApi</a>.
+                Implementations based in the current SOAP interface will remain working.
             </td>
         </tr>
         <tr>
@@ -433,6 +434,12 @@
             <td><b><a href="protocol/sysclient.htm">Sysclient</a></b></td>
             <td>
                 The sysclient protocol is used by devices to register in the Devices App.
+            </td>
+        </tr>
+        <tr>
+            <td><b><a href="protocol/push.htm">Push</a></b></td>
+            <td>
+                Protocol used between the PBX and the innovaphone Push service.
             </td>
         </tr>
     </table>

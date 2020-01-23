@@ -52,7 +52,7 @@
                 <dd>Display name</dd>
                 <dt>link</dt>
                 <dd>App-Item-Link (if the originating app can display item details)</dd>
-                <dt>entry</dt>
+                <dt>contact</dt>
                 <dd>
                     Directory entry that matches the criteria. An entry contains the following optional members:
                     <dl>
@@ -64,6 +64,8 @@
                         <dt>privatecity, privatestreet, privatepostalcode, privatestate, privatecountry </dt>
                     </dl>
                 </dd>
+                <dt>adjust</dt>
+                <dd>Indicates that provided phone numbers might not contain the external line prefix and might need to be adjusted by the phone/softphone app before dialing.</dd>
             </dl>
         </dd>
         <dd>Example: <pre>
@@ -79,7 +81,8 @@
             company: "Blues Brothers",
             sip: ["jbl@example.com"],
             email: ["john.blues@example.com"]
-        }
+        },
+        adjust: true
     }</pre></dd>
 
         <dt>SearchResult</dt>

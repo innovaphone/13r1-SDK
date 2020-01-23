@@ -129,6 +129,7 @@ protected:
 public:
     ApiProvider(class ApiWebsocketClient * const client, const char * api);
 
+    void ApiProviderSendJson(const char * client, const char * consumer, const char * src, const char * buffer);
     void ApiProviderSend(const char * client, const char * consumer, const char * src, class json_io & msg, word base, char * buffer);
     void ApiProviderUpdate(class json_io & json, word base, char * buffer);
 
@@ -158,6 +159,7 @@ protected:
 public:
     ApiConsumer(class ApiWebsocketClient * const client, const char * api);
 
+    void ApiConsumerSendJson(const char * provider, const char * src, const char * buffer);
     void ApiConsumerSend(const char * provider, const char * src, class json_io & msg, word base, char * buffer);
 
     virtual void ApiConsumerRecv(const char * provider, const char * src, class json_io & msg, word base) {};

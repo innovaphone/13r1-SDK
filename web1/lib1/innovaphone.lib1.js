@@ -570,7 +570,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
                     case "ApiUpdate":
                         if (e.source == opener || e.source == parent) {
                             start.apis = obj.apis;
-                            start.defaultApiProviders = obj.defaultApiProviders;
+                            start.defaultApiProviders = obj.defaultApiProviders || {};
                             onapiupdate.notify(obj);
                         }
                         break;

@@ -30,7 +30,8 @@ typedef enum {
     HTTP_AUTHENTICATION_FAILED,
     HTTP_NOT_FOUND,
     HTTP_BAD_REQUEST,
-    HTTP_INTERNAL_SERVER_ERROR
+    HTTP_INTERNAL_SERVER_ERROR,
+    HTTP_CONNECTION_REFUSED
 } http_shutdown_reason_t;
 
 inline const char * HTTPShutdownReasonToStr(http_shutdown_reason_t reason)
@@ -50,6 +51,7 @@ inline const char * HTTPShutdownReasonToStr(http_shutdown_reason_t reason)
     case HTTP_NOT_FOUND: result = "HTTP_NOT_FOUND"; break;
     case HTTP_BAD_REQUEST: result = "HTTP_BAD_REQUEST"; break;
     case HTTP_INTERNAL_SERVER_ERROR: result = "HTTP_INTERNAL_SERVER_ERROR"; break;
+    case HTTP_CONNECTION_REFUSED: result = "HTTP_CONNECTION_REFUSED"; break;
     }
     return result;
 }

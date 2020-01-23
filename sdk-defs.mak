@@ -36,10 +36,10 @@ endif
 CC       = x86_64-linux-gnu-g++.exe
 AR       = x86_64-linux-gnu-ar.exe
 OBJCPY   = x86_64-linux-gnu-objcopy.exe
-CFLAGS  += -isystem $(TOOLSDIR)/x86_64-7.2.0-linux-gnu/x86_64-linux-gnu/include/c++/7.2.0 -isystem $(SYSROOT)/usr/include -fsigned-char 
-LFLAGS  += --sysroot=$(SYSROOT)
-LFLAGS  += -Wl,-rpath,$(SYSROOT)/usr/lib
-LFLAGS  += -Wl,-rpath,$(SYSROOT)/lib
+CFLAGS  += -isystem "$(TOOLSDIR)/x86_64-7.2.0-linux-gnu/x86_64-linux-gnu/include/c++/7.2.0" -isystem "$(SYSROOT)/usr/include" -fsigned-char 
+LFLAGS  += --sysroot="$(SYSROOT)"
+LFLAGS  += -Wl,-rpath,"$(SYSROOT)/usr/lib"
+LFLAGS  += -Wl,-rpath,"$(SYSROOT)/lib"
 LFLAGS  += -Wl,--warn-common
 #LFLAGS  += -v 
 #LFLAGS  += -Wl,-verbose 
@@ -66,10 +66,10 @@ endif
 CC       = arm-linux-gnueabi-g++.exe
 AR       = arm-linux-gnueabi-ar.exe
 OBJCPY   = arm-linux-gnueabi-objcopy.exe
-CFLAGS  += -Wno-psabi -isystem $(TOOLSDIR)/arm-7.2.0-linux-gnu/arm-linux-gnueabi/include/c++/7.2.0 -isystem $(SYSROOT)/usr/include -fsigned-char
-LFLAGS  += --sysroot=$(SYSROOT)
-LFLAGS  += -Wl,-rpath,$(SYSROOT)/usr/lib
-LFLAGS  += -Wl,-rpath,$(SYSROOT)/lib
+CFLAGS  += -Wno-psabi -isystem "$(TOOLSDIR)/arm-7.2.0-linux-gnu/arm-linux-gnueabi/include/c++/7.2.0" -isystem "$(SYSROOT)/usr/include" -fsigned-char
+LFLAGS  += --sysroot="$(SYSROOT)"
+LFLAGS  += -Wl,-rpath,"$(SYSROOT)/usr/lib"
+LFLAGS  += -Wl,-rpath,"$(SYSROOT)/lib"
 LFLAGS  += -Wl,--warn-common
 #LFLAGS  += -v 
 #LFLAGS  += -Wl,-verbose 
