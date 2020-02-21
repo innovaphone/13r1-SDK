@@ -457,7 +457,6 @@ public:
     <h2 id="http_shutdown_reason_t">http_shutdown_reason_t</h2>
     <pre><code class="C++">typedef enum {
     HTTP_SHUTDOWN_NORMAL,
-    HTTP_SHUTDOWN_BY_PEER,
     HTTP_SOCKET_LOST,
     HTTP_ADDRESS_INVALID,
     HTTP_SOCKET_ERROR,
@@ -475,7 +474,6 @@ public:
     </p>
     <table style="margin-left: 20px">
         <tr><td><b>HTTP_SHUTDOWN_NORMAL</b></td><td>A normal shutdown initiated by the application itself by calling IHTTPClient::Shutdown().</td></tr>
-        <tr><td><b>HTTP_SHUTDOWN_BY_PEER</b></td><td>The server has initiated the shutdown.</td></tr>
         <tr><td><b>HTTP_SOCKET_LOST</b></td><td>The socket had been lost.</td></tr>
         <tr><td><b>HTTP_ADDRESS_INVALID</b></td><td>The address given to IHTTPClient::Connect() was invalid.</td></tr>
         <tr><td><b>HTTP_SOCKET_ERROR</b></td><td>An unexpected socket error occured.</td></tr>

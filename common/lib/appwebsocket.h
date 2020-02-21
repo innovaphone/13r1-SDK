@@ -1,7 +1,7 @@
 
 /*---------------------------------------------------------------------------*/
 /* appwebsocket.h                                                            */
-/* copyright (c) innovaphone 2016                                            */
+/* copyright (c) innovaphone 2016 - 2020                                     */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
@@ -51,10 +51,10 @@ public:
     virtual void AppWebsocketClosed() = 0;
     virtual bool AppWebsocketApiPermission(const char * api) { return true; }
     virtual void AppWebsocketSendResult() = 0;
-    virtual void AppWebsocketCheckLogin(const char * src, const char * app, const char * challenge, const char * digest) { AppWebsocketCheckLoginComplete(src, app, challenge, digest, AppWebsocketPassword()); };
+    virtual void AppWebsocketCheckLogin(const char * src, const char * app, const char * domain, const char * challenge, const char * digest) { AppWebsocketCheckLoginComplete(src, app, domain, challenge, digest, AppWebsocketPassword()); };
 
     bool AppWebsocketLoginComplete(const char * password, char * key = 0, unsigned keyLen = 0);
-    void AppWebsocketCheckLoginComplete(const char * src, const char * app, const char * challenge, const char * digest, const char * password);
+    void AppWebsocketCheckLoginComplete(const char * src, const char * app, const char * domain, const char * challenge, const char * digest, const char * password);
     void AppWebsocketMessageComplete();
     void AppWebsocketMessageSend(class json_io & msg, char * buffer);
     void AppWebsocketMessageSendText(const char * buffer);

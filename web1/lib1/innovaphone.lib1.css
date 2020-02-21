@@ -11,9 +11,9 @@ html
     font-weight: normal;
 }
 
-input
+input, select
 {
-    font-family: titillium, 'Open Sans', sans-serif;
+    font-family: inherit;
 }
 
 body, p

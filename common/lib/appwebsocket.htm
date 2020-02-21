@@ -79,10 +79,10 @@ public:
     <a href="#AppWebsocketClosed">virtual void AppWebsocketClosed()</a> = 0;
     <a href="#AppWebsocketApiPermission">virtual bool AppWebsocketApiPermission(const char * api) { return true; }</a>
     <a href="#AppWebsocketSendResult">virtual void AppWebsocketSendResult()</a> = 0;
-    <a href="#AppWebsocketCheckLogin">virtual void AppWebsocketCheckLogin(const char * src, const char * app, const char * challenge, const char * digest) { AppWebsocketCheckLoginComplete(src, app, challenge, digest, AppWebsocketPassword()); };</a>
+    <a href="#AppWebsocketCheckLogin">virtual void AppWebsocketCheckLogin(const char * src, const char * app, const char * domain, const char * challenge, const char * digest) { AppWebsocketCheckLoginComplete(src, app, domain, challenge, digest, AppWebsocketPassword()); };</a>
 
     <a href="#AppWebsocketLoginComplete">bool AppWebsocketLoginComplete(const char * password, char * key = 0, unsigned keyLen = 0);</a>
-    <a href="#AppWebsocketCheckLoginComplete">void AppWebsocketCheckLoginComplete(const char * src, const char * app, const char * challenge, const char * digest, const char * password);</a>
+    <a href="#AppWebsocketCheckLoginComplete">void AppWebsocketCheckLoginComplete(const char * src, const char * app, const char * domain, const char * challenge, const char * digest, const char * password);</a>
     <a href="#AppWebsocketMessageComplete">void AppWebsocketMessageComplete();</a>
     <a href="#AppWebsocketMessageSend">void AppWebsocketMessageSend(class json_io & msg, char * buffer);</a>
     <a href="#AppWebsocketMessageSendText">void AppWebsocketMessageSendText(const char * buffer);</a>
@@ -141,10 +141,11 @@ public:
                     are used (e.g. <a href="config.htm">config.h</a>).
                 </td>
             </tr>
-        </table></dd>
-
-
+        </table>
+    </dd>
+    
     <div class="fnhead" id="AppWebsocketPassword1">virtual AppWebsocketPassword (overloaded)</div>
+
     <dd>
         Called by the library to read the shared secret, which is part of the App instance
         configuration.
@@ -171,7 +172,7 @@ public:
         <h4>Return value</h4>
             The domain password, if defined. If null is returned, the function AppWebsocketLogin is
             called to start assynchronous athentication.
-        </dd>
+    </dd>
 
     <div class="fnhead" id="AppWebsocketInstanceDomain">virtual AppWebsocketInstanceDomain</div>
     
@@ -181,7 +182,7 @@ public:
     
         <h4>Return value</h4>
             The domain name of the instance.
-        </dd>
+    </dd>
 
     <div class="fnhead" id="AppWebsocketConnectComplete">virtual AppWebsocketConnectComplete</div>
     
@@ -206,14 +207,13 @@ public:
                 </td>
             </tr>
         </table>
-    </dd>
 
         <h4>Return value</h4>
-
             The application should return true to indicate, that it is ready
             to receive messages. If false is returned, a call to AppWebsocketMessageComplete() is needed
             to receive messages.
         </dd>
+    </dd>
 
     <div class="fnhead" id="AppWebsocketMessage">virtual AppWebsocketMessage</div>
 
@@ -489,9 +489,15 @@ public:
                 </td>
             </tr>
             <tr>
-                <td class="param">const char * app<b>app</b></td>
+                <td class="param">const char * <b>app</b></td>
                 <td>
                     The app propery as received
+                </td>
+            </tr>
+            <tr>
+                <td class="param">const char * <b>domain</b></td>
+                <td>
+                    The domain name as received
                 </td>
             </tr>
             <tr>
@@ -514,13 +520,12 @@ public:
         Called by the application to complete a login process started with the AppWebsocketLogin
         call
 
-
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr>
                 <td class="param">const char * <b>password</b></td>
                 <td>
-                    The password used to check the login
+                    The password used to check the login.
                 </td>
             </tr>
             <tr>
@@ -556,6 +561,12 @@ public:
                 <td class="param">const char * <b>app</b></td>
                 <td>
                     The app as received in AppWebsocketCheckLogin
+                </td>
+            </tr>
+            <tr>
+                <td class="param">const char * <b>domain</b></td>
+                <td>
+                    The domain name as received in AppWebsocketCheckLogin
                 </td>
             </tr>
             <tr>
@@ -626,7 +637,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr>
-                <td class="param">const char * seed<b>seed</b></td>
+                <td class="param">const char * <b>seed</b></td>
                 <td>
                     Seed, which can be used so that the result of the encryption is different even
                     if the data is the same.
@@ -662,7 +673,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr>
-                <td class="param">const char * seed<b>seed</b></td>
+                <td class="param">const char * <b>seed</b></td>
                 <td>
                     Seed, which can be used so that the result of the encryption is different even
                     if the data is the same.
@@ -698,7 +709,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr>
-                <td class="param">const char * seed<b>seed</b></td>
+                <td class="param">const char * <b>seed</b></td>
                 <td>
                     Seed, which can be used so that the result of the encryption is different even
                     if the data is the same.
@@ -779,7 +790,7 @@ public:
             <tr>
                 <td class="param">char * <b>buffer</b></td>
                 <td>
-                    buffer big enough to contain the message
+                    A buffer big enough to contain the message
                 </td>
             </tr>
         </table></dd>
@@ -801,7 +812,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr>
-                <td class="param">const char * <b></b></td>
+                <td class="param">const char * <b>api</b></td>
                 <td>
                     The name of the api.
                 </td>

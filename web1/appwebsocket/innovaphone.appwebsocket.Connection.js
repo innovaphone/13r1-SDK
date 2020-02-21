@@ -55,15 +55,15 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     this.checkBuild = false;
     window.addEventListener('message', onpostmessage);
     window.addEventListener('beforeunload', function () {
-        console.log("close beforeunload");
+        console.log(app + ": close beforeunload");
     });
     window.addEventListener("unload", function () {
-        console.log("close unload");
+        console.log(app + ": close unload");
     });
 
     function onopen() {
         timeout = TIMEOUT_MIN;
-        console.log("opened " + ws.url + " location " + location.href);
+        console.log(app + ": opened " + ws.url + " location " + location.href);
         state = states.OPENED;
         if (instance.checkBuild) {
             send({ mt: "CheckBuild", url: location.href });
@@ -74,7 +74,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     function onmessage(message) {
         var obj = JSON.parse(message.data);
         if (obj && obj.mt) {
-            console.log("recv: " + message.data);
+            console.log(app + ": recv: " + message.data);
             switch (obj.mt) {
                 case "AppChallengeResult":
                     if (obj.sysClient) password = "";
@@ -102,7 +102,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     if (instance.checkBuild) {
                         if (obj.url) {
                             if (applicationCache) try { applicationCache.update(); } catch (err) { };
-                            console.log("build mismatch, redirect to: " + obj.url);
+                            console.log(app + ": build mismatch, redirect to: " + obj.url);
                             if (ws) {
                                 ws.onclose = undefined;
                                 ws.onerror = undefined;
@@ -204,7 +204,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     }
 
     function onerror(error) {
-        console.log("error");
+        console.log(app + ": error");
         ws.onclose = null;
         ws.onmessage = null;
         ws.onopen = null;
@@ -213,7 +213,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     }
 
     function onclose() {
-        if (console) console.log("closed");
+        if (console) console.log(app + ": closed");
         ws = null;
         if (state != states.CLOSED) close("REMOTE_CLOSE");
     }
@@ -231,7 +231,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
 
     function close(error) {
         if (state != states.CLOSED) {
-            console.log("closing");
+            console.log(app + ": closing");
             state = states.CLOSED;
             if (ws) ws.close();
             ws = null;
@@ -241,7 +241,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
             else instance.onclosed();
         }
         if (error) {
-            console.log("reconnect in " + timeout + "ms");
+            console.log(app + ": reconnect in " + timeout + "ms");
             window.setTimeout(function () { if (state == states.CLOSED) connect(); }, timeout);
             if (timeout < TIMEOUT_MAX) timeout *= 2;
         }
@@ -315,11 +315,11 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     function send(obj) {
         var messageJSON = JSON.stringify(obj);
         if (ws) {
-            console.log("send: " + messageJSON);
+            console.log(app + ": send: " + messageJSON);
             ws.send(messageJSON);
         }
         else {
-            console.log("discard: " + messageJSON);
+            console.log(app + ": discard: " + messageJSON);
         }
     }
 
@@ -388,7 +388,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         }
         for (var i = 0; i < srcs.length; i++) {
             if (srcs[i].src == src) {
-                console.log("duplicate src " + src);
+                console.log(app + ": duplicate src " + src);
                 srcs.splice(i, 1);
             }
         }
@@ -412,7 +412,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         }
         for (var i = 0; i < srcs.length; i++) {
             if (srcs[i].src == src) {
-                console.log("duplicate src " + src);
+                console.log(app + ": duplicate src " + src);
                 srcs.splice(i, 1);
             }
         }
@@ -427,7 +427,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     this.registerApi = function (obj, name) {
         for (var i = 0; i < apis.length; ++i) {
             if (apis[i].name == name) {
-                console.log("registerApi(): duplicate api " + name);
+                console.log(app + ": registerApi(): duplicate api " + name);
                 return;
             }
         }

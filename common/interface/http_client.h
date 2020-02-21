@@ -19,7 +19,6 @@ typedef enum {
 
 typedef enum {
     HTTP_SHUTDOWN_NORMAL,
-    HTTP_SHUTDOWN_BY_PEER,
     HTTP_SOCKET_LOST,
     HTTP_ADDRESS_INVALID,
     HTTP_SOCKET_ERROR,
@@ -39,7 +38,6 @@ inline const char * HTTPShutdownReasonToStr(http_shutdown_reason_t reason)
     const char * result = "<unkown reason id>";
     switch (reason) {
     case HTTP_SHUTDOWN_NORMAL: result = "HTTP_SHUTDOWN_NORMAL"; break;
-    case HTTP_SHUTDOWN_BY_PEER: result = "HTTP_SHUTDOWN_BY_PEER"; break;
     case HTTP_SOCKET_LOST: result = "HTTP_SOCKET_LOST"; break;
     case HTTP_ADDRESS_INVALID: result = "HTTP_ADDRESS_INVALID"; break;
     case HTTP_SOCKET_ERROR: result = "HTTP_SOCKET_ERROR"; break;
