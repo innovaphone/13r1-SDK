@@ -35,7 +35,8 @@ public:
         WSCR_BUFFER_OVERFLOW,
         WSCR_PROTOCOL_ERROR,
         WSCR_SOCKET_LOST,
-        WSCR_SERVER_CLOSED      // Server hat Close-Handshake initiiert
+        WSCR_SERVER_CLOSED,     // Server hat Close-Handshake initiiert
+        WSCR_DOUBLE_RECV_CALL   // Ony in server-mode - recv() had been called multiple times.
     } closereason_t;
     
     virtual void WebsocketConnectComplete(IWebsocketClient * const websocket) = 0;

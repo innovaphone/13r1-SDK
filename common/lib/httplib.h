@@ -159,7 +159,7 @@ class HTTPHeader {
 protected:
     char * buffer;
     size_t bufferSize;
-    size_t contentSize;
+    size_t contentSize; // contentSize is not the Content-Size field, it is the size of the content of the header.
     struct {
         int major;
         int minor;
@@ -173,8 +173,8 @@ public:
 
     void SetHTTPVersion(int major, int minor);
     void SetHTTPResult(const HTTPLib::http_result_t * result);
-    void SetContentSize(size_t size);
-    void SetContentRange(size_t start, size_t end, size_t completeSize);
+    void SetContentSize(ulong64 size);
+    void SetContentRange(ulong64 start, ulong64 end, ulong64 completeSize);
     void SetContentType(const char * contentType);
     void SetEncoding(HTTPLib::http_encoding_t enc);
     void SetETag(const char * etag);
@@ -219,8 +219,8 @@ public:
         RANGE_START_ONLY  = 0x02,
         RANGE_LAST_BYTES  = 0x03
     } rangeType;
-    size_t start;
-    size_t end;
+    ulong64 start;
+    ulong64 end;
     HTTPRange * next;
 };
 
@@ -251,7 +251,7 @@ class HTTPParser {
     class HTTPFieldList * fieldList;
     size_t fieldListBufferSize;
     HTTPLib::http_encoding_t acceptEncoding;
-    size_t contentLength;
+    ulong64 contentLength;
     int connectionType;
     const char * cookie;
     const char * contentType;
@@ -303,7 +303,7 @@ public:
     int GetVersion() const { return httpVersion; }
     const HTTPHeaderField * GetHeaderField(const char * fieldName)  const;
 
-    size_t GetContentLength() const { return contentLength; }
+    ulong64 GetContentLength() const { return contentLength; }
     bool IsConnectionType(HTTPLib::http_connection_t ct) const { return (connectionType & ct) != 0; }
     bool IsChunkedTransfer();
     const char * GetCookie() const { return cookie; }

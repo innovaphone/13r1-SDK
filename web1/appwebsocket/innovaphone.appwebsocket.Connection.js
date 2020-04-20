@@ -62,7 +62,6 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     });
 
     function onopen() {
-        timeout = TIMEOUT_MIN;
         console.log(app + ": opened " + ws.url + " location " + location.href);
         state = states.OPENED;
         if (instance.checkBuild) {
@@ -85,6 +84,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     break;
                 case "AppLoginResult":
                     if (obj.ok) {
+                        timeout = TIMEOUT_MIN;
                         state = states.CONNECTED;
                         instance.onconnected(domain, user, dn, obj.domain);
                     }

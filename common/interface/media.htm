@@ -162,7 +162,7 @@ public:
     <pre><code class="C++">class IDeviceIo {
 public:
     virtual void QueryDevices(void * context) = 0; // Calls DeviceAdded() for all present devices.
-    virtual const char * StartDevice(void * context, const char *deviceId, int deviceMode) = 0;
+    virtual const char * StartDevice(void * context, void * src, const char *deviceId, int deviceMode) = 0;
     virtual void StopDevice(void * context, const char *deviceId) = 0;
 };</code></pre>
 
@@ -251,7 +251,6 @@ public:
     static class IVideoIo * Create(class IIoMux * const iomux, class IInstanceLog * log);
     virtual ~IVideoIo() {};
     virtual void Initialize(class UVideoIo * const user, class UDeviceIo * const deviceIoUser) = 0;
-    virtual void AddLocalContainer(void * context, void * container, enum MediaType coder) = 0;
     virtual void RemoveLocalContainer(void * container, enum MediaType coder) = 0;
     virtual void AddRemoteContainer(void * context, void * container, const char * channelId, enum MediaType coder) = 0;
     virtual void RemoveRemoteContainer(void * container, enum MediaType coder) = 0;

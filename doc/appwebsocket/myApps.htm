@@ -187,7 +187,7 @@
 }</code></pre>
     <p>
         If the authentication was successful the PBX will respond with <a href="#LoginResult">LoginResult</a>.
-        If two-factor authentication is enables the PBX will first send an <a href="#Authorize">Authorize</a> and wait with the <a href="#LoginResult">LoginResult</a> until the session
+        If two-factor authentication is enabled the PBX will first send an <a href="#Authorize">Authorize</a> and wait with the <a href="#LoginResult">LoginResult</a> until the session
         has been authorized over a second channel.
     </p>
     <dl>
@@ -225,10 +225,61 @@
         <dd>A string describing the used software for this connection, like "myApps (Windows)".</dd>
     </dl>
 
+    <a name="Authenticate"></a><div class="fnhead">Authenticate</div>
+    <p>
+        Sent by the PBX as a response to the initial <a href="#Login">Login</a> message.
+    </p>
+    <p>
+        After the client sent the first <a href="#Login">Login</a> message without credentials, the PBX sends the <a href="#Authenticate">Authenticate</a> message. It includes the parameters (method, challenge and domain) that are needed to calculate the fields for the second <a href="#Login">Login</a> message for the actual authentication.
+    </p>
+<pre><code class="json">{
+    "mt": "Authenticate",
+    "type": string,
+    "method": string,
+    "domain": string,
+    "challenge": string
+}</code></pre>
+    <dl>
+        <dt>type</dt>
+        <dd>
+            "user" or "session".
+        </dd>
+        <dd>
+            Same type as requested by the client in the initial <a href="#Login">Login</a> message.
+        </dd>
+        <dt>method</dt>
+        <dd>"digest" or "ntlm".</dd>
+        <dd>Defines the hash calculation method that shall be used in the subsequent <a href="#Login">Login</a> message.</dd>
+        <dt>domain</dt>
+        <dd>The domain of the PBX.</dd>
+        <dt>challenge</dt>
+        <dd>An opaque string.</dd>
+    </dl>
+
+    <a name="Authorize"></a><div class="fnhead">Authorize</div>
+    <p>
+        Sent by the PBX as a response to the second <a href="#Login">Login</a> message.
+    </p>
+    <p>
+        This message is used together with two-factor authentication with the "user" type login.
+        At this point the user password was successfully validated by the PBX but the user needs to complete the second factor of the authentication on a differnt channel.
+        If that has happened the PBX proceeds by sending the <a href="#LoginResult">LoginResult</a> message.
+    </p>
+<pre><code class="json">{
+    "mt": "Authorize",
+    "code": integer
+}</code></pre>
+    <dl>
+        <dt>Code</dt>
+        <dd>
+            A security number that should be displayed to the user.
+            The same number is presented to the user on the second channel, so the user can be sure he or she confirms the right session.
+        </dd>
+    </dl>
 
     <a name="LoginResult"></a><div class="fnhead">LoginResult</div>
     <p>
-        Sent by the PBX as a response to the <a href="#Login">Login</a> message.
+        Sent by the PBX as a response to the second <a href="#Login">Login</a> message.
     </p> 
     <p>
         The message indicates that the login was successful and includes additional information for the client.
@@ -256,6 +307,14 @@
             <pre>Hexstring(SHA256(innovaphoneAppClient:loginresult:&lt;domain&gt;:&lt;username&gt;:&lt;password&gt;:&lt;nonce&gt;:&lt;challenge&gt;:&lt;info&gt;))</pre>
         </dd>
     </dl>
+    <p>
+        If the login failed the message contains error information instead.
+    </p>
+<pre><code class="json">{
+    "mt": "LoginResult",
+    "error": integer,
+    "errorText": string
+}</code></pre>
 
     <a name="Redirect"></a><div class="fnhead">Redirect</div>
     <p>

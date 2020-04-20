@@ -554,12 +554,12 @@ public:
         if (lastUser) delete plugin;
     }
     
-    virtual void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+    virtual void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
     {
         plugin->Cancel(WSP_CANCEL_NOT_FOUND);
     }
 
-    virtual void WebserverPluginPassthroughListenResult(IWebserverPlugin * plugin, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+    virtual void WebserverPluginPassthroughListenResult(IWebserverPlugin * plugin, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
     {
         plugin->Cancel(WSP_CANCEL_NOT_FOUND);
     }
@@ -592,7 +592,7 @@ public:
             <tr><td class="param">ws_request_type_t <b>requestType</b></td><td>The type of the request. See <a href="#ws_request_type_t">ws_request_type_t</a> for details.</td></tr>
             <tr><td class="param">char * <b>resourceName</b></td><td>The resource requested. The resource can include a relative path, with the given registeredPathForRequest as root. </td></tr>
             <tr><td class="param">char * <b>registeredPathForRequest</b></td><td>The registered path for that request.</td></tr>
-            <tr><td class="param">size_t <b>dataSize</b></td><td>The size of the data comming with the request, if the kind of request can deliver data (e. g. POST).</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The size of the data comming with the request, if the kind of request can deliver data (e. g. POST).</td></tr>
         </table>
 		
 		<h4>Callbacks</h4>
@@ -628,7 +628,7 @@ public:
             <tr><td class="param">IWebserverPlugin * <b>plugin</b></td><td>The calling IWebserverPlugin instance</td></tr>
             <tr><td class="param">char * <b>resourceName</b></td><td>The resource requested. The resource can include a relative path, with the given registeredPathForRequest as root. </td></tr>
             <tr><td class="param">char * <b>registeredPathForRequest</b></td><td>The registered path for that request.</td></tr>
-            <tr><td class="param">size_t <b>dataSize</b></td><td>The size of the data comming with the request. This data must be be read with IWebserverPassthrough::Recv() and includes the whole HTTP header of the request.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The size of the data comming with the request. This data must be be read with IWebserverPassthrough::Recv() and includes the whole HTTP header of the request.</td></tr>
         </table>
 		
 		<h4>Callbacks</h4>
@@ -742,12 +742,12 @@ public:
     virtual const char * GetResourceName();
     virtual const char * GetRegisteredPathForRequest();
     virtual const char * GetETag();
-    virtual size_t GetRangeCount();
+    virtual ulong64 GetRangeCount();
     virtual IWebserverGetRange * GetRange(size_t idx);
 
     virtual void Cancel(wsr_cancel_type_t reason);
-    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr);
-    virtual void SetTransferRange(size_t rangeStart, size_t rangeEnd);
+    virtual void SetTransferInfo(wsr_type_t resourceType, ulong64 dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr);
+    virtual void SetTransferRange(ulong64 rangeStart, ulong64 rangeEnd);
     virtual void ForceDownloadResponse(const char * fileName = nullptr);
     virtual void Send(void * buffer, size_t len);
     virtual void Close();
@@ -838,7 +838,7 @@ public:
         <table style="margin-left:-12px">
             <tr><td class="param">wsr_type_t <b>resourceType</b></td><td>The type of the reosurce the application is going to send. Dis should combine with the type of resource requested. The helper functon
 																																	<a href="#GetResponseTypeForFileName">GetResponseTypeForFileName</a> can be used to get the right resource type depending on the resource sufix.</td></tr>
-            <tr><td class="param">size_t <b>dataSize</b></td><td>The data size of the requests data. If unkown, the application must used chunked encoding by setting dataSize to WS_RESPONSE_CHUNKED.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The data size of the requests data. If unkown, the application must used chunked encoding by setting dataSize to WS_RESPONSE_CHUNKED.</td></tr>
             <tr><td class="param">wsr_flags_t <b>flags</b></td><td><i>(Default WSP_FLAG_NONE)</i>Optional, additional flags. See <a href="wsr_flags_t ">wsr_flags_t </a> for details.</td></tr>
             <tr><td class="param">const char * <b>etag</b></td><td><i>(Default nullptr)</i> An optional etag used for caching purposed of an HTTP client.</td></tr>
         </table>
@@ -854,8 +854,8 @@ public:
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">size_t <b>rangeStart</b></td><td>The start of the range.</td></tr>
-            <tr><td class="param">size_t <b>rangeEnd</b></td><td>The end of the range.</td></tr>
+            <tr><td class="param">ulong64 <b>rangeStart</b></td><td>The start of the range.</td></tr>
+            <tr><td class="param">ulong64 <b>rangeEnd</b></td><td>The end of the range.</td></tr>
         </table>
 
         <h4>Remarks</h4>
@@ -916,8 +916,8 @@ public:
         RANGE_LAST_BYTES = 0x03
     } rangeType;
 
-    size_t start;
-    size_t end;
+    ulong64 start;
+    ulong64 end;
 };</code></pre>
 
 	<h3>Overview</h3>
@@ -1008,10 +1008,10 @@ public:
 
     virtual const char * GetResourceName();
     virtual const char * GetRegisteredPathForRequest();
-    virtual size_t GetDataSize();
+    virtual ulong64 GetDataSize();
     virtual bool DataIsChunkEncoded();
 
-    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr);
+    virtual void SetTransferInfo(wsr_type_t resourceType, ulong64 dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr);
     virtual void ForceDownloadResponse(const char * fileName = nullptr);
     virtual void Cancel(wsr_cancel_type_t reason);
     virtual void Send(void * buffer, size_t len);
@@ -1060,7 +1060,7 @@ public:
                     <a href="#GetResponseTypeForFileName">GetResponseTypeForFileName</a> can be used to get the right resource type depending on the resource sufix.
                 </td>
             </tr>
-            <tr><td class="param">size_t <b>dataSize</b></td><td>The data size of the requests data. If unkown, the application must used chunked encoding by setting dataSize to WS_RESPONSE_CHUNKED.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The data size of the requests data. If unkown, the application must used chunked encoding by setting dataSize to WS_RESPONSE_CHUNKED.</td></tr>
             <tr><td class="param">wsr_flags_t <b>flags</b></td><td><i>(Default WSP_FLAG_NONE)</i>Optional, additional flags. See <a href="wsr_flags_t ">wsr_flags_t </a> for details.</td></tr>
             <tr><td class="param">const char * <b>etag</b></td><td><i>(Default nullptr)</i> An optional etag used for caching purposed of an HTTP client.</td></tr>
         </table>
@@ -1247,11 +1247,11 @@ public:
 
     virtual const char * GetResourceName();
     virtual const char * GetRegisteredPathForRequest();
-    virtual size_t GetDataSize();
+    virtual ulong64 GetDataSize();
     virtual bool DataIsChunkEncoded();
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
 
     virtual void Cancel(wsr_cancel_type_t reason);
     virtual void Send(void * buffer, size_t len);
@@ -1307,7 +1307,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -1476,11 +1476,11 @@ public:
 
     virtual const char * GetResourceName();
     virtual const char * GetRegisteredPathForRequest();
-    virtual size_t GetDataSize();
+    virtual ulong64 GetDataSize();
     virtual bool DataIsChunkEncoded();
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
     virtual void Cancel(wsr_cancel_type_t reason);
     virtual void Recv(void * buffer = nullptr, size_t len = 0);
     virtual void Send(void * buffer, size_t len);
@@ -1535,7 +1535,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -1709,7 +1709,7 @@ public:
     virtual const char * GetRegisteredPathForRequest();
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
     virtual void SetLocation(const char * location);
     virtual void Cancel(wsr_cancel_type_t reason);
     virtual void Send(void * buffer, size_t len);
@@ -1755,7 +1755,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -1886,7 +1886,7 @@ public:
     virtual const char * GetRegisteredPathForRequest();
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
     virtual void SetLocation(const char * location);
     virtual void Cancel(wsr_cancel_type_t reason);
     virtual void Send(void * buffer, size_t len);
@@ -1929,7 +1929,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -2064,7 +2064,7 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
     virtual void Cancel(wsr_cancel_type_t reason);
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
     virtual void Send(void * buffer, size_t len);
     virtual void Close();
 };</code></pre>
@@ -2105,7 +2105,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -2221,7 +2221,7 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
     virtual void Cancel(wsr_cancel_type_t reason);
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
     virtual void Send(void * buffer, size_t len);
     virtual void Close();
 };</code></pre>
@@ -2262,7 +2262,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -2420,7 +2420,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -2594,7 +2594,7 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
     virtual void Cancel(wsr_cancel_type_t reason);
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
     virtual void Send(void * buffer, size_t len);
     virtual void Close();
 };</code></pre>
@@ -2635,7 +2635,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -2750,7 +2750,7 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName);
 
     virtual void Cancel(wsr_cancel_type_t reason);
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0);
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0);
     virtual void Recv(void * buffer = nullptr, size_t len = 0);
     virtual void Send(void * buffer, size_t len);
     virtual void Close();
@@ -2792,7 +2792,7 @@ public:
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">ws_webdav_result_t <b>result</b></td><td>The result code to set. See <a href=#ws_webdav_result_t>ws_webdav_result_t</a> for details.</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
+            <tr><td class="param">ulong64 <b>dataSize</b></td><td>The number of data that will be send. Pass WS_RESPONSE_CHUNKED to enabled chunk enconded transfer.</td></tr>
         </table>
         
         <h4>Remarks</h4>
@@ -3738,7 +3738,7 @@ to determine the correct wsr_type_t value depending on the suffix of a filename.
     this->webserverPlugin->RegisterForPath("/path/to/webserver", "/demoapp/main");
 }
 
-void app::WebserverPluginWebRequest(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, size_t dataSize)
+void app::WebserverPluginWebRequest(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, ulong64 dataSize)
 {
     if (requestType != WS_REQUEST_GET || strcmp(resourceName, "myresource.png") != 0)
         plugin->Cancel(WSP_CANCEL_NOT_FOUND);
@@ -3752,8 +3752,8 @@ void app::WebserverPluginWebRequest(IWebserverPlugin * plugin, ws_request_type_t
 class MyGetHandler {
 protected:
     char * dataBuffer;
-    size_t dataSize;
-    size_t dataSend;
+    ulong64 dataSize;
+    ulong64 dataSend;
 
 public:
     MyGetHandler() {}
@@ -3783,11 +3783,11 @@ public:
 
     void SendNextPart(IWebserverGet * const webserverGet)
     {
-        size_t dataSize = staticFile->GetSize();
+        ulong64 dataSize = staticFile->GetSize();
 
         if (bytesSend < dataSize) {
-            size_t dataSizeDiff = dataSize - bytesSend;
-            size_t sendSize = dataSizeDiff > WS_MAX_DATA_SIZE ? WS_MAX_DATA_SIZE : dataSizeDiff;
+            ulong64 dataSizeDiff = dataSize - bytesSend;
+            ulong64 sendSize = dataSizeDiff > WS_MAX_DATA_SIZE ? WS_MAX_DATA_SIZE : dataSizeDiff;
             webserverGet->Send((void *)(dataBuffer + bytesSend), sendSize);
             bytesSend += sendSize;
             if (bytesSend == dataSize)

@@ -64,6 +64,8 @@
                         <dt>privatecity, privatestreet, privatepostalcode, privatestate, privatecountry </dt>
                     </dl>
                 </dd>
+                <dt>photourl</dt>
+                <dd>URL to image data. Could be HTTP/HTTPS url or inline data (data:image/png;base64…).</dd>
                 <dt>adjust</dt>
                 <dd>Indicates that provided phone numbers might not contain the external line prefix and might need to be adjusted by the phone/softphone app before dialing.</dd>
             </dl>
@@ -82,6 +84,7 @@
             sip: ["jbl@example.com"],
             email: ["john.blues@example.com"]
         },
+        photourl: "http://1.2.3.4/jbl/avatar.png",
         adjust: true
     }</pre></dd>
 

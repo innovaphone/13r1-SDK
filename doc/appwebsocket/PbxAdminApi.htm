@@ -739,13 +739,24 @@
 	<pre><code class="json">{
     "api": "PbxAdminApi",
     "mt": "SearchUsers",
-    "cn": string
+    "cn": string,
+    "includeMatch": boolean
 }</code></pre>
 
     <p>
         Searches for users, based on the cn (Long Name) provided. Returns a list of up to 20 users starting
         from the position in the list of users identified by cn. Only objects of the type user or executive
         are returned.
+    </p>
+    <p>
+        This message can be used to enumerate all user and executive objects in the PBX:
+        <ul>
+            <li>Start with SearchUsers for cn ""</li>
+            <li>Continue with SearchUsers with the cn of the last returned object until no more objects are returned.</li>
+        </ul>
+
+        If you don't want to enumerate all objects but find also the object that exactly matches the specified cn,
+        set the parameter includeMath to true. In all other cases the parameter can be omitted.
     </p>
 
 	<pre><code class="json">{

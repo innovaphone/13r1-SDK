@@ -40,8 +40,16 @@
             <dd>An array that contains the apps that can be used as a phone app by the user.</dd>
             <dt>profileApp</dt>
             <dd>The name of the app that shall be used to configure the user profile.</dd>
+            <dt>lang</dt>
+            <dd>The two-letter code of the user's language.</dd>
+            <dt>scheme</dt>
+            <dd>The current color scheme ("light" or "dark").</dd>
             <dt>standby</dt>
             <dd>true if the client is running on a standby PBX. Apps can use this information if they implement a special behaviour in that case.</dd>
+            <dt>launcher</dt>
+            <dd>true if myApps is running inside the myApps launcher for Windows, iOS or Android.</dd>
+            <dt>adminSettings</dt>
+            <dd>An object that contains administrative settings that are used by the launcher, by the myApps client or by apps. Each setting is represented by a named object that contains a "value" and "force" field. If "force" is true, the user should not be allowed to change that setting.</dd>
         </dl>
     </p>
     <h3>Example</h3>
@@ -74,7 +82,50 @@
           "deviceapp": "phone"
         }
       ],
-      "profileApp": "profile"
+      "profileApp": "profile",
+      "launcher": true,
+      "adminSettings": {
+        "autostart": {
+            "value": false,
+            "force": true
+        },
+        "taskbar": {
+            "value": true,
+            "force": true
+        },
+        "offline": {
+            "value": 300000,
+            "force": true
+        },
+        "video": {
+            "value": true,
+            "force": true
+        },
+        "hotkeyDial": {
+            "value": "F8",
+            "force": true
+        },
+        "hotkeyAccept": {
+            "value": "CTRL + ALT + F9",
+            "force": true
+        },
+        "hotkeyReject": {
+            "value": "WIN + F10",
+            "force": true
+        },
+        "logFlags": {
+            "value": "00000000d6800001",
+            "force": true
+        },
+        "docking": {
+            "value": 0,
+            "force": true
+        },
+        "notifications": {
+            "value": false,
+            "force": true
+        }
+      }
     }
   }
 }

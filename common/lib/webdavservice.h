@@ -101,7 +101,7 @@ public:
     WebdavService(class IIoMux * const iomux, class UWebdavService * service, class IDbFiles * dbFiles, class IDatabase * database, class IInstanceLog * const log, const char * webserverPath, const char * rootFolder = 0);
     virtual ~WebdavService();
 
-    bool WebRequestWebdavService(IWebserverPlugin * const webserverPlugin, ws_request_type_t requestType, char * resourceName, size_t dataSize, bool decoded = false);
+    bool WebRequestWebdavService(IWebserverPlugin * const webserverPlugin, ws_request_type_t requestType, char * resourceName, ulong64 dataSize, bool decoded = false);
     bool GetCompleted() { return completed; }
     void Start();
     void RegisterforNotification(class UWebdavNotification * notification, const char * appName);
@@ -136,8 +136,8 @@ public:
 
     void Cancel(wsr_cancel_type_t type);
     void Send(const void * data, size_t len);
-    void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, const char * filename);
-    void SetTransferRange(size_t start, size_t end);
+    void SetTransferInfo(wsr_type_t resourceType, ulong64 dataSize, const char * filename);
+    void SetTransferRange(ulong64 start, ulong64 end);
     size_t GetRangeCount();
     IWebserverGetRange* GetRange(size_t idx);
     void Close() override;
@@ -173,8 +173,8 @@ class WebdavServiceGet : public IWebdavServiceTask, public UWebdavServiceTask {
     char * path;
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
-    size_t requestedLength;
-    size_t sendedLength;
+    ulong64 requestedLength;
+    ulong64 sendedLength;
     byte * sendBuffer;
 public:
     WebdavServiceGet(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path);
@@ -260,14 +260,14 @@ class WebdavServicePut : public IWebdavServiceTask, public UWebdavServiceTask {
     class WebdavService * webdavservice;
     ulong64 id;
     char * path;
-    size_t dataSize;
+    ulong64 dataSize;
     char * filename;
     bool chunkEncoded;
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
 
 public:
-    WebdavServicePut(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServicePut(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServicePut();
 
     bool Send(const void * data, size_t len);
@@ -280,7 +280,7 @@ public:
     void SendResult();
     void WriteProgress();
     bool Cancel(wsr_cancel_type_t type);
-    bool SetTransferInfo(wsr_type_t resourceType, size_t dataSize);
+    bool SetTransferInfo(wsr_type_t resourceType, ulong64 dataSize);
     class WebdavService * GetWebdavService(){ return webdavservice ? webdavservice : 0; }
     char * GetPath() { return path ? path : 0; }
 };
@@ -317,7 +317,7 @@ public:
     void Cancel(wsr_cancel_type_t type);
     void Recv();
     void Send(const void * data, size_t len);
-    void SetResultCode(ws_webdav_result_t result, size_t datasize = 0);
+    void SetResultCode(ws_webdav_result_t result, ulong64 datasize = 0);
     bool DataIsChunkEncoded();
     const char * GetHeaderFieldValue(const char * field);
     void Close() override;
@@ -353,7 +353,7 @@ class WebdavServicePropfind : public IWebdavServiceTask, public UWebdavServiceTa
     ulong64 id;
     char * path;
     char * rootFolderPath;
-    size_t dataSize;
+    ulong64 dataSize;
     dword properties;
     dword depth;
     const char * host;
@@ -366,7 +366,7 @@ class WebdavServicePropfind : public IWebdavServiceTask, public UWebdavServiceTa
     void SendItem(const char * name, unsigned contentlength, bool is_folder, ulong64 created, ulong64 modified);
 
 public:
-    WebdavServicePropfind(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, size_t dataSize, char * rootFolderPath = 0);
+    WebdavServicePropfind(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, ulong64 dataSize, char * rootFolderPath = 0);
     ~WebdavServicePropfind();
 
     bool Send(const void * data, size_t len);
@@ -413,7 +413,7 @@ public:
     void Cancel(wsr_cancel_type_t type);
     void Recv();
     void Send(const void * data, size_t len);
-    void SetResultCode(ws_webdav_result_t result, size_t datasize = 0);
+    void SetResultCode(ws_webdav_result_t result, ulong64 datasize = 0);
     const char * GetHeaderFieldValue(const char * field);
     void Close() override;
 };
@@ -461,7 +461,7 @@ class WebdavServiceMove : public IWebdavServiceTask, public UWebdavServiceTask {
     dword depth;
     bool overwrite;
     bool iscollection;
-    size_t dataSize;
+    ulong64 dataSize;
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
     dword GetDepthHeader();
@@ -470,7 +470,7 @@ class WebdavServiceMove : public IWebdavServiceTask, public UWebdavServiceTask {
     bool GetOverwriteHeader();
 
 public:
-    WebdavServiceMove(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServiceMove(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServiceMove();
 
     bool Send(const void * data, size_t len);
@@ -485,7 +485,7 @@ public:
     void SendResult();
     void WriteProgress();
     bool Cancel(wsr_cancel_type_t type);
-    bool SetTransferInfo(wsr_type_t resourceType, size_t dataSize);
+    bool SetTransferInfo(wsr_type_t resourceType, ulong64 dataSize);
     class WebdavService * GetWebdavService(){ return webdavservice ? webdavservice : 0; }
     char * GetPath() { return path ? path : 0; }
 };
@@ -554,13 +554,13 @@ class WebdavServiceMkCol : public IWebdavServiceTask, public UWebdavServiceTask 
     char * path;
     const char * host;
     
-    size_t dataSize;
+    ulong64 dataSize;
     const char * GetHostHeader();
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
 
 public:
-    WebdavServiceMkCol(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServiceMkCol(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServiceMkCol();
 
     bool Send(const void * data, size_t len);
@@ -604,7 +604,7 @@ public:
     void Cancel(wsr_cancel_type_t type);
     void Send(const void * data, size_t len);
     void Close() override;
-    void SetResultCode(ws_webdav_result_t result, size_t datasize=0);
+    void SetResultCode(ws_webdav_result_t result, ulong64 datasize=0);
 };
 
 class WebdavServiceDeleteDBFiles : public UTask, public UWebdavServiceTask {
@@ -639,12 +639,12 @@ class WebdavServiceDelete : public IWebdavServiceTask, public UWebdavServiceTask
     char * path;
     
     
-    size_t dataSize;
+    ulong64 dataSize;
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
 
 public:
-    WebdavServiceDelete(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServiceDelete(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServiceDelete();
 
     void AcceptReceived();
@@ -668,7 +668,7 @@ class WebdavServiceOptions : public UWebserverOptions {
     class IWebserverOptions * webserveroptions;
 
 public:
-    WebdavServiceOptions(class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServiceOptions(class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServiceOptions();
 };
 
@@ -697,11 +697,11 @@ class WebdavServiceLock : public UWebserverLock {
     class IWebserverLock * webserverLock;
     class WebdavLock * GetLockProperties(void * buffer);
     void SendLockResponse(class WebdavLock * lock);
-    size_t dataSize;
+    ulong64 dataSize;
     char * path;
 
 public:
-    WebdavServiceLock(class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServiceLock(class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServiceLock();
 };
 
@@ -714,7 +714,7 @@ class WebdavServiceUnLock : public UWebserverUnlock {
     class IWebserverUnlock * webserverUnlock;
 
 public:
-    WebdavServiceUnLock(class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServiceUnLock(class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServiceUnLock();
 };
 
@@ -757,7 +757,7 @@ class WebdavServiceProppatch : public UWebserverProppatch {
     void WebserverProppatchCloseComplete(IWebserverProppatch * const webserverProppatch) override;
     class WebdavService * webdavservice;
     char * path;
-    size_t dataSize;
+    ulong64 dataSize;
     class IWebserverProppatch * webserverProppatch;
     void GetProppatchProperties(void * buffer);
     void SendProppatchResponse();
@@ -765,7 +765,7 @@ class WebdavServiceProppatch : public UWebserverProppatch {
     class istd::list<RemProperty> remProperties;
 
 public:
-    WebdavServiceProppatch(class WebdavService * webdavservice, char * path, size_t dataSize);
+    WebdavServiceProppatch(class WebdavService * webdavservice, char * path, ulong64 dataSize);
     ~WebdavServiceProppatch();
 };
 

@@ -120,9 +120,9 @@ typedef enum {
 
 
 typedef enum {
-    WSP_FLAG_NONE           =   0x00,
-    WSP_FLAG_ENCODING_GZIP  =   0x01,
-    WSP_FLAG_SEND_RANGE     =   0x02
+    WSP_FLAG_NONE = 0x00,
+    WSP_FLAG_ENCODING_GZIP = 0x01,
+    WSP_FLAG_SEND_RANGE = 0x02
     // Note that the values 0x10 and above are used internally and must not be used
 } wsr_flags_t;
 
@@ -222,23 +222,24 @@ typedef enum {
     WSCR_BUFFER_OVERFLOW,
     WSCR_SOCKET_LOST,
     WSCR_ERROR,
+    WSCR_DOUBLE_RECV_CALL
 } ws_close_reason_t;
 
 
 typedef enum {
-    WS_REQUEST_GET          = 0x0001,
-    WS_REQUEST_POST         = 0x0002,
-    WS_REQUEST_PUT          = 0x0004,
-    WS_REQUEST_PASSTHROUGH  = 0x0008,
-    WS_REQUEST_PROPFIND     = 0x0010,
-    WS_REQUEST_MOVE         = 0x0020,
-    WS_REQUEST_COPY         = 0x0040,
-    WS_REQUEST_MKCOL        = 0x0080,
-    WS_REQUEST_DELETE       = 0x0100,
-    WS_REQUEST_OPTIONS      = 0x0200,
-    WS_REQUEST_LOCK         = 0x0400,
-    WS_REQUEST_UNLOCK       = 0x0800,
-    WS_REQUEST_PROPPATCH    = 0x1000
+    WS_REQUEST_GET = 0x0001,
+    WS_REQUEST_POST = 0x0002,
+    WS_REQUEST_PUT = 0x0004,
+    WS_REQUEST_PASSTHROUGH = 0x0008,
+    WS_REQUEST_PROPFIND = 0x0010,
+    WS_REQUEST_MOVE = 0x0020,
+    WS_REQUEST_COPY = 0x0040,
+    WS_REQUEST_MKCOL = 0x0080,
+    WS_REQUEST_DELETE = 0x0100,
+    WS_REQUEST_OPTIONS = 0x0200,
+    WS_REQUEST_LOCK = 0x0400,
+    WS_REQUEST_UNLOCK = 0x0800,
+    WS_REQUEST_PROPPATCH = 0x1000
 } ws_request_type_t;
 
 
@@ -250,21 +251,20 @@ typedef enum {
     WS_AUTH_ERR_PATH_INVALID
 } ws_update_auth_result_t;
 
-
 // Give this to SetTransferInfo as dataSize to tell the Webserver that your data
 // will need to be sent chunk encoded.
-static const size_t WS_RESPONSE_CHUNKED = 0xFFFFFFFF;
+static const ulong64 WS_RESPONSE_CHUNKED = 0xFFFFFFFFFFFFFFFF;
 
 // Webserver Plugin
 class IWebserverPluginProvider {
 public:
     virtual ~IWebserverPluginProvider() {}
     virtual class IWebserverPlugin * CreateWebserverPlugin(class IIoMux * const iomux,
-                                                           class ISocketProvider * localSocketProvider,
-                                                           class UWebserverPlugin * const user,
-                                                           const char * webserverAddress,
-                                                           const char * appWebRoot,
-                                                           class IInstanceLog * const log) = 0;
+    class ISocketProvider * localSocketProvider,
+    class UWebserverPlugin * const user,
+        const char * webserverAddress,
+        const char * appWebRoot,
+    class IInstanceLog * const log) = 0;
 };
 
 extern IWebserverPluginProvider * CreateWebserverPluginProvider();
@@ -316,12 +316,12 @@ public:
         if (lastUser) delete plugin;
     }
 
-    virtual void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+    virtual void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
     {
         plugin->Cancel(WSP_CANCEL_NOT_FOUND);
     }
 
-    virtual void WebserverPluginPassthroughListenResult(IWebserverPlugin * plugin, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+    virtual void WebserverPluginPassthroughListenResult(IWebserverPlugin *plugin, char *resourceName, const char *registeredPathForRequest, ulong64 dataSize)
     {
         plugin->Cancel(WSP_CANCEL_NOT_FOUND);
     }
@@ -346,14 +346,14 @@ public:
     virtual ~IWebserverGetRange() {}
 
     enum range_type_t {
-        RANGE_NONE       = 0x00,
-        RANGE_START_END  = 0x01,
+        RANGE_NONE = 0x00,
+        RANGE_START_END = 0x01,
         RANGE_START_ONLY = 0x02,
         RANGE_LAST_BYTES = 0x03
     } rangeType;
 
-    size_t start;
-    size_t end;
+    ulong64 start;
+    ulong64 end;
 };
 
 
@@ -369,8 +369,8 @@ public:
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
-    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr) = 0;
-    virtual void SetTransferRange(size_t rangeStart, size_t rangeEnd) = 0;
+    virtual void SetTransferInfo(wsr_type_t resourceType, ulong64 dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr) = 0;
+    virtual void SetTransferRange(ulong64 rangeStart, ulong64 rangeEnd) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void ForceDownloadResponse(const char * fileName = nullptr) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
@@ -396,10 +396,10 @@ public:
     virtual const char * GetResourceName() = 0;
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
-    virtual size_t GetDataSize() = 0;
+    virtual ulong64 GetDataSize() = 0;
     virtual bool DataIsChunkEncoded() = 0;
 
-    virtual void SetTransferInfo(wsr_type_t resourceType, size_t dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr) = 0;
+    virtual void SetTransferInfo(wsr_type_t resourceType, ulong64 dataSize, wsr_flags_t flags = WSP_FLAG_NONE, const char * etag = nullptr) = 0;
     virtual void ForceDownloadResponse(const char * fileName = nullptr) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
@@ -460,10 +460,10 @@ public:
     virtual const char * GetResourceName() = 0;
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
-    virtual size_t GetDataSize() = 0;
+    virtual ulong64 GetDataSize() = 0;
     virtual bool DataIsChunkEncoded() = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
@@ -493,10 +493,10 @@ public:
     virtual const char * GetResourceName() = 0;
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
-    virtual size_t GetDataSize() = 0;
+    virtual ulong64 GetDataSize() = 0;
     virtual bool DataIsChunkEncoded() = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
@@ -529,7 +529,7 @@ public:
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetLocation(const char * location) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
@@ -556,7 +556,7 @@ public:
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetLocation(const char * location) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
@@ -583,7 +583,7 @@ public:
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
@@ -609,7 +609,7 @@ public:
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
@@ -635,7 +635,7 @@ public:
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
@@ -668,7 +668,7 @@ public:
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Send(const void * buffer, size_t len) = 0;
@@ -694,7 +694,7 @@ public:
     virtual const char * GetRegisteredPathForRequest() = 0;
     virtual const char * GetHeaderFieldValue(const char * fieldName) = 0;
 
-    virtual void SetResultCode(ws_webdav_result_t result, size_t dataSize = 0) = 0;
+    virtual void SetResultCode(ws_webdav_result_t result, ulong64 dataSize = 0) = 0;
     virtual void SetHeaderField(const char * fname, const char * fvalue) = 0;
     virtual void Cancel(wsr_cancel_type_t reason) = 0;
     virtual void Recv(void * buffer = nullptr, size_t len = 0) = 0;
@@ -739,9 +739,9 @@ public:
     virtual void WebserverOptionsRequestAcceptComplete(IWebserverOptions * const webserverOptions)
     {
         webserverOptions->SetSupportedRequests(WS_REQUEST_GET | WS_REQUEST_POST | WS_REQUEST_PUT |
-                                               WS_REQUEST_PROPFIND | WS_REQUEST_MOVE | WS_REQUEST_COPY |
-                                               WS_REQUEST_MKCOL | WS_REQUEST_DELETE | WS_REQUEST_OPTIONS |
-                                               WS_REQUEST_LOCK | WS_REQUEST_UNLOCK | WS_REQUEST_PROPPATCH);
+            WS_REQUEST_PROPFIND | WS_REQUEST_MOVE | WS_REQUEST_COPY |
+            WS_REQUEST_MKCOL | WS_REQUEST_DELETE | WS_REQUEST_OPTIONS |
+            WS_REQUEST_LOCK | WS_REQUEST_UNLOCK | WS_REQUEST_PROPPATCH);
         webserverOptions->Close();
     }
 

@@ -13,10 +13,14 @@
     <h1>AppWebsocket</h1>
 
     <p>
-        The AppWebsocket protocol is the base protocol for all communication between Apps and their
-        App Services and bewtween App Services. It is also used for the new PBX Apis like PbxSignal,
-        EpSignal, Replication, ...
-	</p>
+        The AppWebsocket protocol is the base protocol for all app-related communication. It is used for websocket connections
+        <ul>
+            <li>between apps and their app services.</li>
+            <li>between app services.</li>
+            <li>between app objects on the PBX and the corresponding app services.<br />Those connections will be established by the PBX if the "websocket" checkmark is set at the app object.<br />The <a href="../reference.htm#APIs_PBX">PBX APIs</a> can be used here.</li>
+            <li>to an app object on the PBX.<br />This can be done by connecting to ws://&lt;pbx-host&gt;/PBX0/APPS/websocket.<br />The <a href="../reference.htm#APIs_PBX">PBX APIs</a> can be used here.</li>
+        </ul>
+    </p>
     <p>
         It provides the following services:
         <ul>

@@ -93,7 +93,7 @@ Location: ./13A000/value
         Let's add a debug printf to see what's going on and try again.
     </p>
     <p>
-        <pre><code class="language-cpp">void NewApp1::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+        <pre><code class="language-cpp">void NewApp1::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
 {
     if (requestType == WS_REQUEST_GET) {
         debug->printf("GET %s", resourceName); // added this line
@@ -160,7 +160,7 @@ Location: ./13A000/value
 public:
     RestApi();
     ~RestApi();
-    void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize) override;
+    void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize) override;
 };</code></pre>
         </p>
         
@@ -174,7 +174,7 @@ RestApi::~RestApi()
 {
 }
 
-void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
 {
     if (requestType == WS_REQUEST_GET) {
         debug->printf("RestApi GET");
@@ -212,7 +212,7 @@ void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_requ
 public:
     RestApi();
     ~RestApi();
-    void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize) override;
+    void WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize) override;
 
     char * value; // added this line
 };</code></pre>
@@ -296,7 +296,7 @@ void RestApiPut::WebserverPutCloseComplete(IWebserverPut * const webserverPut)
     </p>
     <p>
         Additionally we need to use our RestApiPut class to handle incoming PUT requests. Therefore we change our <code>RestApi::WebserverPluginHttpListenResult</code> like follows.
-        <pre><code class="language-cpp">void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+        <pre><code class="language-cpp">void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
 {
     if (requestType == WS_REQUEST_GET) {
         debug->printf("RestApi GET");
@@ -387,7 +387,7 @@ void RestApiGet::WebserverGetCloseComplete(IWebserverGet * const webserverGet)
 
         <p>
             Handling of incoming GET request
-            <pre><code class="language-cpp">void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+            <pre><code class="language-cpp">void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
 {
     if (requestType == WS_REQUEST_GET) {
         debug->printf("RestApi GET");
@@ -478,7 +478,7 @@ void RestApiDelete::WebserverDeleteCloseComplete(IWebserverDelete * const webser
 
         <p>
             Handling of incoming DELETE request
-            <pre><code class="language-cpp">void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, size_t dataSize)
+            <pre><code class="language-cpp">void RestApi::WebserverPluginHttpListenResult(IWebserverPlugin * plugin, ws_request_type_t requestType, char * resourceName, const char * registeredPathForRequest, ulong64 dataSize)
 {
     if (requestType == WS_REQUEST_GET) {
         debug->printf("RestApi GET");

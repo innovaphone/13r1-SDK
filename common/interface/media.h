@@ -112,9 +112,17 @@ enum ConnectionType {
 #define CHANNEL_CANDIDATE_PRFLX     2
 #define CHANNEL_CANDIDATE_RELAY     3
 
+enum SetupRole {
+    SETUP_ROLE_NONE = 0x00,
+    SETUP_ROLE_ACTIVE = 0x01,
+    SETUP_ROLE_PASSIVE = 0x02,
+    SETUP_ROLE_ACTPASS = 0x03,
+    SETUP_ROLE_HOLDCONN = 0x04,
+};
+
 class MediaConfiguration {
 public:
-    MediaConfiguration(bool turnOnly, bool iceNoHost, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx, bool phoneLoad,
+    MediaConfiguration(bool turnOnly, bool iceNoHost, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx, bool phoneLoad, bool hdVideo,
                        byte * cert = NULL, size_t certLen = 0) {
         this->turnOnly = turnOnly;
         this->iceNoHost = iceNoHost;
@@ -135,6 +143,8 @@ public:
         else {
             this->cert = NULL;
         }
+        this->hdVideo = hdVideo;
+        this->noVpnAddresses = false;
     }
     ~MediaConfiguration() {
         if (cert) free(cert);
@@ -151,6 +161,8 @@ public:
     int mediaDropPacketsTx;
     int mediaDropPacketsRx;
     bool phoneLoad;
+    bool hdVideo;
+    bool noVpnAddresses;
     byte * cert;
     size_t certLen;
 };
@@ -268,8 +280,8 @@ public:
 class IMedia {
 public:
     virtual ~IMedia() {};
-    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, bool iceNoHost, int dropMediaTx, int dropMediaRx, const char * hostPbx) = 0;
-    virtual void Connect(class MediaConfig *remoteMediaConfig, bool iceControlling) = 0;
+    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, bool iceNoHost, int dropMediaTx, int dropMediaRx, const char * hostPbx, bool noVpnAddresses) = 0;
+    virtual void Connect(class MediaConfig *remoteMediaConfig, bool iceRemoteRole, enum SetupRole remoteDtlsRole) = 0;
     virtual void RtpSend(const void * buf, size_t len, dword timestamp) = 0;
     virtual void RtpForward(const void * buf, size_t len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;
     virtual void RtcpSend(const void * buf, size_t len) = 0;
@@ -281,6 +293,55 @@ public:
 
 enum MediaEndpointEvent {
     CHANNEL_FULL_INTRA_REQUEST = 0,
+    CHANNEL_PACKET_LOST_INDICATION,
+    CHANNEL_MEDIA_STATISTICS,
+    CHANNEL_MEDIA_ERROR
+};
+
+#define FAULT_CODE_RTP        0x00050000
+
+#define FAULT_CODE_RTP_NO_MEDIA_DATA            (FAULT_CODE_RTP|1)
+#define FAULT_CODE_RTP_EXCESSIVE_LOSS_OF_DATA   (FAULT_CODE_RTP|2)
+#define FAULT_CODE_RTP_WRONG_PAYLOAD_TYPE       (FAULT_CODE_RTP|3)
+#define FAULT_CODE_RTP_STUN_FAILED              (FAULT_CODE_RTP|4)
+#define FAULT_CODE_RTP_SRTP_AUTH_FAILED         (FAULT_CODE_RTP|5)
+#define FAULT_CODE_RTP_SRTCP_AUTH_FAILED        (FAULT_CODE_RTP|6)
+#define FAULT_CODE_RTP_STUN_DNS_FAILED          (FAULT_CODE_RTP|7)
+#define FAULT_CODE_RTP_ICE_FAILED               (FAULT_CODE_RTP|8)
+#define FAULT_CODE_RTP_DTLS_SRTP_FAILED         (FAULT_CODE_RTP|9)
+#define FAULT_CODE_RTP_RECORDING_FAILED         (FAULT_CODE_RTP|10)
+
+class EventMediaError {
+public:
+    EventMediaError(int code, const char * errorText, const char * src) {
+        this->code = code;
+        this->errorText = _strdup(errorText);
+        this->src = _strdup(src);
+    }
+    ~EventMediaError() {
+        if(errorText) free(errorText);
+        if(src) free(src);
+    };
+
+    int code;
+    char * errorText;
+    char * src;
+};
+
+class EventMediaStatistics {
+public:
+    EventMediaStatistics(bool xmit = false, dword loss = 0, dword jitter = 0, dword roundTrip = 0) {
+        this->xmit = xmit;
+        this->loss = loss;
+        this->jitter = jitter;
+        this->roundTrip = roundTrip;
+    }
+    ~EventMediaStatistics() {};
+
+    bool xmit; // xmit==false: local recv statistics; xmit==true: remote recv statistics received via RTCP
+    dword loss;
+    dword jitter;
+    dword roundTrip;
 };
 
 class UMedia {
@@ -293,7 +354,7 @@ public:
     virtual void MediaSctpRecvResult(IMedia * const media, void * buf, size_t len) {};
     virtual void MediaSctpRecvAck(IMedia * const media, unsigned num) {};
     virtual void MediaCloseComplete(IMedia * const media) {};
-    virtual void MediaEventReceived(IMedia * const media, enum MediaEndpointEvent event) {};
+    virtual void MediaEventReceived(IMedia * const media, enum MediaEndpointEvent event, void * ctx) {};
     virtual void MediaRtpRecv(IMedia * const media, const char * src_addr, word src_port, dword ssrc, word pt) {};
     virtual void MediaRtpDtmfNearStart(char digit) {};
     virtual void MediaRtpDtmfNear(char digit) {};
@@ -343,7 +404,7 @@ public:
 class IDeviceIo {
 public:
     virtual void QueryDevices(void * context) = 0; // Calls DeviceAdded() for all present devices.
-    virtual const char * StartDevice(void * context, const char *deviceId, int deviceMode) = 0;
+    virtual const char * StartDevice(void * context, void * src, const char *deviceId, int deviceMode) = 0;
     virtual void StopDevice(void * context, const char *deviceId) = 0;
 };
 
@@ -351,6 +412,7 @@ class UDeviceIo {
 public:
     virtual void MediaIoDeviceAdded(IDeviceIo * deviceIo, void * context, const char *deviceId, int deviceType, unsigned deviceCapabilities, const char *deviceName) = 0;
     virtual void MediaIoDeviceRemoved(IDeviceIo * deviceIo, void * context, const char *deviceId) = 0;
+    virtual void MediaIoDeviceFailed(IDeviceIo* deviceIo, void* context, const char* deviceId) = 0;
     virtual void MediaIoQueryDevicesResult(IDeviceIo * deviceIo, void * context) = 0;
 };
 
@@ -426,6 +488,20 @@ enum VideoDeviceType {
     VideoScreen,
 };
 
+#define RTP_STAP_A             24
+#define RTP_STAP_B             25
+#define RTP_MTAP16             26
+#define RTP_MTAP24             27
+#define RTP_FU_A               28
+#define RTP_FU_B               29
+
+#define NAL_UNIT_NON_IDR       1
+#define NAL_UNIT_IDR           5
+#define NAL_UNIT_SEI           6
+#define NAL_UNIT_SPS           7
+#define NAL_UNIT_PPS           8
+#define NAL_UNIT_DELIMITER     9
+
 class IVideoIoChannel : public IMediaIoChannel {
 public:
     static class IVideoIoChannel * Create(class IIoMux * const iomux, class IVideoIo * videoIo, class UMediaIoChannel * const user, class IInstanceLog * log);
@@ -437,20 +513,23 @@ public:
 
 class IVideoIo : public IDeviceIo {
 public:
-    static class IVideoIo * Create(class IIoMux * const iomux, class IInstanceLog * log);
+    static class IVideoIo * Create(class IIoMux * const iomux, class IInstanceLog * log, class MediaConfiguration* mediaConfiguration);
     virtual ~IVideoIo() {};
     virtual void Initialize(class UVideoIo * const user, class UDeviceIo * const deviceIoUser) = 0;
-    virtual void AddLocalContainer(void * context, void * container, enum MediaType coder) = 0;
-    virtual void RemoveLocalContainer(void * container, enum MediaType coder) = 0;
-    virtual void AddRemoteContainer(void * context, void * container, const char * channelId, enum MediaType coder) = 0;
-    virtual void RemoveRemoteContainer(void * container, enum MediaType coder) = 0;
-    virtual void StartVideoEncoder(void * context, const char * channelId, int codec) = 0;
+    virtual void StartLocalVideoEncoder(void * context, const char * channelId, int coder) = 0;
+    virtual void StartRemoteVideoEncoder(void * context, const char * channelId, int coder) = 0;
+    virtual void StopLocalVideoEncoder(void * context, const char * channelId, int coder) = 0;
     virtual void Close() = 0;
 };
 
 class UVideoIo {
 public:
     virtual void CloseVideoIoComplete() = 0;
+};
+
+class IAppClientMedia {
+public:
+    virtual void SetNoVpnAddresses(bool noVpnAddresses) = 0;
 };
 
 enum AppSharingDeviceType {
@@ -568,7 +647,9 @@ struct VideoFrameFormat {
     int height;
     int stride;
     int averageBitrate;
+    int targetBitrate;
     int sampleSize;
+    bool hdVideo;
     enum VideoFormat format;
     enum VideoInterlaceMode interlace;
     struct VideoRatio frameRate;
@@ -580,7 +661,7 @@ struct VideoFrameFormat {
 class IWebcam {
 public:
     virtual ~IWebcam() {};
-    virtual struct VideoFrameFormat * Start() = 0;
+    virtual struct VideoFrameFormat * Start(bool hdVideo) = 0;
     virtual void Stop() = 0;
     virtual void Close() = 0;
     virtual const char * GetWebcamId() = 0;
@@ -606,6 +687,7 @@ public:
 class UWebcamProvider {
 public:
     virtual void WebcamLost(class IWebcam * const webcam, void * context) = 0;
+    virtual void WebcamFailed(class IWebcam* const webcam, void* context) = 0;
     virtual void WebcamAdded(class IWebcam * const webcam, void * context) = 0;
     virtual void WebcamQueryResult(void * context) = 0;
     virtual void WebcamClosed(class IWebcam * const webcam) = 0;
@@ -620,6 +702,7 @@ public:
     virtual bool Initialize(struct VideoFrameFormat * const format) = 0;
     virtual void Encode(const void * buf, int len, dword timestamp, dword duration, const struct VideoFrameFormat * f) = 0;
     virtual bool FullIntraRequest() = 0;
+    virtual enum VideoCoder GetVideoCoder() = 0;
     virtual void Close() = 0;
 };
 
@@ -637,6 +720,7 @@ public:
     virtual ~IMediaDecoder() {};
     virtual void DecodeFrame(const void *buf, int len, dword timestamp) = 0;
     virtual void DecodeStream(const void *buf, int len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;
+    virtual enum VideoCoder GetVideoDecoder() = 0;
     virtual void Close() = 0;
 };
 
@@ -645,4 +729,13 @@ class UMediaDecoder
 public:
     virtual void DecodeResult(class IMediaDecoder * decoder, const void * buf, int len, dword timestamp, dword duration, struct VideoFrameFormat * f) = 0;
     virtual void MediaDecoderCloseResult(class IMediaDecoder * decoder) = 0;
+};
+
+class IScaleVideoSample {
+public:
+    static void ScaleRGB24(byte* dst, int dstStride, dword dstWidth, dword dstHeight, const byte* src, int srcStride, dword srcWidth, dword srcHeight);
+    static void ScaleYUY2(byte* dst, int dstStride, dword dstWidth, dword dstHeight, const byte* src, int srcStride, dword srcWidth, dword srcHeight);
+    static void ScaleNV12(byte* dst, int dstStride, dword dstWidth, dword dstHeight, const byte* src, int srcStride, dword srcWidth, dword srcHeight);
+    static void ScaleI420(byte* dst, int dstStride, dword dstWidth, dword dstHeight, const byte* src, int srcStride, dword srcWidth, dword srcHeight);
+    static void ScaleYV12(byte* dst, int dstStride, dword dstWidth, dword dstHeight, const byte* src, int srcStride, dword srcWidth, dword srcHeight);
 };

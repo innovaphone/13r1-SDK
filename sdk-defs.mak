@@ -5,7 +5,7 @@ HTTPFILES-FLAGS = -k -s 0,HTTP_GZIP
 HTTPFILES-WEB-FLAGS = -k -r web -s 0,HTTP_GZIP
 
 SYSROOT  =
-INCLUDES = -I sdk
+INCLUDES = -I sdk -I .
 # we need -fno-delete-null-pointer-checks as the btree implementations uses if(!this) ... GCC 6 removes this, as the new standard assumes that this is always NOT NULL
 CFLAGS	 = -Wall -Werror -fno-delete-null-pointer-checks -c -D NO_LEGACY -D BUILD=$(BUILD) 
 LIBS     = -lpthread -luuid -lhpdf -lpng -lcap -lpam -lcrypto -lssl -lmysqlclient -ldl -lz -lpq

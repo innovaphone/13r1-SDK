@@ -20,16 +20,19 @@ class Cipher {
 protected:
     bool encrypt;
     cipher_t type;
-    ulong64 ctx[129];
+    ulong64 encrypt_ctx[129];
+    ulong64 decrypt_ctx[129];
 
 public:
     Cipher();
-    void Init(cipher_t type, const byte * key, int keyLen, bool encrypt = true);
+    void Init(cipher_t type, const byte * key, int keyLen, bool encrypt = true, bool makekey = true);
     void Reset();
 
     void Block(const byte * in, byte * out);
     void Crypt(const byte * in, byte * out, int len);
     void CtrCrypt(const byte * in, byte * out, int len, byte * iv);
+    void CfbCrypt(const byte * in, byte * out, int len, byte * iv);
+    void CbcCrypt(const byte * in, byte * out, int len, byte * iv);
 };
 
 NAMESPACE_END

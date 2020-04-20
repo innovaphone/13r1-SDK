@@ -55,6 +55,13 @@
             <dd>The combination of key and IV must be unique and must never be reused.</dd>
             <dd>Considered to be secure (unless key and IV are reused).</dd>
         </dl>
+        <dl>
+            <dt>CFB (Cipher Feedback Mode)</dt>
+            <dd>Turns block ciphers into stream ciphers. So any data size can be processed. It doesn't need to be a multiple of the block size.</dd>
+            <dd>Additional to the key an initialization vector (IV) is needed.</dd>
+            <dd>The combination of key and IV must be unique and must never be reused.</dd>
+            <dd>Considered to be secure (unless key and IV are reused).</dd>
+        </dl>
     </p>
 
     <h2>File information</h2>
@@ -77,6 +84,7 @@
             <td><b>Examples</b></td>
             <td>
                 <a href="#Example_AES_CTR">Encryption with AES-256 in counter mode</a><br>
+                <a href="#Example_AES_CFB">Encryption with AES-128 in cipher feedback mode</a><br>
                 <a href="#Example_DES">Single block encryption with DES</a><br>
                 <a href="#Example_RC4">Encryption with RC4</a>
                 <br>
@@ -89,10 +97,12 @@
     <pre><code class="C++">class Cipher {
 public:
     Cipher();
-    void Init(cipher_t type, const byte * key, int keyLen, bool encrypt = true);
+    void Init(cipher_t type, const byte * key, int keyLen, bool encrypt = true, bool makekey = true);
     void Block(const byte * in, byte * out);
     void Crypt(const byte * in, byte * out, int len);
     void CtrCrypt(const byte * in, byte * out, int len, byte * iv);
+    void CfbCrypt(const byte * in, byte * out, int len, byte * iv);
+    void CbcCrypt(const byte * in, byte * out, int len, byte * iv);
     void Reset();
 };</code></pre>
 
@@ -142,6 +152,12 @@ public:
                     true if the data shall be encrypted. false if the data shall be decrypted.
                 </td>
             </tr>
+            <tr>
+                <td class="param">bool <b>makekey</b></td>
+                <td>
+                    true if the key is to be generated/modified by means of a protocol-specific method. false if the key is to be taken as-is (currently for DES only).
+                </td>
+             </tr>
         </table>
 
         <h4>Remarks</h4>
@@ -252,6 +268,80 @@ public:
         The function is not implemented for DES and RC4. If the object was initialized with CIPHER_DES or CIPHER_RC4 the function will fail with an assertion.
     </dd>
 
+    <div class="fnhead">CfbCrypt</div>
+    <dd>
+        Implementation of the cipher feedback mode of operation.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">const byte * <b>in</b></td>
+                <td>
+                    A buffer containing the data that shall be encrypted / decrypted.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">byte * <b>out</b></td>
+                <td>
+                    A buffer to write the encrypted / decrypted data. It must be big enough to contain len bytes.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">int <b>len</b></td>
+                <td>
+                    Any positive number of bytes that shall be encrypted.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">byte * <b>iv</b></td>
+                <td>
+                    The initialization vector for cipher feedback mode. The size must match the block size of the underlying cipher (16 bytes for AES).
+                    The content of the buffer is updated, so it can be reused for subsequent encryptions / decryptions.
+                </td>
+            </tr>
+        </table>
+
+        <h4>Remarks</h4>
+        The function is not implemented for DES and RC4. If the object was initialized with CIPHER_DES or CIPHER_RC4 the function will fail with an assertion.
+    </dd>
+
+    <div class="fnhead">CbcCrypt</div>
+    <dd>
+        Implementation of the cipher block chaining mode of operation.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr>
+                <td class="param">const byte * <b>in</b></td>
+                <td>
+                    A buffer containing the data that shall be encrypted / decrypted.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">byte * <b>out</b></td>
+                <td>
+                    A buffer to write the encrypted / decrypted data. It must be big enough to contain len bytes.
+                </td>
+            </tr>
+            <tr>
+                <td class="param">int <b>len</b></td>
+                <td>
+                    The number of bytes that shall be encrypted / decrypted. Must be a multiple of the block size (8 bytes for DES).
+                </td>
+            </tr>
+            <tr>
+                <td class="param">byte * <b>iv</b></td>
+                <td>
+                    The initialization vector for cipher block chaining mode. The size must match the block size of the underlying cipher (8 bytes for DES).
+                    The content of the buffer is updated, so it can be reused for subsequent encryptions / decryptions.
+                </td>
+            </tr>
+        </table>
+
+        <h4>Remarks</h4>
+        The function is not implemented for AES and RC4. If the object was initialized with CIPHER_AES or CIPHER_RC4 the function will fail with an assertion.
+    </dd>
+
     <div class="fnhead">Reset</div>
     <dd>
         This function is only needed in combination with CtrCrypt. It must be called each time a new initialization vector defined by the application is used.
@@ -307,6 +397,30 @@ c.Reset(); // needed because a new IV is set by the application
 c.CtrCrypt(in2, out2, 64, iv2);
 c.CtrCrypt(in2 + 64, out2 + 64, 64, iv2);
 c.CtrCrypt(in2 + 128, out2 + 128, 4, iv2);
+</code></pre>
+
+        <a name="Example_AES_CFB"><h2>Encryption with AES-128 in cipher feedback mode</h2></a>
+    <pre class="sample"><code style="language-cpp">byte key[16] = { /*...*/ };
+cipher c;
+c.Init(CIPHER_AES, key, 16, true);
+
+// encryption of the in1 buffer
+
+byte iv1[16] = { /*...*/ };
+byte in1[37] = { /*...*/ };
+byte out1[37] = { /*...*/ };
+
+c.CfbCrypt(in1, out1, 37, iv1);
+
+// encryption of the in2 buffer in multiple passes
+
+byte iv2[16] = { /*...*/ };
+byte in2[132] = { /*...*/ };
+byte out2[132] = { /*...*/ };
+
+c.CfbCrypt(in2, out2, 64, iv2);
+c.CfbCrypt(in2 + 64, out2 + 64, 64, iv2);
+c.CfbCrypt(in2 + 128, out2 + 128, 4, iv2);
 </code></pre>
 
     <a name="Example_DES"><h2>Single block encryption with DES</h2></a>
