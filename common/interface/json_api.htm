@@ -168,6 +168,14 @@ public:
                 </td>
             </tr>
             <tr>
+                <td class="param">word <b>base</b></td>
+                <td>
+                    The ID of the base element of the message inside the msg structure. Pass it to the get functions of json_io to read the attributes of the message.
+                    Example:
+                    <pre>const char * text = msg.get_string(base, "text");</pre>
+                </td>
+            </tr>
+            <tr>
                 <td class="param">const char * <b>mt</b></td>
                 <td>
                     The message type of the message.

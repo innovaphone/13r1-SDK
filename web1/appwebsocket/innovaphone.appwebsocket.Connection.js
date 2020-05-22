@@ -40,6 +40,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     console.log("AppWebsocket(" + app + ") " + url);
     var TIMEOUT_MIN = 1000,
         TIMEOUT_MAX = 32000,
+        TIMEOUT_KEEPALIVE = 60000,
         states = { "CONNECT": 1, "OPENED": 2, "LOGIN2": 3, "CONNECTED": 4, "CLOSED": 5 };
 
     var instance = this,
@@ -50,12 +51,15 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         dn = null,
         sessionKey = null,
         unique = 0,
-        timeout = TIMEOUT_MIN;
+        timeout = TIMEOUT_MIN,
+        keepAlive = false,
+        keepAliveTimer = null;
 
     this.checkBuild = false;
     window.addEventListener('message', onpostmessage);
     window.addEventListener('beforeunload', function () {
         console.log(app + ": close beforeunload");
+        stopKeepAlive();
     });
     window.addEventListener("unload", function () {
         console.log(app + ": close unload");
@@ -86,13 +90,14 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     if (obj.ok) {
                         timeout = TIMEOUT_MIN;
                         state = states.CONNECTED;
+                        restartKeepAlive();
                         instance.onconnected(domain, user, dn, obj.domain);
                     }
                     else {
                         var error = "LOGIN_FAILURE";
                         if (instance.logindata) {
                             if (instance.logindata.info && instance.logindata.info.unlicensed) error = "UNLICENSED";
-                            else if (instance.logindata.errorText) error = instance.logindata.info.errorText;
+                            else if (instance.logindata.errorText) error = instance.logindata.errorText;
                             else if (instance.logindata.error) error = "Error " + instance.logindata.error;
                         }
                         close(error);
@@ -103,6 +108,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                         if (obj.url) {
                             if (applicationCache) try { applicationCache.update(); } catch (err) { };
                             console.log(app + ": build mismatch, redirect to: " + obj.url);
+                            stopKeepAlive();
                             if (ws) {
                                 ws.onclose = undefined;
                                 ws.onerror = undefined;
@@ -115,6 +121,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
                     }
                 default:
                     if (state == states.CONNECTED) {
+                        restartKeepAlive();
                         for (var i = 0; i < srcs.length; i++) {
                             if (srcs[i].src == obj.src) {
                                 srcs[i].onmessage(obj);
@@ -218,6 +225,18 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         if (state != states.CLOSED) close("REMOTE_CLOSE");
     }
 
+    function restartKeepAlive() {
+        window.clearTimeout(keepAliveTimer);
+        keepAliveTimer = keepAlive ? window.setTimeout(function () {
+            send({ mt: "KeepAlive" });
+        }, TIMEOUT_KEEPALIVE) : null;
+    }
+
+    function stopKeepAlive() {
+        window.clearTimeout(keepAliveTimer);
+        keepAliveTimer = null;
+    }
+
     // general control functions
     function connect() {
         state = states.CONNECT;
@@ -230,6 +249,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     }
 
     function close(error) {
+        stopKeepAlive();
         if (state != states.CLOSED) {
             console.log(app + ": closing");
             state = states.CLOSED;
@@ -321,6 +341,7 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
         else {
             console.log(app + ": discard: " + messageJSON);
         }
+        restartKeepAlive();
     }
 
     // public interface
@@ -358,6 +379,11 @@ innovaphone.appwebsocket.Connection = innovaphone.appwebsocket.Connection || fun
     }
     this.connected = function () {
         return state == states.CONNECTED;
+    }
+    this.setKeepAlive = function (on) {
+        keepAlive = on;
+        if (on) restartKeepAlive();
+        else stopKeepAlive();
     }
     this.encrypt = encrypt;
     this.decrypt = decrypt;

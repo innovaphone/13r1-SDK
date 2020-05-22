@@ -88,6 +88,16 @@ innovaphone.ui1.nodePrototype = {
         return this.container.classList.contains(className);
     },
 
+    setStyle: function (style, value) {
+        this.container.style[style] = value;
+        return this;
+    },
+
+    setAttribute: function (attribute, value) {
+        this.container.setAttribute(attribute, value);
+        return this;
+    },
+
     addTranslation: function (languages, id, property, args) {
         languages.create(this, property, id, args);
         return this;
@@ -313,6 +323,7 @@ innovaphone.ui1.lib = innovaphone.ui1.lib || (function () {
         }
         else if (ua.indexOf("OPR/") != -1 || ua.indexOf("Opera/") != -1) return { name: "Opera", webkit: true };
         else if (ua.indexOf("Edge/") != -1) return { name: "Edge", webkit: false };
+        else if (ua.indexOf("Edg/") != -1) return { name: "Edge", webkit: true };
         else if (ua.indexOf("Firefox/") != -1) return { name: "Firefox", webkit: false };
         else if (ua.indexOf("Chromium/") != -1) return { name: "Chromium", webkit: true };
         else if (ua.indexOf("Chrome/") != -1) return { name: "Chrome", webkit: true };

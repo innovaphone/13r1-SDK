@@ -26,12 +26,12 @@
                 </dl>
             </dd>
             <dt>To get an URL</dt>
-            <dd><code>avatar.url(user, size, dn);</code>
+            <dd><code>avatar.url(sip, size, dn);</code>
                 <dl>
-                    <dt>user</dt>
+                    <dt>sip</dt>
                     <dd>
-                        The username from the user which profile picture is requested.
-                        If this name does not contain a domain, the domain provided in
+                        The sip from the user which profile picture is requested.
+                        If it does not contain a domain (which means that just the username is provided), the domain provided in
                         the constructor is used.
                     </dd>
                     <dt>size</dt>

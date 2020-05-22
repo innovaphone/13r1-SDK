@@ -68,6 +68,11 @@
         <dd>
             Boolean. If set to true, the CheckBuild mechanism will be used.
         </dd>
+        <dt>this.setKeepAlive = function (on)</dt>
+        <dd>
+            Turns KeepAlive on or off. If on, a "KeepAlive" message will be sent to the server
+            from time to time in order to detect if the connection is still up.
+        </dd>
     </dl>
     <hr/>
     <h2>Messages</h2>
@@ -95,6 +100,11 @@
     <dl>
         <dt>mt</dt><dd>"LoginResult"</dd>
         <dt>ok</dt><dd>Boolean, true if login succeeded</dd>
+    </dl>
+    <h3>KeepAlive</h3>
+    <dl>
+        <dt>mt</dt>
+        <dd>"KeepAlive"</dd>
     </dl>
 </body>
 </html>

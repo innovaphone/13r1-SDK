@@ -113,7 +113,7 @@ public:
     void StartLocked(unsigned timeoutMs);
     void Cancel();
     void CancelLocked();
-    bool IsRunning() const { return running; };
+    bool IsRunning() const; // const { return running; };
 };
 
 template <class ITimerSubclass> class UTimerSubclass : public UTimer {
