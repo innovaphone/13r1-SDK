@@ -16,7 +16,7 @@ enum AlarmSeverity {
 enum AlarmType {
     SET_ALARM = 0,
     CLEAR_ALARM,
-    ERROR
+    ERROR_ALARM
 };
 
 typedef enum {

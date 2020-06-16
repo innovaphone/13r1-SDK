@@ -18,7 +18,7 @@
             <li>between apps and their app services.</li>
             <li>between app services.</li>
             <li>between app objects on the PBX and the corresponding app services.<br />Those connections will be established by the PBX if the "websocket" checkmark is set at the app object.<br />The <a href="../reference.htm#APIs_PBX">PBX APIs</a> can be used here.</li>
-            <li>to an app object on the PBX.<br />This can be done by connecting to ws://&lt;pbx-host&gt;/PBX0/APPS/websocket.<br />The <a href="../reference.htm#APIs_PBX">PBX APIs</a> can be used here.</li>
+            <li>to an app object on the PBX.<br />This can be done by connecting to wss://&lt;pbx-host&gt;/PBX0/APPS/websocket.<br />The <a href="../reference.htm#APIs_PBX">PBX APIs</a> can be used here.</li>
         </ul>
     </p>
     <p>
@@ -40,6 +40,7 @@
     <ul>
         <li><a href="#BaseMessage">Basic message format</a></li>
         <li><a href="#messages">AppWebsocket messages</a></li>
+        <li><a href="#MessageFlow">Message flow</a></li>
     </ul>
 
 	<a name="BaseMessage"><h2>Basic message format</h2></a>
@@ -89,7 +90,7 @@
         </dd>
     </dl>
 
-	<a name="messages"><u>AppWebsocket Messages</u></a>
+	<a name="messages"><h2>AppWebsocket Messages</h2></a>
 
 	<ul>
 		<li><a href="#AppChallenge">AppChallenge</a> - Request a challenge for authentication</li>
@@ -103,6 +104,43 @@
 	</ul>
 
     <div><a href="#Objects">Objects</a> - recurring definitions</div>
+
+    <a name="MessageFlow"><h2>Message Flow</h2></a>
+
+    <p>
+        This sample message flow shows an example of a websocket connection to an app object on the PBX.
+    </p>
+
+    <p>
+        The app object assumed to have following sample configuration:
+
+        <ul>
+            <li>Object Type: App</li>
+            <li>Name: pbxadminapi</li>
+            <li>Password: password</li>
+            <li>App URL: http://1.2.3.4/PBX0/APPS/websocket</li>
+            <li>Grant access to APIs: Admin</li>
+        </ul>
+    </p>
+    <p>
+        In the example following operations are performed:
+        <ul>
+            <li>
+                Authentication at the app object
+            </li>
+            <li>
+                Reading the parameters of the PBX user object with the name "My Testuser"
+            </li>
+            <li>
+                Writing changed PBX user object parameter "filter "back to the PBX
+            </li>
+        </ul>
+    </p>
+
+
+    <br/><br/>
+    <img src="AppWebsocketAppLoginSequence.svg" alt="AppWebsocket Login Sequence Diagramm">
+    <br/><br/>
 
 	<a name="AppChallenge"><h2>AppChallenge</h2></a>
 
@@ -164,17 +202,17 @@
             to a user on the PBX, the user can only access what is defined for this App.
         </dd>
         <dd>
-            In case the login is done to a PBX Api, which is assigned to an App Object, this property should
+            In case the login is done to a PBX API, which is assigned to an App Object, this property should
             contain the Name of the App object. The properties 'domain', 'sip', 'guid' or 'dn' need not to be
             set in this case.
         </dd>
         <dt>domain</dt>
         <dd>
-            The domain of the logged in user
+            The domain of the logged in user, if available
         </dd>
         <dt>sip</dt>
         <dd>
-            The sip user part of the logged in user.
+            The sip user part of the logged in user, if available
         </dd>
         <dt>guid</dt>
         <dd>
@@ -186,9 +224,99 @@
         </dd>
         <dt>digest</dt>
         <dd>
-            The digest calculated to verify the knowledge of the shared secret. It is calculated as
-            SHA256 hash over the string
-            <pre><code class="json">&lt;app&gt;:&lt;domain&gt;:&lt;sip&gt;:&lt;guid&gt;:&lt;dn&gt;:&lt;info&gt;:&lt;challenge&gt;:&lt;password&gt;</code></pre>
+            <p>
+                The digest calculated to verify the knowledge of the shared secret. It is calculated as SHA256 hash over the string:
+                <pre><code class="json">&lt;app&gt;:&lt;domain&gt;:&lt;sip&gt;:&lt;guid&gt;:&lt;dn&gt;:&lt;info&gt;:&lt;challenge&gt;:&lt;password&gt;</code></pre>
+            </p>
+            <p>
+                In case no Info parameter is provided as part of the AppLogin message the string for hash calculation should be following:
+                <pre><code class="json">&lt;app&gt;:&lt;domain&gt;:&lt;sip&gt;:&lt;guid&gt;:&lt;dn&gt;:&lt;challenge&gt;:&lt;password&gt;</code></pre>
+            </p>
+            <p>
+                Following examples can be used as test vectors for your implementation of the digest calculation. 
+            </p>
+            <p>
+                <b>Example 1:</b><br />
+                Password on the "pbxadminapi" app object is "pwd". No info object is provided.<br />
+
+                <pre><code class="json">{
+    "app": "pbxadminapi",
+    "digest": "a205299ed2ef2786c311e0be1b14db343f2cadd906a6ae7b564eee34bda5e9a1",
+    "dn": "",
+    "domain": "",
+    "guid": "",
+    "mt": "AppLogin",
+    "sip": ""
+}</code></pre>
+                String for digest calculation:
+                <pre><code class="json">pbxadminapi:::::0123456789abcdef:pwd</code></pre>
+            </p>
+            <p>
+                <b>Example 2:</b><br />
+                Password on the "pbxadminapi" app object is "pwd". An empty info object is provided.<br />
+
+                <pre><code class="json">{
+    "app": "pbxadminapi",
+    "digest": "57b23fe824b9222a7ac879597cb509bcdc865a1bfeb057d9d12118cef0c3ba34",
+    "dn": "",
+    "domain": "",
+    "guid": "",
+    "info": {},
+    "mt": "AppLogin",
+    "sip": ""
+}</code></pre>
+                String for digest calculation:
+                <pre><code class="json">pbxadminapi:::::{}:0123456789abcdef:pwd</code></pre>
+            </p>
+            <p>
+                <b>Example 3:</b><br />
+                Password on the "pbxadminapi" app object is "pwd". An info object is provided.<br />
+
+                <pre><code class="json">{
+    "app": "pbxadminapi",
+    "digest": "96db3c3f657230c2b68194becc6d2a77f05de9f79f01fc81e9ca0fb196b10d9d",
+    "dn": "",
+    "domain": "",
+    "guid": "",
+    "info": {
+        "cn": "Test User"
+    },
+    "mt": "AppLogin",
+    "sip": ""
+}</code></pre>
+                String for digest calculation:
+                <pre><code class="json">pbxadminapi:::::{"cn":"Test User"}:0123456789abcdef:pwd</code></pre>
+            </p>
+            <p>
+                <b>Example 4:</b><br />
+                Password on the "pbxadminapi" app object is "pwd". An info object is provided. The parameters for dn, domain, guid and sip are provieded.<br />
+
+                <pre><code class="json">{
+    "app": "innovaphone-users",
+    "digest": "ef1b811ffaa8f9255c39c653d8fb26b4687b2d8c4d9ac91b4821bff6bae3ff44",
+    "dn": "Administrator User",
+    "domain": "example.com",
+    "guid": "0123456789abcdef0123456789abcdef",
+    "info": {
+        "appobj": "users",
+        "apps": [
+            {
+                "name": "users"
+            },
+            {
+                "name": "profile"
+            }
+        ],
+        "appurl": "https://1.2.3.4/example.com/usersapp/innovaphone-users",
+        "unlicensed": true
+    },
+    "mt": "AppLogin",
+    "pbxObj": "users",
+    "sip": "administrator"
+}</code></pre>
+                String for digest calculation:
+                <pre><code class="json">innovaphone-users:example.com:administrator:0123456789abcdef0123456789abcdef:Administrator User:{"appobj":"users","apps":[{"name":"users"},{"name":"profile"}],"appurl":"https://1.2.3.4/example.com/usersapp/innovaphone-users","unlicensed":true}:0123456789abcdef:pwd</code></pre>
+            </p>
         </dd>
         <dt>pbxObj</dt>
         <dd>
@@ -196,10 +324,10 @@
         </dd>
         <dt>info</dt>
         <dd>
-            A Json Object with additional information. For the digest calculation this must be json
+            An optional JSON Object with additional information. For the digest calculation this must be JSON
             encoded without any unnecessary white space and no unnecessary escaping. This is the
             encoding done by the json_io library of the SDK, by the Javascript JSON.stringify function
-            or by PHP json_encode($input, JSON_UNESCAPED_UNICODE)
+            or by a PHP function json_encode($input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
         </dd>
     </dl>
 

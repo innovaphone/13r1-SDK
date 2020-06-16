@@ -77,34 +77,7 @@
     <hr/>
     <h2>Messages</h2>
     <p>
-        The following Messages are used on the websocket connection for this:
+        See the protocol definition here: <a href="../../doc/appwebsocket/AppWebsocket.htm">AppWebsocket</a>.
     </p>
-    <h3>mt: "Challenge"</h3>
-    <dl>
-        <dt>mt</dt><dd>"Challenge"</dd>
-        <dt>app</dt><dd>Name of the app entity (same as H.323 id of corresponding PBX object)</dd>
-    </dl>
-    <h3>mt: "ChallengeResult"</h3>
-    <dl>
-        <dt>mt</dt><dd>"ChallengeResult"</dd>
-        <dt>challenge</dt><dd>Challenge created by the App</dd>
-    </dl>
-    <h3>mt: "Login"</h3>
-    <dl>
-        <dt>mt</dt><dd>"Login"</dd>
-        <dt>app</dt><dd>Name of the app entity (same as H.323 id of corresponding PBX object)</dd>
-        <dt>user</dt><dd>User logged in at PBX</dd>
-        <dt>key</dt><dd>Hash calculated over &lt;app&gt;:&lt;user&gt;:&lt;challenge&gt;:&lt;password&gt;</dd>
-    </dl>
-    <h3>LoginResult</h3>
-    <dl>
-        <dt>mt</dt><dd>"LoginResult"</dd>
-        <dt>ok</dt><dd>Boolean, true if login succeeded</dd>
-    </dl>
-    <h3>KeepAlive</h3>
-    <dl>
-        <dt>mt</dt>
-        <dd>"KeepAlive"</dd>
-    </dl>
 </body>
 </html>

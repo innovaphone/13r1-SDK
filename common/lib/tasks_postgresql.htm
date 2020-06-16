@@ -77,7 +77,9 @@ public:
                 <tr>
                     <td class="param">const char * <b>tableName</b></td>
                     <td>
-                        The name of the table.
+                        The name of the table. <br />
+                        The CREATE statement puts the tableName inside double quotes.<br />
+                        Pay attention about the casing and chars inside the tableName. If you e.g. use uppercase letters or spaces within the table name, you must later double quote the table name in your queries yourself too!<br />
                     </td>
                 </tr>
             </table>
