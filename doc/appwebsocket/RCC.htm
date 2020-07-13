@@ -108,52 +108,13 @@
         <dd>
             Limits the number of users sent with a 20ms timer tick. Maximum is 50.
         </dd>
-    </dl>
-
-    <div class="fnhead">UserInfo</div>
-
-    <p>
-        This message is used to send update to users
-    </p>
-	
-    <dl>
-        <dt>update:string</dt>
+        <dt>calls</dt>
         <dd>
-            Present if not the initial transmition. A value of "del" indicates a deleted user.
+            If set to true, all PBX calls are inicated using the messages "CallAdd", "CallDelete"
+            and "CallUpdate".
+            This option is only availabe on AppWebsocket conections to an App Object so that not
+            any user can read all PBX calls.
         </dd>
-        <dt>guid:string</dt>
-        <dd>
-            Hexstring of the users guid
-        </dd>
-        <dt>cn:string</dt>
-        <dd>
-            common name
-        </dd>
-        <dt>dn:string</dt>
-        <dd>
-            display name
-        </dd>
-        <dt>h323:string</dt>
-        <dd>
-            H.323 Id/SIP URI
-        </dd>
-        <dt>e164:string</dt>
-        <dd>
-            Extension number
-        </dd>
-        <dt>node:string</dt>
-        <dd>
-            Numbering Node
-        </dd>
-        <dt>pbx:string</dt>
-        <dd>
-            PBX
-        </dd>
-        <dt>pseudo:string</dt>
-        <dd>
-            Type of user
-        </dd>
-        <dt>regs[<a href="#regInfo">regInfo]</a></dt>
     </dl>
 
 	<h2><a name="Devices">Devices</a></h2>
@@ -608,6 +569,130 @@
         <dt>position:integer</dt>
     </dl>
 
+	<h1><a name="Indications">Indications</a></h1>
+
+	<h2><a name="UserInfo">UserInfo</a></h2>
+
+    <p>
+        This message is used to send update to users
+    </p>
+	
+    <dl>
+        <dt>update:string</dt>
+        <dd>
+            Present if not the initial transmition. A value of "del" indicates a deleted user.
+        </dd>
+        <dt>guid:string</dt>
+        <dd>
+            Hexstring of the users guid
+        </dd>
+        <dt>cn:string</dt>
+        <dd>
+            common name
+        </dd>
+        <dt>dn:string</dt>
+        <dd>
+            display name
+        </dd>
+        <dt>h323:string</dt>
+        <dd>
+            H.323 Id/SIP URI
+        </dd>
+        <dt>e164:string</dt>
+        <dd>
+            Extension number
+        </dd>
+        <dt>node:string</dt>
+        <dd>
+            Numbering Node
+        </dd>
+        <dt>pbx:string</dt>
+        <dd>
+            PBX
+        </dd>
+        <dt>pseudo:string</dt>
+        <dd>
+            Type of user
+        </dd>
+        <dt>regs[<a href="#regInfo">regInfo]</a></dt>
+    </dl>
+
+	<h2><a name="CallAdd">CallAdd</a></h2>
+
+    <pre><code class="json">{
+    "api": "RCC",
+    "src": string,
+    "mt": "CallAdd",
+    "guid": hexstring,
+    "cn": string,
+    "call": unsigned,
+    "state": unsigned,
+    "conf-id": hexstring,
+    "call-id": hexstring
+}</code></pre>
+    <p>
+        Indicates that a call was added on the PBX
+    </p>
+    <dl>
+        <dt>src</dt>
+        <dd>The src value from the Initialize</dd>
+        <dt>guid</dt>
+        <dd>The guid of the user</dd>
+        <dt>cn</dt>
+        <dd>The cn of the user</dd>
+        <dt>state</dt>
+        <dd>
+            The call state 0 - init, 1 - setup, 2 - setup-ack, 3 - call-proc, 4 - alert, 5 - conn, 
+            6 - disc-sent, 7 - disc-received, 8 -parked
+        </dd>
+        <dd>
+            Add 128 for outgoing, add 256 for hold, add 512 for held, add 1024 for waiting
+        </dd>
+        <dt>conf-id</dt>
+        <dd>The conference ID</dd>
+        <dt>call-id</dt>
+        <dd>The call ID</dd>
+    </dl>
+
+	<h2><a name="UserDel">CallDel</a></h2>
+
+    <pre><code class="json">{
+    "api": "RCC",
+    "src": string,
+    "mt": "CallDel",
+    "call": unsigned,
+}</code></pre>
+
+    <p>
+        Indicates the call was deleted from the PBX
+    </p>
+
+	<h2><a name="UserUpdate">CallUpdate</a></h2>
+
+    <pre><code class="json">{
+    "api": "RCC",
+    "src": string,
+    "mt": "CallUpdate",
+    "call": unsigned,
+    "msg": string,
+    "local": <a href="#endpoint">endpoint</a>,
+    "remote": <a href="#endpoint">endpoint</a>
+}</code></pre>
+
+    <dl>
+        <dt>msg</dt>
+        <dd>
+            A message indicating the change of state
+        </dd>
+        <dt>local</dt>
+        <dd>
+            The local peer inside the PBX with number adjusted
+        </dd>
+        <dt>
+            The remote endpoint connected to the user object with normalized number
+        </dt>
+    </dl>
+
 	<h1><a name="Objects">Objects</a></h1>
 
     <p>
@@ -669,6 +754,7 @@
             Normalized number
         </dd>
     </dl>
+
     <div class="fnhead"><a id="mobile">mobile</a></div>
 
     <p>
@@ -687,6 +773,26 @@
         <dt>off</dt>
         <dd>
             True if mobile endpoint is configured off.
+        </dd>
+    </dl>
+
+    <div class="fnhead"><a id="endpoint">endpoint</a></div>
+
+    <pre><code class="json">{
+    "h323": string,
+    "e164": string
+}</code></pre>
+
+    <p>The addressing information identifying an endpoint</p>
+
+    <dl>
+        <dt>h233</dt>
+        <dd>
+            SIP-URI/H.323
+        </dd>
+        <dt>e164</dt>
+        <dd>
+            The phone number
         </dd>
     </dl>
 </body>

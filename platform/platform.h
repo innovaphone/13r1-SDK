@@ -103,8 +103,8 @@ typedef dword interrupt_mask;
 #define GET_OFS(s,m) ((int)((char *)(&((s *)0)->m) - (char *)0))
 
 #define READ_WORD_NET(a) ( (((byte *)(a))[0]<<8) + ((byte *)(a))[1] )
-#define READ_DWORD_NET(a) ( dword((((byte *)(a))[0]<<24)) + (((byte *)(a))[1]<<16) + (((byte *)(a))[2]<<8) + ((byte *)(a))[3] )
-#define READ_QUAD_NET(a) ((ulong64(READ_DWORD_NET(((byte *)(a)))) << 32) + READ_DWORD_NET(((byte *)((a) + 4))))
+#define READ_DWORD_NET(a) ((dword)( (((byte *)(a))[0]<<24) + (((byte *)(a))[1]<<16) + (((byte *)(a))[2]<<8) + ((byte *)(a))[3] ))
+#define READ_QUAD_NET(_a) (((ulong64)READ_DWORD_NET(((dword *)(_a))) << 32) + READ_DWORD_NET(((((dword *)(_a)) + 1))))
 
 #define WRITE_WORD_NET(a,w) { word wx=(w); ((byte *)(a))[0]=(wx>>8); ((byte *)(a))[1]=(wx&0xff); }
 #define WRITE_DWORD_NET(a,w) { dword wx=(w); ((byte *)(a))[0]=(byte)((wx>>24)); ((byte *)(a))[1]=(byte)((wx>>16)&0xff); ((byte *)(a))[2]=(byte)((wx>>8)&0xff); ((byte *)(a))[3]=(byte)((wx)&0xff); }

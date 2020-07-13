@@ -212,6 +212,7 @@
     "grp": [<a href="#group">group</a>],
     "presence": [<a href="#presence">presence</a>],
     "cds": [<a href="#diversion">diversion</a>],
+    "wakeups": [<a href="#wakeup">wakeup</a>],
     "pseudo": <a href="#pseudo">pseudo</a>,
     "phone": <a href="#phone">phone</a>,
     "copyPwd": string
@@ -355,6 +356,10 @@
         <dd>
             Array of call diversion configurations
         </dd>
+        <dt>wakeups</dt>
+        <dd>
+            Array of wakeups
+        </dd>
         <dt>pseudo</dt>
         <dd>
             Pseudo object configuration
@@ -436,6 +441,7 @@
     "grp": [<a href="#group">group</a>],
     "presence": [<a href="#presence">presence</a>],
     "cds": [<a href="#diversion">diversion</a>],
+    "wakeups": [<a href="#wakeup">wakeup</a>],
     "pseudo": <a href="#pseudo">pseudo</a>,
     "phone": <a href="#phone">phone</a>,
     "copyPwd": string
@@ -740,7 +746,7 @@
     "api": "PbxAdminApi",
     "mt": "SearchUsers",
     "cn": string,
-    "includeMatch": boolean
+    "includeMatch": boolen
 }</code></pre>
 
     <p>
@@ -1226,6 +1232,82 @@
             </dl>
         </dd>
     </dl>
+
+    <a name="wakeup"><div class="fnhead">wakeup</div></a>
+
+	<pre><code class="json">{
+    "h": unsigned,
+    "m": unsigned,
+    "s": unsigned,
+    "name": string,
+    "num": string,
+    "retry": unsigned,
+    "mult": bool,
+    "to": unsigned,
+    "fallback": string,
+    "bool": string,
+    "bool-not": bool
+}</code></pre>
+
+    <dl>
+        <dt>h</dt>
+        <dd>
+            The hour of the day, to which the wakeup call is executed.
+            This referes to the local time of the PBX.
+        </dd>
+        <dt>m</dt>
+        <dd>
+            The minute to which the wakeup call is executed.
+            If no hour is configured, the wakeup call is executed each hour.
+        </dd>
+        <dt>s</dt>
+        <dd>
+            The second to which the wakeup call is executed.
+            If no hour and no minute is configured, the wakeup call is executed each minute.
+            The clock resolution for wakeup calls is 10s, so the wakeup call is executed
+            within a 10s interval after the configured time.
+        </dd>
+        <dt>name</dt>
+        <dd>
+            Name which is called for the announcement source
+            (if no Name or Number' is configured the default MOH is used as source)
+        </dd>
+        <dt>num</dt>
+        <dd>
+            Number which is called for the announcement source
+            (if no Name or Number is configured the default MOH is used as source)
+        </dd>
+        <dt>retry</dt>
+        <dd>
+            Number of Retries, if Source or Destination do not connect
+        </dd>
+        <dt>mult</dt>
+        <dd>
+            If this value is set, the wakeup call is executed periodically until it is removed.
+            If not set, the wakeup call is removed after execution.
+        </dd>
+        <dt>to</dt>
+        <dd>
+            Timeout to limit the time the wakeup call is alerting at the user.
+            After the timeout the call is disconnected.
+        </dd>
+        <dt>fallback</dt>
+        <dd>
+            Number to be called when the wakeup failed. The wakeup failed if the call was never alerting
+            at the user after the configured retries, or if the Timeout expired,
+            so the call was alerting the configured time, but was not answered. 
+        </dd>
+        <dt>bool</dt>
+        <dd>
+            An optional Boolean object. If configured the call is sent to the given time
+            only if the state of the boolean object is true.
+        </dd>
+        <dt>bool-not</dt>
+        <dd>
+            When this value is set the call is sent if the state of the boolean object is false.
+        </dd>
+    </dl>
+
     <a name="pseudo"><div class="fnhead">pseudo</div></a>
 
 	<pre><code class="json">{

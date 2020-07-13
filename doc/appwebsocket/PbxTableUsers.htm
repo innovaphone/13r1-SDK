@@ -65,6 +65,7 @@
         <li><a href="#devices">devices</a> - devices table</li>
         <li><a href="#cds">cds</a> - call diversions table</li>
         <li><a href="#forks">forks</a> - forks table</li>
+        <li><a href="#wakeups">wakeups</a> - wakeups table</li>
     </ul>
 
     <u><a href="#Examples">Examples</u>
@@ -182,6 +183,22 @@
         <tr><td class="param">ReplicationBool</td><td><b>cw</b></td><td>Call-Waiting</td></tr>
         <tr><td class="param">ReplicationUnsigned</td><td><b>min</b></td><td>Min-Alert</td></tr>
         <tr><td class="param">ReplicationUnsigned</td><td><b>max</b></td><td>Max-Alert</td></tr>
+    </table>
+
+    <h3><a name="wakeups">wakeups</a></h3>
+    <p>Table with the users wakeups</p>
+    <table style="margin-left:-12px">
+        <tr><td class="param">ReplicationUnsigned</td><td><b>h</b></td><td>Hour</td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>m</b></td><td>Minute</td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>s</b></td><td>Second</td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>name</b></td><td></td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>num</b></td><td></td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>retry</b></td><td></td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>mult</b></td><td></td></tr>
+        <tr><td class="param">ReplicationUnsigned</td><td><b>to</b></td><td></td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>fallback</b></td><td></td></tr>
+        <tr><td class="param">ReplicationString</td><td><b>bool</b></td><td>Boolean object</td></tr>
+        <tr><td class="param">ReplicationBool</td><td><b>bool-not</b></td><td>Not flag (boolean object)</td></tr>
     </table>
 
     <h2><a name="Examples">Examples</a></h2>
