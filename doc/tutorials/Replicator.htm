@@ -65,14 +65,19 @@
     <button name="spoiler" style="height:30px; font-size:14px" onclick="toggleSpoiler('solution1');">Code spoiler</button>
     <div id="solution1" style="display:none">
         <p>
-            Include the replicator and tasks_postgresql header files
+            Include the replicator and tasks_postgresql header file NewApp1.h
             <pre><code class="language-cpp">#include "common/interface/replication.h"
 #include "common/lib/tasks_postgresql.h"
 </code></pre>
         </p>
         <p>
+            Include the replicator header file also on NewApp1-main.cpp
+            <pre><code class="language-cpp">#include "common/interface/replication.h"
+</code></pre>
+        </p>
+        <p>
             The AppInstance class needs to use JsonApiContext as base class and the UReplicator.
-            <pre><code class="language-cpp">class SDKSample : public AppInstance, ... , public UReplicator, public JsonApiContext</code></pre>
+            <pre><code class="language-cpp">class NewApp1 : public AppInstance, ... , public UReplicator, public JsonApiContext</code></pre>
         </p>
         <p>
             Declare the replicator object as public global variable from the app instance class on the header file.
@@ -93,10 +98,18 @@ replicator->AddColumn("cn", "cn", ReplicationString, true);</code></pre>
         </p>
         <p>
             When an AppWebsocket connection is established, this AppWebsocket connection needs to be added to the JsonApiContext
-            <pre><code class="language-cpp">class SDKSampleSession : ..., public AppWebsocket, ... {
-    class JsonApi * jsonApi = sdksample->CreateJsonApi("PbxTableUsers", this, msg, base);
-    if (jsonApi) jsonApi->JsonApiStart();
-}</code></pre>
+            <pre><code class="language-cpp">class NewApp1Session : ..., public AppWebsocket, ... {
+...
+}
+void NewApp1Session::AppWebsocketMessage(class json_io& msg, word base, const char* mt, const char* src)
+{
+...
+    if (!strcmp(mt, "PbxInfo")) {
+        class JsonApi * jsonApi = newapp1->CreateJsonApi("PbxTableUsers", this, msg, base);
+        if (jsonApi) jsonApi->JsonApiStart();
+    }
+}
+</code></pre>
         </p>
     </div>
 
@@ -123,27 +136,40 @@ replicator->AddColumn("cn", "cn", ReplicationString, true);</code></pre>
     <button name="spoiler" style="height:30px; font-size:14px" onclick="toggleSpoiler('solution2');">Code spoiler</button>
     <div id="solution2" style="display:none">
         <p>
+            Include the functions on the header file NewApp1.h
+            <pre><code class="language-cpp">void ReplicatorInitialized();
+void ReplicatorAdded(ulong64 id);
+void ReplicatorDeleted(ulong64 id);
+void ReplicatorDeletedConfirm(ulong64 id);
+void ReplicatorDeletedConfirmComplete(ulong64 id);
+void ReplicatorUpdated(ulong64 id, ulong64 mask);
+void ReplicatorUpdate(class json_io& msg, word base, bool initial);
+void ReplicatorStopped();
+void ReplicatorStart(class json_io& msg, word base, char*& tmp) override;
+</code></pre>
+        </p>
+        <p>
             Add the <code>ReplicatorInitialized</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorInitialized()
+            <pre><code class="language-cpp">void NewApp1::ReplicatorInitialized()
 {
 }</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorAdded</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorAdded(ulong64 id)
+            <pre><code class="language-cpp">void NewApp1::ReplicatorAdded(ulong64 id)
 {
 }</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorDeleted</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorDeleted(ulong64 id)
+            <pre><code class="language-cpp">void NewApp1::ReplicatorDeleted(ulong64 id)
 {
     replicator->DeletedConfirm(id);
 }</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorDeletedConfirm</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorDeletedConfirm(ulong64 id)
+            <pre><code class="language-cpp">void NewApp1::ReplicatorDeletedConfirm(ulong64 id)
 {
     currentTask = new TaskDeleteUser(this->database, id);
     currentTask->Start(&taskDeleteUser);
@@ -151,25 +177,25 @@ replicator->AddColumn("cn", "cn", ReplicationString, true);</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorDeletedConfirmComplete</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorDeletedConfirmComplete(ulong64 id)
+            <pre><code class="language-cpp">void NewApp1::ReplicatorDeletedConfirmComplete(ulong64 id)
 {
 }</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorUpdated</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorUpdated(ulong64 id, ulong64 mask)
+            <pre><code class="language-cpp">void NewApp1::ReplicatorUpdated(ulong64 id, ulong64 mask)
 {
 }</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorUpdate</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorUpdate(class json_io & msg, word base, bool initial)
+            <pre><code class="language-cpp">void NewApp1::ReplicatorUpdate(class json_io & msg, word base, bool initial)
 {
 }</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorStopped</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorStopped()
+            <pre><code class="language-cpp">void NewApp1::ReplicatorStopped()
 {
     delete replicator;
     replicator = 0;
@@ -178,7 +204,7 @@ replicator->AddColumn("cn", "cn", ReplicationString, true);</code></pre>
         </p>
         <p>
             Add the <code>ReplicatorStart</code> function
-            <pre><code class="language-cpp">void SDKSample::ReplicatorStart(class json_io & msg, word base, char * & tmp)
+            <pre><code class="language-cpp">void NewApp1::ReplicatorStart(class json_io & msg, word base, char * & tmp)
 {
     word handle = msg.add_array(base, "pseudo");
     msg.add_string(handle, nullptr, "");
@@ -200,7 +226,7 @@ replicator->AddColumn("cn", "cn", ReplicationString, true);</code></pre>
             <li>Initialize the <code>users</code> table.</li>
             <li>Add <code>id</code>, <code>username</code> and <code>cn</code> columns to the table.</li>
             <li>Add a constraint to the username, which must be unique.</li>
-            <li>Add the Init callbacks to the SDKSample class and the TaskDatabaseInit task.</li>
+            <li>Add the Init callbacks to the NewApp1 class and the TaskDatabaseInit task.</li>
         </ul>
     </p>
 
@@ -245,18 +271,29 @@ void AppTaskDatabaseInit::DatabaseExecSQLResult(IDatabase * const database, IDat
 </code></pre>
         </p>
         <p>
-            Add the Init callbacks to the SDKSample class and the TaskDatabaseInit task.
-            <pre><code class="language-cpp">SDKSample::SDKSample(...) : 
+            Add the Init callbacks to the NewApp1 class and the TaskDatabaseInit task  to the header file NewApp1.h.
+            <pre><code class="language-cpp">void DatabaseInitComplete(class TaskDatabaseInit * task);
+void DatabaseInitFailed(class TaskDatabaseInit * task);
+class UTaskTemplate&lt;NewApp1, class TaskDatabaseInit&gt; taskDatabaseInit;
+class ITask * tableSetup;
+                </code></pre>
+        </p>
+        <p>
+            And to the NewApp1.cpp file.
+            <pre><code class="language-cpp">NewApp1::NewApp1(...) : 
 AppInstance(service, args),
-taskDatabaseInit(this, &SDKSample::DatabaseInitComplete, &SDKSample::DatabaseInitFailed)
+taskDatabaseInit(this, &NewApp1::DatabaseInitComplete, &NewApp1::DatabaseInitFailed)
 {
     ...
+void NewApp1::DatabaseInitComplete(class TaskDatabaseInit* task)
+{
 }
-//On header file:
-void DatabaseInitComplete(class TaskDatabaseInit * task);
-void DatabaseInitFailed(class TaskDatabaseInit * task);
-class UTaskTemplate&lt;SDKSample, class TaskDatabaseInit&gt; taskDatabaseInit;
-class ITask * tableSetup;
+
+void NewApp1::DatabaseInitFailed(class TaskDatabaseInit* task)
+{
+	TryStop();
+}
+}
                 </code></pre>
         </p>
     </div>
@@ -279,7 +316,7 @@ class ITask * tableSetup;
     <div id="solution4" style="display:none">
         <p>
             When <code>DatabaseConnectComplete</code> is called the database can be initialized.
-            <pre><code class="language-cpp">void SDKSample::DatabaseConnectComplete(IDatabase * const database)
+            <pre><code class="language-cpp">void NewApp1::DatabaseConnectComplete(IDatabase * const database)
 {
     this->tableSetup = new AppTaskDatabaseInit(database);
     this->tableSetup->Start(&taskDatabaseInit);
@@ -287,19 +324,17 @@ class ITask * tableSetup;
         </p>
         <p>
             When <code>DatabaseInitComplete</code> the replicator must be started.
-            <pre><code class="language-cpp">void SDKSample::DatabaseInitComplete(class TaskDatabaseInit * task)
+            <pre><code class="language-cpp">void NewApp1::DatabaseInitComplete(class TaskDatabaseInit * task)
 {
     replicator->Initialize("BIGINT REFERENCES users(id) ON DELETE CASCADE NOT NULL");
 }</code></pre>
         </p>
         <p>
             When the replicator has started, the <code>webserverPlugin</code> Listen functions can be called. The <code>replicator->Update()</code> function has to be called to set the PBX name.
-            <pre><code class="language-cpp">void SDKSample::ReplicatorInitialized()
+            <pre><code class="language-cpp">void NewApp1::ReplicatorInitialized()
 {
     this->webserverPlugin->HttpListen(0, 0, 0, 0, _BUILD_STRING_);
     this->webserverPlugin->WebsocketListen();
-    this->webserverPlugin->WebsocketListen("helloworld");
-    this->webserverPlugin->WebsocketListen("pbx");
     replicator->Update(args.appDomain, pbxName);  
 }</code></pre>
         </p>
@@ -322,7 +357,7 @@ class ITask * tableSetup;
     <div id="solution5" style="display:none">
         <p>
             Open your App Platform Manager and when you click on edit your app instance you should see the URL of your app. It should be something like this:
-            <pre><code class="language-cpp">http://XXX.XX.XXX.XXX/domain.com/sdksample/helloworld</code></pre>
+            <pre><code class="language-cpp">http://XXX.XX.XXX.XXX/domain.com/newapp1/helloworld</code></pre>
         </p>
     </div>
 
@@ -390,11 +425,11 @@ rArrayGroups->AddColumn("dyn", "dyn", ReplicationString, true);</code></pre>
     </div>
 
     <h2>Other considerations</h2>
-    <p>The are functions that must be called when your database changes:</p>
+    <p>The are functions that must be called when your database changes (when a user is added, updated or deleted):</p>
     <table style="margin-left:-12px">
-        <tr><td class="param"><b>sdkSample->replicator->Added(id)</b></td><td>This must be called when a user is added on your database, so that the replicator will add it too.</td></tr>
-        <tr><td class="param"><b>sdkSample->replicator->Updated(id)</b></td><td>This must be called when a user is updated on your database, so that the replicator will update it too.</td></tr>
-        <tr><td class="param"><b>sdkSample->replicator->Deleted(id)</b></td><td>This must be called when you would like to delete a user from your database.</td></tr>
+        <tr><td class="param"><b>newapp1->replicator->Added(id)</b></td><td>This must be called when a user is added on your database, so that the replicator will add it too.</td></tr>
+        <tr><td class="param"><b>newapp1->replicator->Updated(id)</b></td><td>This must be called when a user is updated on your database, so that the replicator will update it too.</td></tr>
+        <tr><td class="param"><b>newapp1->replicator->Deleted(id)</b></td><td>This must be called when you would like to delete a user from your database.</td></tr>
     </table>
 
     <h2>List of data fields that can be replicated</h2>
