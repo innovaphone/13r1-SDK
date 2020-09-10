@@ -178,6 +178,7 @@ innovaphone.ui1.Input = innovaphone.ui1.Input || function (style, value, placeHo
 
     this.createNode("input", style, null, cl);
     if (value) setValue(value);
+    else originalValue = "";
     if (placeHolder) this.container.placeholder = placeHolder;
     if (maxLength) this.container.maxLength = maxLength;
     if (type) {
@@ -221,6 +222,124 @@ innovaphone.ui1.Input = innovaphone.ui1.Input || function (style, value, placeHo
     this.getValue = getValue;
 }
 innovaphone.ui1.Input.prototype = innovaphone.ui1.nodePrototype;
+
+
+innovaphone.ui1.Password = innovaphone.ui1.Password || function (style, value, placeHolder, maxLength, cl, styleInput, clInput) {
+    this.createNode("div", (style || "") + "; display:flex", null, cl);
+
+    var that = this,
+        input = this.add(new innovaphone.ui1.Input((styleInput || "") + "; flex:1 1 auto; padding-right:30px", value, placeHolder, maxLength, "password", clInput)),
+        showPassword = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
+        path = showPassword.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path")),
+        visible = false;
+
+    function init() {
+        that.container.appendChild(showPassword);
+        showPassword.style.display = "none";
+        showPassword.style.position = "absolute";
+        showPassword.style.width = "20px";
+        showPassword.style.height = "20px";
+        showPassword.style.cursor = "pointer";
+        showPassword.setAttribute("viewBox", "0 0 20 20");
+        showPassword.addEventListener("click", toggle);
+        if (value) input.setValue(value);
+        if (placeHolder) input.container.placeholder = placeHolder;
+        if (maxLength) input.container.maxLength = maxLength;
+        if (innovaphone.ui1.lib.browser.name != "Edge" && innovaphone.ui1.lib.browser.name != "Internet Explorer") {
+            input.addEvent("focus", onFocus);
+        }
+    }
+
+    function toInt(value) {
+        if (value && innovaphone.lib1.isInt(parseInt(value))) {
+            return parseInt(value);
+        }
+        else {
+            return 0;
+        }
+    }
+
+    function onFocus() {
+        input.remEvent("focus", onFocus);
+        visible = true;
+        toggle();
+        var color = window.getComputedStyle(input.container, null).getPropertyValue("color"),
+            position = window.getComputedStyle(that.container, null).getPropertyValue("position"),
+            paddingRight = toInt(window.getComputedStyle(that.container, null).getPropertyValue("padding-right")),
+            borderRight = toInt(window.getComputedStyle(input.container, null).getPropertyValue("border-right-width"));
+
+        if (position == "" || position == "static") that.container.style.position = "relative";
+        if (input.changed()) {
+            showPassword.style.display = "";
+        }
+        showPassword.style.fill = color;
+        showPassword.style.right = (borderRight + paddingRight + 5) + "px";
+        showPassword.style.top = ((input.container.offsetHeight - 20) / 2) + "px";
+        window.addEventListener("click", onClick);
+        input.addEvent("keyup", onKeyUp);
+        input.addEvent("keydown", onKeyDown);
+    }
+
+    function onClick(event) {
+        if (event.target == that.container || that.container.contains(event.target) || event.target == path) {
+            return;
+        }
+        onBlur();
+    }
+
+    function onKeyUp(event) {
+        if (input.changed()) {
+            showPassword.style.display = "";
+        }
+        else {
+            showPassword.style.display = "none";
+        }
+    }
+
+    function onKeyDown(event) {
+        if (event.keyCode == innovaphone.lib1.keyCodes.f12 || event.keyCode == innovaphone.lib1.keyCodes.tab) {
+            onBlur();
+        }
+    }
+
+    function onBlur(event) {
+        input.addEvent("focus", onFocus);
+        input.remEvent("keyup", onKeyUp);
+        input.remEvent("keydown", onKeyDown);
+        window.removeEventListener("click", onClick);
+        showPassword.style.display = "none";
+        input.setAttribute("type", "password");
+    }
+
+    function toggle() {
+        if (visible) {
+            path.setAttribute("d", "M10,4C4.48,4,0,10.09,0,10.09S4.48,16,10,16s10-4.91,10-4.91S15.52,4,10,4Zm0,3a2.3,2.3,0,0,1,2,2.5A2.3,2.3,0,0,1,10,12,2.3,2.3,0,0,1,8,9.5,2.3,2.3,0,0,1,10,7Zm0,7c-3.07,0-5.89-2.42-7.36-3.93A16.68,16.68,0,0,1,6.16,7.18a4.5,4.5,0,1,0,7.91.42,18.3,18.3,0,0,1,3.28,3.23C15.84,12.09,13.06,14,10,14Z");
+            input.setAttribute("type", "password");
+        }
+        else {
+            path.setAttribute("d", "M2,19.45.56,18,18.43.17l1.41,1.42Zm1.63-5.88,1.44-1.43a17.23,17.23,0,0,1-2.41-2.07C4.1,8.51,6.93,6,10,6a4.72,4.72,0,0,1,1.06.12l1.59-1.58A7.29,7.29,0,0,0,10,4C4.48,4,0,10.09,0,10.09A19.9,19.9,0,0,0,3.61,13.57ZM16.14,6.7,14.72,8.12a18.91,18.91,0,0,1,2.63,2.71C15.84,12.09,13.06,14,10,14a6.24,6.24,0,0,1-1.06-.1L7.3,15.54A8.69,8.69,0,0,0,10,16c5.52,0,10-4.91,10-4.91A22.13,22.13,0,0,0,16.14,6.7Z");
+            input.setAttribute("type", "text");
+            if (that.onShowPassword) that.onShowPassword();
+        }
+        visible = !visible;
+    }
+
+    function testId(id) {
+        input.testId(id);
+        return that;
+    }
+
+    this.changed = input.changed;
+    this.setValue = input.setValue;
+    this.getValue = input.getValue;
+    this.input = input;
+    this.testId = testId;
+    this.onShowPassword = null;
+
+    init();
+}
+innovaphone.ui1.Password.prototype = innovaphone.ui1.nodePrototype;
+
 
 innovaphone.ui1.Checkbox = innovaphone.ui1.Checkbox || function (style, value, cl, background, foreground, backgroundOff, inherit) {
     var that = this;

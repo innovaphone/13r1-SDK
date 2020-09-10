@@ -181,6 +181,8 @@ public:
     virtual void EnableDTLS(bool useSrtp);
     virtual void SetServerCertificate(const byte * cert, size_t certLen, const char * hostName = nullptr);
     virtual void SetClientCertificate(const byte * cert, size_t certLen, const char * hostName = nullptr);
+    virtual const byte * GetCertificateFingerprint(size_t * length);
+    virtual void DisableClientCertificate();
 };</code></pre>
 
     <h3>Overview</h3>
@@ -222,9 +224,19 @@ public:
         <table style="margin-left:-12px">
             <tr><td class="param">const byte * <b>cert</b></td><td>The buffer to the certificate data.</td></tr>
             <tr><td class="param">size_t <b>certLen</b></td><td>The length of the certificate.</td></tr>
-            <tr><td class="param">const char * <b>hostName</b></td><td>Hey - dde - still not used here, too?=</td></tr>
+            <tr><td class="param">const char * <b>hostName</b></td><td><i>Reserved for later use - see remarks.</i></td></tr>
         </table>
+        <h4>Remarks</h4>
+        Currently, the hostName functionality is not implemented, so you just override the default server certificate.<br>
+        Please not that if you set a new server certificate, all currently established conntections will still use the old certificate. The new set certificate only will be used by new connections.
     </dd></dl>
+
+    <div class="fnhead">DisableClientCertificate</div>
+    <dl>
+        <dd>
+            Disables sending of a client certificate in TLS requests.
+        </dd>
+    </dl>
 
     <a name="ISocket"><h2>ISocket</h2></a>
     <pre><code class="C++">class ISocket {

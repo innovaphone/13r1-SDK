@@ -138,7 +138,7 @@ langs.clear(div1);
         Represents an input field. Supports all methods defined in innovaphone.ui1.nodePrototype.
     </p>
     <dl>
-        <dt>innovaphone.ui1.Input(style, content, cl)</dt>
+        <dt>innovaphone.ui1.Input(style, value, placeHolder, maxLength, type, cl)</dt>
         <dd>Constructor</dd>
         <dd>
             <dl>
@@ -154,6 +154,34 @@ langs.clear(div1);
                 <dd>The type of data (e.g. "text", "number", "password")</dd>
                 <dt>cl (optional)</dt>
                 <dd>The CSS class of the node.</dd>
+            </dl>
+        </dd>
+    </dl>
+
+    <h3>innovaphone.ui1.Password</h3>
+    <p>
+        Represents an input password field. Supports all methods defined in innovaphone.ui1.nodePrototype and offered by innovaphone.ui1.Input.<br/>
+        The benefit of using innovaphone.ui1.Password is, that you'll have a show password button inside the input field.
+    </p>
+    <dl>
+        <dt>innovaphone.ui1.Password(style, value, placeHolder, maxLength, cl, styleInput, clInput)</dt>
+        <dd>Constructor</dd>
+        <dd>
+            <dl>
+                <dt>style (optional)</dt>
+                <dd>The style attribute of the node (e.g. "color: blue; font-size: 14px").</dd>
+                <dt>content (optional)</dt>
+                <dd>The text content of the input field.</dd>
+                <dt>placeHolder (optional)</dt>
+                <dd>The placeholder text.</dd>
+                <dt>maxLength (optional)</dt>
+                <dd>Maximum number of characters.</dd>
+                <dt>cl (optional)</dt>
+                <dd>The CSS class of the node.</dd>
+                <dt>styleInput (optional)</dt>
+                <dd>The style attribute for the embedded input field (e.g. "color: blue; font-size: 14px").</dd>
+                <dt>clInput (optional)</dt>
+                <dd>The class for the embedded input field.</dd>
             </dl>
         </dd>
     </dl>

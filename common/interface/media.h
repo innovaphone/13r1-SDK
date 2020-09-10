@@ -234,13 +234,14 @@ public:
         this->lIceUfrag = NULL;
         this->lIcePwd = NULL;
         this->rtcpMux = false;
+        this->count = 0;
     };
     ~IceCandidates() { 
-        if(fingerprint) free(fingerprint);
-        if(iceUfrag) free(iceUfrag);
-        if(icePwd) free(icePwd);
-        if(lIceUfrag) free(lIceUfrag);
-        if(lIcePwd) free(lIcePwd);
+        if(this->fingerprint) free(this->fingerprint);
+        if(this->iceUfrag) free(this->iceUfrag);
+        if(this->icePwd) free(this->icePwd);
+        if(this->lIceUfrag) free(this->lIceUfrag);
+        if(this->lIcePwd) free(this->lIcePwd);
         while(this->candidateList.front()) {
             delete this->candidateList.front();
         }
@@ -252,6 +253,7 @@ public:
     char * lIceUfrag;
     char * lIcePwd;
     bool rtcpMux;
+    int count;
     istd::list<class IceCandidate> candidateList;
 };
 

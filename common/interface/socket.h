@@ -64,6 +64,7 @@ public:
     virtual void SetServerCertificate(const byte * cert, size_t certLen, const char * hostName = NULL) {};
     virtual void SetClientCertificate(const byte * cert, size_t certLen, const char * hostName = NULL) {};
     virtual const byte * GetCertificateFingerprint(size_t * length) { return NULL; };
+    virtual void DisableClientCertificate() {};
 };
 
 class ISocketProvider {

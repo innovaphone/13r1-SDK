@@ -86,7 +86,8 @@ public:
                                 class ISocketProvider * const tlsSocketProvider,
                                 class UHTTPClient * const user,
                                 class IInstanceLog * const log,
-                                class IDns * const dns = nullptr);
+                                class IDns * const dns = nullptr,
+                                class ISocketContext * const socketContext = nullptr);
     virtual void Connect(const char * address,
                          const char * user = NULL,
                          const char * pwd = NULL,
@@ -125,6 +126,7 @@ public:
             <tr><td class="param">UHTTPClient * const <b>user</b></td><td>An UHTTPClient instance to receive the callbakcs from IHTTPClient.</td></tr>
             <tr><td class="param">IInstanceLog * const <b>log</b></td><td>The log instance for logging.</td></tr>
             <tr><td class="param">IDns * const <b>dns</b></td><td>The optional dns instance for dns requests. If specified, the same DNS instance is used for DNS requests which saves performance.</td></tr>
+            <tr><td class="param">ISocketContext * const <b>socketContext</b></td><td>An optional socketContext which can be used for the socket which is created by the httpclient. You can disable sending of a client certificate with this socketContext or send a specific own client certificate.</td></tr>
         </table>
 
         <h4>Return Value</h4>
@@ -527,7 +529,11 @@ public:
     <pre><code class="C++">app::app(IIoMux * iomux)
     : iomux(iomux)
 {
-    this->httpClient = IHTTPClient::Create(iomux, aTcpSocketProvider, aTlsSocketProvider, this);
+    // you can optionally create a socketContext, if you e.g. want to disable sending of a client certificate
+    class ISocketContext * socketContext = aTlsSocketProvider->CreateSocketContext(this);  
+    socketContext->DisableClientCertificate();
+    // create the httpClient instance
+    this->httpClient = IHTTPClient::Create(iomux, aTcpSocketProvider, aTlsSocketProvider, this, this, nullptr, socketContext);
     this->httpClient->Connect("google.de");
 }
 void app::HTTPClientConnectComplete(IHTTPClient * const httpClient)
