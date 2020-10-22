@@ -48,6 +48,8 @@
             <dl>
                 <dt>type</dt>
                 <dd>Type of serach information (e.g. "contact")</dd>
+                <dt>guid</dt>
+                <dd>User's GUID on the PBX</dd>
                 <dt>dn</dt>
                 <dd>Display name</dd>
                 <dt>link</dt>
@@ -66,27 +68,42 @@
                 </dd>
                 <dt>photourl</dt>
                 <dd>URL to image data. Could be HTTP/HTTPS url or inline data (data:image/png;base64…).</dd>
+                <dt>avatar</dt>
+                <dd>Username to get the profile picture with the Avatar API.</dd>
+                <dt>pbx</dt>
+                <dd>Location</dd>
+                <dt>node</dt>
+                <dd>Node</dd>
+                <dt>template</dt>
+                <dd>Config template</dd>
                 <dt>adjust</dt>
                 <dd>Indicates that provided phone numbers might not contain the external line prefix and might need to be adjusted by the phone/softphone app before dialing.</dd>
             </dl>
         </dd>
-        <dd>Example: <pre>
+        <dd>
+            Example: <pre>
     {
         mt: "SearchInfo",
         type: "contact",
+        guid: "8800aa00-a000-5f01-4800-009030010600",
         dn: "Jake Blues",
-        link:"someapp?id=4",
+        link:"someapp?id=jbl@example.com",
         contact: {
-            telephonenumber: ["673"],
+            extension: ["673"],
             givenname: "Jake",
             sn: "Blues",
             company: "Blues Brothers",
             sip: ["jbl@example.com"],
             email: ["john.blues@example.com"]
         },
+        avatar: "jbl",
+        pbx: "master",
+        node: "root",
+        template: "Config",
         photourl: "http://1.2.3.4/jbl/avatar.png",
         adjust: true
-    }</pre></dd>
+    }</pre>
+        </dd>
 
         <dt>SearchResult</dt>
         <dd>One single SearchResult is returned for each <b>Search</b> request (after all SearchInfo)</dd>

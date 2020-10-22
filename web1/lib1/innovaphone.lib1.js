@@ -637,11 +637,9 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
             }
         }
         start.url = start.url || location.href;
-        start.url = start.url.slice(0, start.url.search(".htm"));
         start.url = start.url.slice(0, start.url.lastIndexOf("/"));
         start.url = start.url.replace("http", "ws");
         start.originalUrl = start.originalUrl || location.href;
-        start.originalUrl = start.originalUrl.slice(0, start.originalUrl.search(".htm"));
         start.originalUrl = start.originalUrl.slice(0, start.originalUrl.lastIndexOf("/"));
         start.postClientMessage({ mt: "Alive" });
         if (langFile) loadObjectScript(langFile + "." + start.lang, function () { onload(start); });

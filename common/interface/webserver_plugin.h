@@ -116,6 +116,7 @@ typedef enum {
     WSP_RESPONSE_MOBILECONFIG,
     WSP_RESPONSE_CACHE_MANIFEST,
     WSP_RESPONSE_OPUS,
+    WSP_RESPONSE_CSV,
 } wsr_type_t;
 
 
@@ -170,6 +171,7 @@ static const ws_type_sfx_t suffixes[] = {
     { "appcache", WSP_RESPONSE_CACHE_MANIFEST },
     { "opus-nb", WSP_RESPONSE_OPUS },
     { "opus-wb", WSP_RESPONSE_OPUS },
+    { "csv", WSP_RESPONSE_CSV },
 };
 
 
