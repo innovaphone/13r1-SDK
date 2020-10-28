@@ -62,6 +62,7 @@ public:
     virtual void Run() = 0;
     virtual void FDAdd(IoMuxFd fd, UIoContext * context, bool pollOut) = 0;
     virtual void FDClose(UIoContext * context) = 0;
+    virtual void FDRem(UIoContext * context) = 0;
     virtual void FDUnblock(IoMuxFd fd) = 0;
     virtual bool CanAcceptFD() = 0;
     virtual void RegisterSignalConsumer(ISignalConsumer * consumer) = 0;
