@@ -96,6 +96,9 @@ public:
     void add_hexstring(word base, const char * name, const byte * hex, word hex_len, char * & tmp);
     void add_bool(word base, const char * name, bool value);
     void add_null(word base, const char * name);
+#if defined(PLATFORM_FLOAT_SUPPORT)
+    void add_double(word base, const char * name, double c, char *& tmp, byte decimalPlaces = 6);
+#endif
  
     word get_object(word base, const char * name);
     word get_object(word base, word & last);
@@ -120,6 +123,10 @@ public:
     bool get_bool(word base, const char * name, bool * present=0);
     bool get_bool(word base, word & last, bool * present=0);
     bool get_bool_int(word base, const char * name, int & iret, byte * present=0);
+#if defined(PLATFORM_FLOAT_SUPPORT)
+    double get_double(word base, const char * name, bool * present = 0);
+    double get_double(word base, word & last, bool * present = 0);
+#endif
     char * last;
     char * name_last;
     char * incomplete;

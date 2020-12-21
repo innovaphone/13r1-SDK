@@ -79,7 +79,8 @@
         Here are some hints how JSON messages are build up.
         <ul>
             <li>
-                The top level element of a JSON string can be either a primitive or a constructed data type.</li>
+                The top level element of a JSON string can be either a primitive or a constructed data type.
+            </li>
             <li>
                 Strings are encoded using quotes.
                 <br /><pre><code class="JS">"some text"</code></pre>
@@ -120,16 +121,17 @@ null</code></pre>
 
     <h1>Classes</h1>
     <a name="json_io"><h2>json_io</h2></a>
-    <pre><code class="C++">class json_io {
-public:
+    <pre><code class="C++">
+    class json_io {
+    public:
     json_io(char * buffer);
-    
+
     void reset();
     bool decode();
     word encode();
     word encode(word handle, char * buffer);
     void write(word current, char * & p, word incomplete = 0xffff);
-    
+
     word add_object(word base, const char * name);
     word add_array(word base, const char * name);
     void add_string(word base, const char * name, const char * value, word len=0xffff);
@@ -141,11 +143,12 @@ public:
     void add_ulong64(word base, const char * name, ulong64 c, char * & tmp);
     void add_bool(word base, const char * name, bool value);
     void add_null(word base, const char * name);
+    void add_double(word base, const char * name, double c, char *& tmp, byte decimalPlaces = 6);
 
     void add_printf(word base, const char * name, char * & tmp, const char * format, ...);
     void add_hexstring(word base, const char * name, const byte * hex, word hex_len, char * & tmp);
     void add_json(word base, const char * name, const char * value, word len=0xffff);
- 
+
     word get_object(word base, const char * name);
     word get_object(word base, word & last);
     word get_array(word base, const char * name);
@@ -163,6 +166,7 @@ public:
     bool get_bool(word base, const char * name, bool * present=0);
     bool get_bool(word base, word & last, bool * present=0);
     bool get_bool_int(word base, const char * name, int & iret, byte * present=0);
+    double get_double(word base, word & last, bool * present = 0);
 
     word to_url(word base, char * b, word l, const char * prefix = 0, bool cont = false);
 
@@ -174,7 +178,8 @@ public:
     char * last;
     char * name_last;
     char * incomplete;
-};</code></pre>
+    };
+</code></pre>
 
     <h3>Overview</h3>
     <p>
@@ -220,7 +225,7 @@ while (last != JSON_ID_NONE);
     </p>
 
     <p>
-        Some add functions need an additional buffer for storing the values temporarily. Those buffers are called <code>char * & tmp</code> in the interface. 
+        Some add functions need an additional buffer for storing the values temporarily. Those buffers are called <code>char * & tmp</code> in the interface.
         Note that the buffer pointer reference is increased when adding an element.
         <pre><code class="JS">char temp[128];
 char * t = temp;
@@ -284,9 +289,14 @@ json.add_unsigned(base, "age", 30, t);
         <table style="margin-left:-12px">
             <tr><td class="param">word <b>current</b></td><td>The ID of the start element. Use 0 for complete data.</td></tr>
             <tr><td class="param">char *& <b>p</b></td><td>The output buffer.</td></tr>
-            <tr><td class="param">word <b>incomplete</b></td><td>The incomplete argument can be used to write only the incomplete data so that new received
-                data can be appended to the buffer an decoding started again. The incomplete argument
-                should be the handle of the descriptor of the array, with potential incomplete elements.</td></tr>
+            <tr>
+                <td class="param">word <b>incomplete</b></td>
+                <td>
+                    The incomplete argument can be used to write only the incomplete data so that new received
+                    data can be appended to the buffer an decoding started again. The incomplete argument
+                    should be the handle of the descriptor of the array, with potential incomplete elements.
+                </td>
+            </tr>
         </table>
     </dd>
 
@@ -429,6 +439,43 @@ json.add_unsigned(base, "age", 30, t);
             <tr><td class="param">const char * <b>name</b></td><td>The name of the element. Only used when it's is inside an object. Set to 0 otherwise.</td></tr>
             <tr><td class="param">ulong64 <b>c</b></td><td>The value of the element.</td></tr>
             <tr><td class="param"> char * & <b>tmp</b></td><td>The temporary buffer to store the value until it's encoded.</td></tr>
+        </table>
+    </dd>
+
+    <div class="fnhead">add_bool</div>
+    <dd>
+        Adds a boolean to the structure.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">word <b>base</b></td><td>The ID of the base element.</td></tr>
+            <tr><td class="param">const char * <b>name</b></td><td>The name of the element. Only used when it's is inside an object. Set to 0 otherwise.</td></tr>
+            <tr><td class="param">bool <b>value</b></td><td>The value of the element.</td></tr>
+        </table>
+    </dd>
+
+    <div class="fnhead">add_null</div>
+    <dd>
+        Adds a null value to the structure.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">word <b>base</b></td><td>The ID of the base element.</td></tr>
+            <tr><td class="param">const char * <b>name</b></td><td>The name of the element. Only used when it's is inside an object. Set to 0 otherwise.</td></tr>
+        </table>
+    </dd>
+    
+    <div class="fnhead">add_double</div>
+    <dd>
+        Adds a double value to the structure.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">word <b>base</b></td><td>The ID of the base element.</td></tr>
+            <tr><td class="param">const char * <b>name</b></td><td>The name of the element. Only used when it's is inside an object. Set to 0 otherwise.</td></tr>
+            <tr><td class="param">double <b>c</b></td><td>The value of the element.</td></tr>
+            <tr><td class="param">char * & <b>tmp</b></td><td>The temporary buffer to store the value until it's encoded.</td></tr>
+            <tr><td class="param">byte <b>decimalPlaces = 6</b></td><td>The decimal places after the period.</td></tr>
         </table>
     </dd>
 
@@ -754,6 +801,40 @@ json.add_unsigned(base, "age", 30, t);
         <h4>Return value</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">bool</td><td>The value of the element or false if it's not found.</td></tr>
+        </table>
+    </dd>
+
+    <div class="fnhead">get_double (overloaded)</div>
+    <dd>
+        Gets a double value by name.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">word <b>base</b></td><td>The ID of the base element.</td></tr>
+            <tr><td class="param">const char * <b>name</b></td><td>The name of the element. Only used when it's is inside an object. Set to 0 otherwise.</td></tr>
+            <tr><td class="param">bool * <b>present</b></td><td>If specified, the value will be set to true if the element existed. false otherwise.</td></tr>
+        </table>
+
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">double</td><td>The value of the element or 0 if it's not found.</td></tr>
+        </table>
+    </dd>
+
+    <div class="fnhead">get_double (overloaded)</div>
+    <dd>
+        Gets the next double value from an array.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">word <b>base</b></td><td>The ID of the base element.</td></tr>
+            <tr><td class="param">word & <b>last</b></td><td>A word reference that must have the value 0 for the first call. The value will be updated by the function call for each subsequent call. If the value is <a href="#JSON_ID_NONE">JSON_ID_NONE</a> the end of the array is reached.</td></tr>
+            <tr><td class="param">bool * <b>present</b></td><td>If specified, the value will be set to true if the element existed. false otherwise.</td></tr>
+        </table>
+
+        <h4>Return value</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">double</td><td>The value of the element or 0 if there are no more objects in the array.</td></tr>
         </table>
     </dd>
 

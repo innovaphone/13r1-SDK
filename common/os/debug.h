@@ -3,6 +3,7 @@
 /* copyright (c) innovaphone 2015                                            */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
+#define ERR(_args_) NAMESPACE::debug->printf _args_
 
 enum LogFlags
 #ifdef _WIN32

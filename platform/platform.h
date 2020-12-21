@@ -50,6 +50,7 @@ extern const char * _RELEASE_STATE_;
 #include <unordered_map>
 #include <unordered_set>
 
+#define NAMESPACE
 #define NAMESPACE_BEGIN
 #define NAMESPACE_END
 #define USING_NAMESPACE
@@ -62,6 +63,7 @@ extern const char * _RELEASE_STATE_;
 #if defined(NO_LEGACY)
 #define PLATFORM_NO_PACKET
 #define PLATFORM_NO_IPADDR
+#define PLATFORM_FLOAT_SUPPORT
 #endif
 
 #define PLATFORM_MALLOC

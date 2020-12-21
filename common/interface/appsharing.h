@@ -47,7 +47,8 @@ enum MouseType {
 
 enum CompressionType {
     PNG = 0,
-    JPEG
+    JPEG,
+    PLAIN
 };
 
 #define JPEG_MIN_SIZE   4
@@ -236,7 +237,7 @@ public:
 
 class IRemoteControl {
 public:
-    static IRemoteControl * Create(class URemoteControl * const user, class IInstanceLog * const log);
+    static IRemoteControl * Create(class IIoMux * const iomux, class URemoteControl * const user, class IInstanceLog * const log);
     virtual ~IRemoteControl() {}
 
     virtual void SendCommand(word coorX, word coorY, int aspectRatio, const char * cmd, int len) = 0;
