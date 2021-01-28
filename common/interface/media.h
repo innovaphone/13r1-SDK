@@ -120,6 +120,20 @@ enum SetupRole {
     SETUP_ROLE_HOLDCONN = 0x04,
 };
 
+// Codecs: h264, vp8, FB
+class CodecAssignments : public istd::listElement<CodecAssignments> {
+public:
+    CodecAssignments(int coder, int pt) {
+        this->coder = coder;
+        this->pt = pt;
+    };
+    ~CodecAssignments() {};
+
+public:
+    int coder;
+    int pt;
+};
+
 class MediaConfiguration {
 public:
     MediaConfiguration(bool turnOnly, bool iceNoHost, int appSharingNumUpdates, int appSharingCaptureTimer, int appSharingBitrate, int appSharingJpegQuality, int appSharingUpdateSum, int appSharingWaitMsForAck, int mediaDropPacketsTx, int mediaDropPacketsRx, bool phoneLoad, bool hdVideo,
@@ -282,7 +296,7 @@ public:
 class IMedia {
 public:
     virtual ~IMedia() {};
-    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, bool iceNoHost, int dropMediaTx, int dropMediaRx, const char * hostPbx, bool noVpnAddresses) = 0;
+    virtual void Initialize(ISocketProvider * udpSocketProvider, ISocketProvider * tcpSocketProvider, class ISocketContext * socketContext, word minPort, word maxPort, const char * stunServers, const char * turnServers, const char * turnUsername, const char * turnPassword, enum MediaType media, bool stunSlow, bool turnOnly, bool iceNoHost, int dropMediaTx, int dropMediaRx, const char * hostPbx, bool noVpnAddresses, istd::list<class CodecAssignments>* assignmentsList) = 0;
     virtual void Connect(class MediaConfig *remoteMediaConfig, bool iceRemoteRole, enum SetupRole remoteDtlsRole) = 0;
     virtual void RtpSend(const void * buf, size_t len, dword timestamp) = 0;
     virtual void RtpForward(const void * buf, size_t len, dword timestamp, short sequenceNumberDiff, bool marker) = 0;

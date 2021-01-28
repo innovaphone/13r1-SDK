@@ -23,16 +23,16 @@ enum AudioDeviceMode {
 #define AUDIO_CAPABILITY_MONITORING     0x00000008
 #define AUDIO_CAPABILITY_HOOK_DEVICE    0x00000010
 
-#define KEY_EHS_TALK	0x81		// Talk button pressed
-#define KEY_EHS_FLASH	0x82		// accept knocking call, toggle calls (if any)
-#define KEY_EHS_REDIAL	0x83		// redial last number dialled (if any)
-#define KEY_OFFHOOK     0x93		// handset up
-#define KEY_ONHOOK      0x94		// handset down
-#define KEY_DISC	    0x8E		// Disconnect
+#define KEY_EHS_TALK	0x81        // Talk button pressed
+#define KEY_EHS_FLASH	0x82        // accept knocking call, toggle calls (if any)
+#define KEY_EHS_REDIAL	0x83        // redial last number dialled (if any)
+#define KEY_OFFHOOK     0x93        // handset up
+#define KEY_ONHOOK      0x94        // handset down
+#define KEY_DISC        0x8E        // Disconnect
 #define KEY_MIC         0x8F        // toggle microphone
 #define KEY_INCALL      0xFE        // from softphone
 #define KEY_HOLD        0xFD        // from softphone
-#define KEY_RETRIEVE      0xFC        // from softphone
+#define KEY_RETRIEVE    0xFC        // from softphone
 
 
 NAMESPACE_BEGIN
@@ -47,7 +47,7 @@ public:
 
 class IAudioProcessor : public IAudioExec {
 public:
-    static class IAudioProcessor * Create(class IIoMux * const iomux, class IInstanceLog * log, unsigned execInterval8khz) ;
+    static class IAudioProcessor * Create(class IIoMux * const iomux, class IInstanceLog * log, unsigned execInterval8khz);
 
     virtual void Initialize(class UAudioProcessor * const user) = 0;
 };
@@ -61,8 +61,6 @@ class UAudioProcessor : public UAudioExec {
 public:
  
 };
-
-
 
 class UAudioPhone : public UAudioExec {
 public:
