@@ -73,6 +73,14 @@
             Turns KeepAlive on or off. If on, a "KeepAlive" message will be sent to the server
             from time to time in order to detect if the connection is still up.
         </dd>
+        <dt>this.encrypt = function (seed, data)</dt>
+        <dd>
+            Returns ecrypted data based on a certain seed. RC4 is used in combination with a session key which is calculated during the login handshake.
+        </dd>
+        <dt>this.decrypt = function (seed, data)</dt>
+        <dd>
+            Returns decrypted data based on a certain seed. RC4 is used in combination with a session key which is calculated during the login handshake.
+        </dd>
     </dl>
     <hr/>
     <h2>Messages</h2>

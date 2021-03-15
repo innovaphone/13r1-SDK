@@ -13,56 +13,72 @@
 
     <h1>Socket implementation</h1>
     <p>
-	    The socket interface is used to create socket for communication. There are four different types of sockets supported by the socket
-		interfaces: normal TCP sockets, TLS sockets (which internally encapsulates a TCP socket), UDP sockets and finally local sockets,
-		used for inter process communication. Each created ISocket instance can be used as server and client socket, depending on what
-		will be called first: ISocket::Bind() or ISocket::Connect(). After calling one of theese functions, the mode the socket is defined and
-		can not be changed anymore.
-	</p>
-	<p>	
-		To create an ISocket instance, at first an instance of ISocketProvider must be created. This need to be done by calling one of the
-		Create*SocketProvider. This defines the type of ISocketProvider as well as the type of ISocket that will be created.	 An ISocketProvider
-		can be used to create multiple ISocket instances and can be deleted, if now	longer be used. An created ISocket doesn't depend on the
-		ISocketProvider used to created it.
-	</p>
-	<p>
-		Generally, eacht type of socket will be handled in the same way by ISocketProvider and ISocket, with two exceptions:
-		<ul>
-			<li><b>ISocket::SendTo() / USocket::SocketRecvFromResult()</b>: Because of the nature of UDP sockets, the address to send data to
-			need to be given. Also the address data received from will be told. Because of that, the interface has special functions for
-			UDP sockets. While calling ISocket::SendTo() on other types of sockets simply will have no effect, USocket::SocketRecvFromResult()
-			will never be called from an other type of ISocket than UDP.</li>
-			<li><b>ISocketContext</b>: ISocketProvider::CreateSocket() will also accept an ISocketContext instance. This onyl will be used by
-			TLS sockets for additional informations about encryption and certificates to use.</li>
-		</ul>
+        The socket interface is used to create socket for communication. There are four different types of sockets supported by the socket
+        interfaces: normal TCP sockets, TLS sockets (which internally encapsulates a TCP socket), UDP sockets and finally local sockets,
+        used for inter process communication. Each created ISocket instance can be used as server and client socket, depending on what
+        will be called first: ISocket::Bind() or ISocket::Connect(). After calling one of theese functions, the mode the socket is defined and
+        can not be changed anymore.
+    </p>
+    <p>
+        To create an ISocket instance, at first an instance of ISocketProvider must be created. This need to be done by calling one of the
+        Create*SocketProvider. This defines the type of ISocketProvider as well as the type of ISocket that will be created.	 An ISocketProvider
+        can be used to create multiple ISocket instances and can be deleted, if now	longer be used. An created ISocket doesn't depend on the
+        ISocketProvider used to created it.
+    </p>
+    <p>
+        Generally, eacht type of socket will be handled in the same way by ISocketProvider and ISocket, with two exceptions:
+        <ul>
+            <li>
+                <b>ISocket::SendTo() / USocket::SocketRecvFromResult()</b>: Because of the nature of UDP sockets, the address to send data to
+                need to be given. Also the address data received from will be told. Because of that, the interface has special functions for
+                UDP sockets. While calling ISocket::SendTo() on other types of sockets simply will have no effect, USocket::SocketRecvFromResult()
+                will never be called from an other type of ISocket than UDP.
+            </li>
+            <li>
+                <b>ISocketContext</b>: ISocketProvider::CreateSocket() will also accept an ISocketContext instance. This onyl will be used by
+                TLS sockets for additional informations about encryption and certificates to use.
+            </li>
+        </ul>
     </p>
 
     <h2>File information</h2>
     <table style="margin-left:-12px">
         <tr><td><b>File</b></td><td>common/interface/socket.h<br><br></td></tr>
-        <tr><td><b>Public functions</b></td><td>
-                                                <a href="#CreateTCPSocketProvider">CreateTCPSocketProvider</a><br>
-                                                <a href="#CreateTLSSocketProvider">CreateTLSSocketProvider</a><br>
-                                                <a href="#CreateUDPSocketProvider">CreateUDPSocketProvider</a><br>
-                                                <a href="#CreateLocalSocketProvider">CreateLocalSocketProvider</a><br>
-                                                <br>
-                                            </td></tr>
-        <tr><td><b>Classes</b></td><td>
-                                       <a href="#ISocketProvider">ISocketProvider</a><br>
-                                       <a href="#ISocketContext">ISocketContext</a><br>
-                                       <a href="#ISocket">ISocket</a><br>
-                                       <a href="#USocket">USocket</a><br>
-                                       <br>
-                                   </td></tr>
-        <tr><td><b>Data types</b></td><td>
-                                          <a href="#shutdownreason_t">shutdownreason_t</a><br>
-                                          <br>
-                                      </td></tr>
-        <tr><td><b>Examples</b></td><td>
-                                          <a href="#ExampleISocketServer">ISocket - server</a><br>
-                                          <a href="#ExampleISocketClient">ISocket - client</a><br>
-                                          <br>
-                                      </td></tr>
+        <tr>
+            <td><b>Public functions</b></td>
+            <td>
+                <a href="#CreateTCPSocketProvider">CreateTCPSocketProvider</a><br>
+                <a href="#CreateTLSSocketProvider">CreateTLSSocketProvider</a><br>
+                <a href="#CreateUDPSocketProvider">CreateUDPSocketProvider</a><br>
+                <a href="#CreateLocalSocketProvider">CreateLocalSocketProvider</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Classes</b></td>
+            <td>
+                <a href="#ISocketProvider">ISocketProvider</a><br>
+                <a href="#ISocketContext">ISocketContext</a><br>
+                <a href="#ISocket">ISocket</a><br>
+                <a href="#USocket">USocket</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Data types</b></td>
+            <td>
+                <a href="#shutdownreason_t">shutdownreason_t</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Examples</b></td>
+            <td>
+                <a href="#ExampleISocketServer">ISocket - server</a><br>
+                <a href="#ExampleISocketClient">ISocket - client</a><br>
+                <br>
+            </td>
+        </tr>
     </table>
 
     <!--- Block with the functions -->
@@ -84,16 +100,18 @@ extern "C" ISocketProvider * CreateLocalSocketProvider();
     <div class="fnhead" id="CreateUDPSocketProvider">CreateUDPSocketProvider</div>
     <div class="fnhead" id="CreateLocalSocketProvider">CreateLocalSocketProvider</div>
 
-    <dl><dd>
+    <dl>
+        <dd>
             <h4>Parameters (CreateTLSSocketProvider only)</h4>
             <table style="margin-left:-12px">
                 <tr><td class="param">class ISocketProvider * <b>tcpSocketProvider</b></td><td>A socket provider instance to create a TCP socket used by the TLS socket object..</td></tr>
             </table>
-        <h4>Return value</h4>
-        The ISocketProvider instance. That instance can be freed as soon as it no longer is used by calling the C++ delete operator.
-        <h4>Remarks</h4>
-        <i>(For CreateTLSSocketProvider only):</i> If a TLS socket provider only will be used to upgrade a TCP sockets, the tcpSocketProvider parameter cann be nullptr.
-    </dd></dl>
+            <h4>Return value</h4>
+            The ISocketProvider instance. That instance can be freed as soon as it no longer is used by calling the C++ delete operator.
+            <h4>Remarks</h4>
+            <i>(For CreateTLSSocketProvider only):</i> If a TLS socket provider only will be used to upgrade a TCP sockets, the tcpSocketProvider parameter cann be nullptr.
+        </dd>
+    </dl>
 
     <!-- Block with the classes -->
     <h1>Classes</h1>
@@ -183,53 +201,60 @@ public:
     virtual void SetClientCertificate(const byte * cert, size_t certLen, const char * hostName = nullptr);
     virtual const byte * GetCertificateFingerprint(size_t * length);
     virtual void DisableClientCertificate();
+    virtual void SetALPNProcotols(const char * const * alpnList) {};
 };</code></pre>
 
     <h3>Overview</h3>
     An ISocketContext can be used to handle certificates and other socket related configuration. Because that configuration will be necessary during the creation if ISocket,
     an ISocketContext instance must be setup properly before passing it to ISocketProvider::CreateSocket()<br>
     After the creation of an ISocket, the ISocketContext instance is connected with the ISocket instance, so it must not be deleted until the ISocket instance had beend deleted first.
-	
+
     <h3>Remarks</h3>
     An ISocketContext insatance can be shared with multiple ISockets (which must be taken care of when deleting ISocketContext). Because of the types of informations hold, it currently
     can only be used for TLS sockets.
     <h3>Public functions</h3>
     <div class="fnhead">EnableDTLS</div>
-    <dl><dd>
-        Enables DTLS encryption. Srtp = true --> Benutzt DTLS für Srtp
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">bool <b>useSrtp</b></td><td>If true, the DTLS class will be prepared to be used for secure real-time transport protocol (e. g. for video)</td></tr>
-        </table>
-    </dd></dl>
+    <dl>
+        <dd>
+            Enables DTLS encryption. Srtp = true --> Benutzt DTLS für Srtp
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">bool <b>useSrtp</b></td><td>If true, the DTLS class will be prepared to be used for secure real-time transport protocol (e. g. for video)</td></tr>
+            </table>
+        </dd>
+    </dl>
 
     <div class="fnhead">SetServerCertificate</div>
-    <dl><dd>
-        Defines the certificate to use for ISocket server functionality.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">const byte * <b>cert</b></td><td>The buffer to the certificate data.</td></tr>
-            <tr><td class="param">size_t <b>certLen</b></td><td>The length of the certificate.</td></tr>
-            <tr><td class="param">const char * <b>hostName</b></td><td><i>Reserved for later use - see remarks.</i></td></tr>
-        </table>
-        <h4>Remarks</h4>
-        Currently, the hostName functionality is not implemented, so you just override the default server certificate.<br>
-        Please not that if you set a new server certificate, all currently established conntections will still use the old certificate. The new set certificate only will be used by new connections.
-    </dd></dl>
+    <dl>
+        <dd>
+            Defines the certificate to use for ISocket server functionality.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const byte * <b>cert</b></td><td>The buffer to the certificate data.</td></tr>
+                <tr><td class="param">size_t <b>certLen</b></td><td>The length of the certificate.</td></tr>
+                <tr><td class="param">const char * <b>hostName</b></td><td><i>Reserved for later use - see remarks.</i></td></tr>
+            </table>
+            <h4>Remarks</h4>
+            Currently, the hostName functionality is not implemented, so you just override the default server certificate.<br>
+            Please not that if you set a new server certificate, all currently established conntections will still use the old certificate. The new set certificate only will be used by new connections.
+        </dd>
+    </dl>
 
     <div class="fnhead">SetClientCertificate</div>
-    <dl><dd>
-        Defines the certificate to use for ISocket client functionality.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">const byte * <b>cert</b></td><td>The buffer to the certificate data.</td></tr>
-            <tr><td class="param">size_t <b>certLen</b></td><td>The length of the certificate.</td></tr>
-            <tr><td class="param">const char * <b>hostName</b></td><td><i>Reserved for later use - see remarks.</i></td></tr>
-        </table>
-        <h4>Remarks</h4>
-        Currently, the hostName functionality is not implemented, so you just override the default server certificate.<br>
-        Please not that if you set a new server certificate, all currently established conntections will still use the old certificate. The new set certificate only will be used by new connections.
-    </dd></dl>
+    <dl>
+        <dd>
+            Defines the certificate to use for ISocket client functionality.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const byte * <b>cert</b></td><td>The buffer to the certificate data.</td></tr>
+                <tr><td class="param">size_t <b>certLen</b></td><td>The length of the certificate.</td></tr>
+                <tr><td class="param">const char * <b>hostName</b></td><td><i>Reserved for later use - see remarks.</i></td></tr>
+            </table>
+            <h4>Remarks</h4>
+            Currently, the hostName functionality is not implemented, so you just override the default server certificate.<br>
+            Please not that if you set a new server certificate, all currently established conntections will still use the old certificate. The new set certificate only will be used by new connections.
+        </dd>
+    </dl>
 
     <div class="fnhead">DisableClientCertificate</div>
     <dl>
@@ -237,6 +262,32 @@ public:
             Disables sending of a client certificate in TLS requests.
         </dd>
     </dl>
+
+    <div class="fnhead">SetALPNProcotols</div>
+    <dl>
+        <dd>
+            Sets a list of supported ALPN protocols, which are sent within the TLS handshake.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const char * const * <b>alpnList</b></td><td>An array of protocols. The last array item must be a nullptr!</td></tr>
+            </table>
+            <h4>Remarks</h4>
+            A sample array would be this:
+        </dd>
+    </dl>
+    <pre><code class="C++">static const constexpr char* ALPN_HTTP1_0     = "http/1.0";
+static const constexpr char* ALPN_HTTP1_1     = "http/1.1";
+static const constexpr char* ALPN_HTTP2       = "h2";
+static const constexpr char* ALPN_END_OF_LIST = nullptr;
+
+static const char* alpnList[] = {
+    ALPN_HTTP1_0,
+    ALPN_HTTP1_1,
+    ALPN_HTTP2,
+    ALPN_END_OF_LIST
+};
+</code></pre>
+
 
     <a name="ISocket"><h2>ISocket</h2></a>
     <pre><code class="C++">class ISocket {
@@ -256,9 +307,9 @@ public:
     The ISocket interface is used for socket communication. After the creation of an ISocket by using an ISocketProvider instance, the usage of the ISocket instance
     starts by calling Connect() or Bind(). All of the functions will lead to an asynchronous callback of the USocket user instance, passed to ISocketProvider::CreateSocket().
 
-	<h3>Logging</h3>
-	To enable logging for ISocket, the flag LOG_TCP (for TCP sockets), LOG_TLS (for TLS sockets), LOG_UDP (for UDP sockets) or LOG_LDS (for local sockets) must be set in the managers
-	diagnostic settings.
+    <h3>Logging</h3>
+    To enable logging for ISocket, the flag LOG_TCP (for TCP sockets), LOG_TLS (for TLS sockets), LOG_UDP (for UDP sockets) or LOG_LDS (for local sockets) must be set in the managers
+    diagnostic settings.
 
     <h3>Remarks</h3>
     An ISocket instance can be used for either server or socket side of the connection, depending what function had been called. After calling Connect(), the ISocket
@@ -267,177 +318,208 @@ public:
 
     <h3>Public functions</h3>
     <div class="fnhead">Bind (server mode)</div>
-    <dl><dd>
-        This function enables the server mode of ISocket and binds it to the given address. After receiving the USocket::BindResult() callback, Listen() must be called to receive
-        incomming connection requests from clients.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">const char * <b>localAddr</b></td><td><i>(Default nullptr)</i> A String that holds an IPv4 or IPv6 address (for TCP and TLS sockets, also depending on
-                   																															 the useIPv6 flag passed for creation)<br>or address name (for local sockets, normaly a file name).
-                    																														If nullptr is given, the operating system bind the socket to all interfaces available (TCP, TLS and UDP socket only)
-                </td></tr><tr>
-                <td class="param">word <b>localPort</b></td><td><i>(Default 0)</i> The port the socket should listen to after binding. (TCP and TLS sockets only). If 0 is passed, the
-																															operating system will pick a free port.</td>
-            </tr>
-        </table>
+    <dl>
+        <dd>
+            This function enables the server mode of ISocket and binds it to the given address. After receiving the USocket::BindResult() callback, Listen() must be called to receive
+            incomming connection requests from clients.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>localAddr</b></td>
+                    <td>
+                        <i>(Default nullptr)</i> A String that holds an IPv4 or IPv6 address (for TCP and TLS sockets, also depending on
+                        the useIPv6 flag passed for creation)<br>or address name (for local sockets, normaly a file name).
+                        If nullptr is given, the operating system bind the socket to all interfaces available (TCP, TLS and UDP socket only)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">word <b>localPort</b></td>
+                    <td>
+                        <i>(Default 0)</i> The port the socket should listen to after binding. (TCP and TLS sockets only). If 0 is passed, the
+                        operating system will pick a free port.
+                    </td>
+                </tr>
+            </table>
 
-        <h4>Callbacks</h4>
-        On success, USocket::BindResult() will be called.<br>
-        If an error occurres, USocket::SocketShutdown() will be called. Details of that error can be found inside the log, if logging for that type of socket is activated. Reason can be one
-        of the following values:<br>
-        <table style="margin-left: 20px">
-            <tr><td><b>SOCKET_ADDRESS_INVALID</b></td><td>The format of the given address is invalid.</td></tr>
-            <tr><td><b>SOCKET_OPEN_FAILED</b></td><td>Opening the socket failed because of an error. See log for details.</td></tr>
-            <tr><td><b>SOCKET_BIND_FAILED</b></td><td>An error occured during the bind process. See the log for details.</td></tr>
-        </table>
+            <h4>Callbacks</h4>
+            On success, USocket::BindResult() will be called.<br>
+            If an error occurres, USocket::SocketShutdown() will be called. Details of that error can be found inside the log, if logging for that type of socket is activated. Reason can be one
+            of the following values:<br>
+            <table style="margin-left: 20px">
+                <tr><td><b>SOCKET_ADDRESS_INVALID</b></td><td>The format of the given address is invalid.</td></tr>
+                <tr><td><b>SOCKET_OPEN_FAILED</b></td><td>Opening the socket failed because of an error. See log for details.</td></tr>
+                <tr><td><b>SOCKET_BIND_FAILED</b></td><td>An error occured during the bind process. See the log for details.</td></tr>
+            </table>
 
-        <h4>Remarks</h4>
-        After calling Bind(), a call to Connect(), Send() or Recv() will end up with an assert.<br>
-        Only for local sockets under Linux: The rights of file given to use for bind will be set to read/write for each users, otherwise other appas can not access the socket because of the
-        apps sandboxing.
-    </dd></dl>
+            <h4>Remarks</h4>
+            After calling Bind(), a call to Connect(), Send() or Recv() will end up with an assert.<br>
+            Only for local sockets under Linux: The rights of file given to use for bind will be set to read/write for each users, otherwise other appas can not access the socket because of the
+            apps sandboxing.
+        </dd>
+    </dl>
 
     <div class="fnhead">Listen (server mode)</div>
-    <dl><dd>
-        After a successfull bind, Listen() must be called to start listening to the address / port combination of Bind(). Only after calling Listen() the ISocket instance
-        will receive and handle connect requests.
-        <h4>Callbacks</h4>
-        If an error occurres, USocket::SocketShutdown() will be called with SOCKET_LISTEN_FAILED as reason. Details of that error can be found inside the log, if logging for
-        that type of socket is activated.<br>
-        On success, USocket will only be informed about an incoming connect request. In that case, USocket::ListenResult() will be called.
-        <h4>Remarks</h4>
-        Listen only must be called once. But it will lead to couple of USocket::ListenResult() callbacks for each incomming connection request.
-    </dd></dl>
+    <dl>
+        <dd>
+            After a successfull bind, Listen() must be called to start listening to the address / port combination of Bind(). Only after calling Listen() the ISocket instance
+            will receive and handle connect requests.
+            <h4>Callbacks</h4>
+            If an error occurres, USocket::SocketShutdown() will be called with SOCKET_LISTEN_FAILED as reason. Details of that error can be found inside the log, if logging for
+            that type of socket is activated.<br>
+            On success, USocket will only be informed about an incoming connect request. In that case, USocket::ListenResult() will be called.
+            <h4>Remarks</h4>
+            Listen only must be called once. But it will lead to couple of USocket::ListenResult() callbacks for each incomming connection request.
+        </dd>
+    </dl>
 
     <div class="fnhead">Accept (server mode)</div>
-    <dl><dd>
-        Need to be called to accept an incomming connection request. This will accept the incomming request, create internally an ISocket and passes it to USocket::AcceptComplete().
-        So the USocket instance passed to Accept() is responsible to release the created ISocket instance when no longer needed. See USocket::AcceptComplete() for details.<br>
-        To deniy the request, nullptr need to be passed to Accept().
-        <h4>Remarks</h4>
-        Note that Accept() must be called from inside USocket::ListenResult()!
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr>
-                <td class="param">class USocket * <b>remoteUser</b></td>
-                <td>
-                    The user for the new ISocket, that will be created when accepting the request. Accept() will call
-                    AcceptComplete() of the given user. If remoteUser is nullptr, the request will be denied.
-                </td>
-            </tr>
-        </table>
+    <dl>
+        <dd>
+            Need to be called to accept an incomming connection request. This will accept the incomming request, create internally an ISocket and passes it to USocket::AcceptComplete().
+            So the USocket instance passed to Accept() is responsible to release the created ISocket instance when no longer needed. See USocket::AcceptComplete() for details.<br>
+            To deniy the request, nullptr need to be passed to Accept().
+            <h4>Remarks</h4>
+            Note that Accept() must be called from inside USocket::ListenResult()!
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">class USocket * <b>remoteUser</b></td>
+                    <td>
+                        The user for the new ISocket, that will be created when accepting the request. Accept() will call
+                        AcceptComplete() of the given user. If remoteUser is nullptr, the request will be denied.
+                    </td>
+                </tr>
+            </table>
 
-        <h4>Callbacks</h4>
-        If an error occurres, USocket::SocketShutdown() will be called with SOCKET_ACCEPT_FAILED as reason. Details of that error can be found inside the log, if logging for
-        that type of socket is activated.<br>
-        On success, USocket::AcceptComplete() will be called with the new ISocket instance of the connection as parameter. Note that the USocket instance given to Accept() is
-        responsible for releasing the inside Accept() created ISocket instance.
-    </dd></dl>
+            <h4>Callbacks</h4>
+            If an error occurres, USocket::SocketShutdown() will be called with SOCKET_ACCEPT_FAILED as reason. Details of that error can be found inside the log, if logging for
+            that type of socket is activated.<br>
+            On success, USocket::AcceptComplete() will be called with the new ISocket instance of the connection as parameter. Note that the USocket instance given to Accept() is
+            responsible for releasing the inside Accept() created ISocket instance.
+        </dd>
+    </dl>
 
     <div class="fnhead">Connect (client mode)</div>
-    <dl><dd>
-        This function enables the client mode of the ISocket instance and starts to establish a connection to the given address. When the connection had been established,
-        the assigned USocket instance will be informed.
-        <h4>Remarks</h4>
-        Note that after calling Connect(), a call to Bind(), Listen() and Accept() will lead to an assert.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr>
-                <td class="param">const char * <b>address</b></td>
-                <td>
-                    The address to connect to. It must be an IPv4 or IPv6 address as string. An optional port can be given
-                    seperated by colon (e. G. "192.168.1.100:4242").<br>For IPv6 addresses, an the adress itself need to be put
-                    inside '[' ']' if a port need to be passed (e. G. [::ffff:c0a8:164]:80)
-                </td>
-            </tr>
-            <tr>
-                <td class="param">const char * <b>serverName = NULL</b></td>
-                <td>
-                    The server name to connect to, e.g. 'www.testserver.com'. The server name is used in the server_name extension of TLS connections inside the ClientHello.
-                </td>
-            </tr>
-        </table>
-        <h4>Callbacks</h4>
-        On success, ISocket will call USocket::SocketConnectComplete().<br>
-        If an error occurres, USocket::SocketShutdown() will be called. Details of that error can be found inside the log, if logging for that type of socket is activated. Reason can be one
-        of the following values:<br>
-        <table style="margin-left: 20px">
-            <tr><td><b>SOCKET_ADDRESS_INVALID</b></td><td>The format of the given address is invalid.</td></tr>
-            <tr><td><b>SOCKET_OPEN_FAILED</b></td><td>Opening the socket failed because of an error. See log for details.</td></tr>
-            <tr><td><b>SOCKET_CONNECT_FAILED</b></td><td>An error occured during the connect process. See the log for details.</td></tr>
-            <tr><td><b>SOCKET_CONNECT_REJECTED</b></td><td>The connection request had been rejected by the host.</td></tr>
-        </table>
-    </dd></dl>
+    <dl>
+        <dd>
+            This function enables the client mode of the ISocket instance and starts to establish a connection to the given address. When the connection had been established,
+            the assigned USocket instance will be informed.
+            <h4>Remarks</h4>
+            Note that after calling Connect(), a call to Bind(), Listen() and Accept() will lead to an assert.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">const char * <b>address</b></td>
+                    <td>
+                        The address to connect to. It must be an IPv4 or IPv6 address as string. An optional port can be given
+                        seperated by colon (e. G. "192.168.1.100:4242").<br>For IPv6 addresses, an the adress itself need to be put
+                        inside '[' ']' if a port need to be passed (e. G. [::ffff:c0a8:164]:80)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>serverName = NULL</b></td>
+                    <td>
+                        The server name to connect to, e.g. 'www.testserver.com'. The server name is used in the server_name extension of TLS connections inside the ClientHello.
+                    </td>
+                </tr>
+            </table>
+            <h4>Callbacks</h4>
+            On success, ISocket will call USocket::SocketConnectComplete().<br>
+            If an error occurres, USocket::SocketShutdown() will be called. Details of that error can be found inside the log, if logging for that type of socket is activated. Reason can be one
+            of the following values:<br>
+            <table style="margin-left: 20px">
+                <tr><td><b>SOCKET_ADDRESS_INVALID</b></td><td>The format of the given address is invalid.</td></tr>
+                <tr><td><b>SOCKET_OPEN_FAILED</b></td><td>Opening the socket failed because of an error. See log for details.</td></tr>
+                <tr><td><b>SOCKET_CONNECT_FAILED</b></td><td>An error occured during the connect process. See the log for details.</td></tr>
+                <tr><td><b>SOCKET_CONNECT_REJECTED</b></td><td>The connection request had been rejected by the host.</td></tr>
+            </table>
+        </dd>
+    </dl>
 
     <div class="fnhead">SetUser</div>
-    <dl><dd>
-        Sets the given user as active one to receive callbacks, replacing the one passed during socket creation.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">USocket * const <b>user</b></td><td>The user to set, must not be nullptr.</td></tr>
-        </table>
+    <dl>
+        <dd>
+            Sets the given user as active one to receive callbacks, replacing the one passed during socket creation.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">USocket * const <b>user</b></td><td>The user to set, must not be nullptr.</td></tr>
+            </table>
 
-        <h4>Remarks</h4>
-        ISocket will not check, if the given user is nullptr or not. However, the developer also should take about not passing an object that already had been deleted.
-    </dd></dl>
+            <h4>Remarks</h4>
+            ISocket will not check, if the given user is nullptr or not. However, the developer also should take about not passing an object that already had been deleted.
+        </dd>
+    </dl>
 
     <div class="fnhead">Send (client mode)</div>
-    <dl><dd>
-        Used to send data to the connected server. Send() can be called directly after calling Connect() and bevore receiving the SocketConnectComplete() callback. In that case,
-        the data to send will be cached. But it is highly recommended to start sending data after the connection had been established as well as send the next part, after receiving
-        the SendComplete() callback. Doing this helps a lot to have a healthy flow control.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">const void * <b>buf</b></td><td>The buffer with the data to send. Must not be nullptr!</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of bytes to send. That means, that the size of the buffer should be at least the same as the value passed to len.</td></tr>
-        </table>
-        <h4>Callbacks</h4>
-        On success, USocket::SocketSendResult() will be called when, ISocket has sent the data.<br>
-        The only case when Send() failes is, when the socket is closing, so there is no special send related error here.
-    </dd></dl>
+    <dl>
+        <dd>
+            Used to send data to the connected server. Send() can be called directly after calling Connect() and bevore receiving the SocketConnectComplete() callback. In that case,
+            the data to send will be cached. But it is highly recommended to start sending data after the connection had been established as well as send the next part, after receiving
+            the SendComplete() callback. Doing this helps a lot to have a healthy flow control.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const void * <b>buf</b></td><td>The buffer with the data to send. Must not be nullptr!</td></tr>
+                <tr><td class="param">size_t <b>len</b></td><td>The number of bytes to send. That means, that the size of the buffer should be at least the same as the value passed to len.</td></tr>
+            </table>
+            <h4>Callbacks</h4>
+            On success, USocket::SocketSendResult() will be called when, ISocket has sent the data.<br>
+            The only case when Send() failes is, when the socket is closing, so there is no special send related error here.
+        </dd>
+    </dl>
 
     <div class="fnhead">SendTo (client mode)</div>
-    <dl><dd>
-        Used to send data to a given address for an UDP socket. Like Send(), the data will be cached if it not can be send immidiatelly.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">const void * <b>buf</b></td><td>The buffer with the data to send. Must not be nullptr!</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of bytes to send. That means, that the size of the buffer should be at least the same as the value passed to len.</td></tr>
-            <tr><td class="param">sockaddr:storage <b>dstAddr</b></td><td><i>Deprecated, will be replaced with an interface-only solution.</i></td></tr>
-        </table>
-        <h4>Callbacks</h4>
-        On success, USocket::SocketSendResult() will be called when, ISocket has sent the data.<br>
-        The only case when Send() failes is, when the socket is closing, so there is no special send related error here.
-        <h4>Remarks</h4>
-        SendTo() is only available for UDP sockets. Every other socket will just ignore a call to of that function.
-    </dd></dl>
+    <dl>
+        <dd>
+            Used to send data to a given address for an UDP socket. Like Send(), the data will be cached if it not can be send immidiatelly.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const void * <b>buf</b></td><td>The buffer with the data to send. Must not be nullptr!</td></tr>
+                <tr><td class="param">size_t <b>len</b></td><td>The number of bytes to send. That means, that the size of the buffer should be at least the same as the value passed to len.</td></tr>
+                <tr><td class="param">sockaddr:storage <b>dstAddr</b></td><td><i>Deprecated, will be replaced with an interface-only solution.</i></td></tr>
+            </table>
+            <h4>Callbacks</h4>
+            On success, USocket::SocketSendResult() will be called when, ISocket has sent the data.<br>
+            The only case when Send() failes is, when the socket is closing, so there is no special send related error here.
+            <h4>Remarks</h4>
+            SendTo() is only available for UDP sockets. Every other socket will just ignore a call to of that function.
+        </dd>
+    </dl>
 
     <div class="fnhead">Recv (client mode)</div>
-    <dl><dd>
-        Tells the ISocket instance to receive data. The SocketRecvResult() callback will be called, as soon as data had been read from the socket.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">const void * <b>buf</b></td><td>The buffer to write the received data to. Must not be nullptr!</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of bytes to receive from the socket. The SocketRecvResult() will only be called, if the given amount of data had been
-                   																						read (except if recvPartitial is set to true). The given buffer must be at least big enough to store len bytes to it.</td> </tr>
-            <tr><td class="param">bool <b>recvPartitial</b></td><td><i>(Default false)</i>If set to true, ISocket will call SocketRecvResult() as soon as posibile. That means, that everything between 1 and len bytes had been read.</td></tr>
-        </table>
-        <h4>Callbacks</h4>
-        On success, USocket::SocketRecvResult() with the buffer given to Recv() and the number of bytes read.
-        The only case when Recv() failes is, when the socket is closing, so there is no special send related error here.
+    <dl>
+        <dd>
+            Tells the ISocket instance to receive data. The SocketRecvResult() callback will be called, as soon as data had been read from the socket.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">const void * <b>buf</b></td><td>The buffer to write the received data to. Must not be nullptr!</td></tr>
+                <tr>
+                    <td class="param">size_t <b>len</b></td>
+                    <td>
+                        The number of bytes to receive from the socket. The SocketRecvResult() will only be called, if the given amount of data had been
+                        read (except if recvPartitial is set to true). The given buffer must be at least big enough to store len bytes to it.
+                    </td>
+                </tr>
+                <tr><td class="param">bool <b>recvPartitial</b></td><td><i>(Default false)</i>If set to true, ISocket will call SocketRecvResult() as soon as posibile. That means, that everything between 1 and len bytes had been read.</td></tr>
+            </table>
+            <h4>Callbacks</h4>
+            On success, USocket::SocketRecvResult() with the buffer given to Recv() and the number of bytes read.
+            The only case when Recv() failes is, when the socket is closing, so there is no special send related error here.
 
-        <h4>Remarks</h4>
-        <b>Warning:</b> If using the default non partitial Recv() (recvPartitial set to false), it must be guaranteed, that there are at least len number of bytes available to read from the socket.
-        If not, the ISocket instance will never call USocket::SocketRecvResult(), because it will wait for the given amount of data to arrive.
-    </dd></dl>
+            <h4>Remarks</h4>
+            <b>Warning:</b> If using the default non partitial Recv() (recvPartitial set to false), it must be guaranteed, that there are at least len number of bytes available to read from the socket.
+            If not, the ISocket instance will never call USocket::SocketRecvResult(), because it will wait for the given amount of data to arrive.
+        </dd>
+    </dl>
 
     <div class="fnhead">Shutdown</div>
-    <dl><dd>
-        Closes the socket. For an ISocket in client mode, all cached data will be send first, because the socket will be closed. However, new calls to Send() or Recv() after
-        calling Shutdown() will be ignored.
-        <h4>Callbacks</h4>
-        After the socket had been closed, USocket::SocketShutdown() will be called with reason SOCKET_SHUTDOWN_NORMAL.
-    </dd></dl>
+    <dl>
+        <dd>
+            Closes the socket. For an ISocket in client mode, all cached data will be send first, because the socket will be closed. However, new calls to Send() or Recv() after
+            calling Shutdown() will be ignored.
+            <h4>Callbacks</h4>
+            After the socket had been closed, USocket::SocketShutdown() will be called with reason SOCKET_SHUTDOWN_NORMAL.
+        </dd>
+    </dl>
 
 
     <a name="USocket"><h2>USocket</h2></a>
@@ -454,6 +536,8 @@ public:
     virtual void SocketRecvFromResult(ISocket * const socket, void * buf, size_t len, IPaddr dstAddr) {};
     virtual void SocketRecvCanceled(ISocket * const socket, void * buf);
     virtual void SocketUpgradeToTLSComplete(ISocket * const socket) {}
+    virtual bool SocketAcceptSelectedALPNProtocol(ISocket * const socket, const char * protocol) { return true; };
+
 };</code></pre>
 
     <h3>Overview</h3>
@@ -466,108 +550,139 @@ public:
 
     <h3>Public functions</h3>
     <div class="fnhead">SocketConnectComplete</div>
-    <dl><dd>
-        Will be called after an ISocket instance sucessfully established a connection to the given address.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
-        </table>
-    </dd></dl>
+    <dl>
+        <dd>
+            Will be called after an ISocket instance sucessfully established a connection to the given address.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
+            </table>
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketBindResult</div>
-    <dl><dd>
-        Will be called after an ISochet instance had been successfully bound to an address. Remember that ISocket::Listen() still must be called, before the socket can
-        receive connection requests. So SocketBindResult() would be the right place to do so.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
-            <tr><td class="param">const char * <b>localAddr</b></td><td>The address the socket had been bound to. Normaly the same value as passed to ISocket::Bind().</td></tr>
-            <tr><td class="param">word <b>localPort</b></td><td>The port the socket had been bound to. Normaly the same as passed to ISocket::Bind() or, in case that 0 had been passed, the port the OS had been selected.</td></tr>
-        </table>
-        <h4>Remarks</h4>
-        If ISocket::Bind() had been called with nullptr as address (to bind the socket to all available interfaces), localAddr will be "0.0.0.0".<br>
-        For local sockets, localPort always will be 0.
-    </dd></dl>
+    <dl>
+        <dd>
+            Will be called after an ISochet instance had been successfully bound to an address. Remember that ISocket::Listen() still must be called, before the socket can
+            receive connection requests. So SocketBindResult() would be the right place to do so.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
+                <tr><td class="param">const char * <b>localAddr</b></td><td>The address the socket had been bound to. Normaly the same value as passed to ISocket::Bind().</td></tr>
+                <tr><td class="param">word <b>localPort</b></td><td>The port the socket had been bound to. Normaly the same as passed to ISocket::Bind() or, in case that 0 had been passed, the port the OS had been selected.</td></tr>
+            </table>
+            <h4>Remarks</h4>
+            If ISocket::Bind() had been called with nullptr as address (to bind the socket to all available interfaces), localAddr will be "0.0.0.0".<br>
+            For local sockets, localPort always will be 0.
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketListenResult</div>
-    <dl><dd>
-        After calling ISocket::Listen(), each incoming connection request to the socket will lead to a USocket::SocketListenResult(). There the application must decide,
-        whether the connection will be accepted or denied. This will be done by calling ISocket::Accept() with an USocket instance (to accept) or with nullptr (to deny).
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The ISocket instance that received an incomming connection request.</td></tr>
-            <tr><td class="param">const char * <b>remoteAddress</b></td><td>The address of the client that whants to connect to the socket.</td></tr>
-            <tr><td class="param">word <b>remotePort</b></td><td>The port of the client that wants to connect to the socket.</td></tr>
-        </table>
-        <h4>Remarks</h4>
-        ISocket::Accept must be called inside USocket::SocketListenResult().
-    </dd></dl>
+    <dl>
+        <dd>
+            After calling ISocket::Listen(), each incoming connection request to the socket will lead to a USocket::SocketListenResult(). There the application must decide,
+            whether the connection will be accepted or denied. This will be done by calling ISocket::Accept() with an USocket instance (to accept) or with nullptr (to deny).
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ISocket * const <b>socket</b></td><td>The ISocket instance that received an incomming connection request.</td></tr>
+                <tr><td class="param">const char * <b>remoteAddress</b></td><td>The address of the client that whants to connect to the socket.</td></tr>
+                <tr><td class="param">word <b>remotePort</b></td><td>The port of the client that wants to connect to the socket.</td></tr>
+            </table>
+            <h4>Remarks</h4>
+            ISocket::Accept must be called inside USocket::SocketListenResult().
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketAcceptComplete</div>
-    <dl><dd>
-        Will be called after USocket::ListenResult() calls ISocket::Accept() with an USocket instance. So ISocket will call USocket::SocketAcceptComplete() of the instance,
-        passed to ISocket::Accept() inside USocket::SocketListenResult().
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance. Unlike the other callback functions, the ISocket instance passed here is a new created one that now had been connected to the client,
-																															  that requested the connection. So USocket is now responsible for this ISocket instance.</td></tr>
-        </table>
-        <h4>Remarks</h4>
-        It is important to understand, that USocket::SocketListenResult() will be called from an ISocket instance, that acts in server mode. But the ISocket instance
-        passed to USocket::SocektAcceptComplete() is a new created instance that acts like a client mode ISocket. So ISocket::Send() and ISocket::Recv() can be called,
-        but not Connect() (because it already is connected). See the documentation of <a href="#ISocket">ISocket</a> for more informations.<br>
-        The USocket instance that received this callback is responsible for the ISocket instance passed to the callback function. So it should be stored in a local
-        variable and freed if no longer needed.
-    </dd></dl>
+    <dl>
+        <dd>
+            Will be called after USocket::ListenResult() calls ISocket::Accept() with an USocket instance. So ISocket will call USocket::SocketAcceptComplete() of the instance,
+            passed to ISocket::Accept() inside USocket::SocketListenResult().
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ISocket * const <b>socket</b></td>
+                    <td>
+                        The calling ISocket instance. Unlike the other callback functions, the ISocket instance passed here is a new created one that now had been connected to the client,
+                        that requested the connection. So USocket is now responsible for this ISocket instance.
+                    </td>
+                </tr>
+            </table>
+            <h4>Remarks</h4>
+            It is important to understand, that USocket::SocketListenResult() will be called from an ISocket instance, that acts in server mode. But the ISocket instance
+            passed to USocket::SocektAcceptComplete() is a new created instance that acts like a client mode ISocket. So ISocket::Send() and ISocket::Recv() can be called,
+            but not Connect() (because it already is connected). See the documentation of <a href="#ISocket">ISocket</a> for more informations.<br>
+            The USocket instance that received this callback is responsible for the ISocket instance passed to the callback function. So it should be stored in a local
+            variable and freed if no longer needed.
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketShutdown</div>
-    <dl><dd>
-        Will be called after the socket had been closed. It is guaranteed, that all cached data had been send and no more receiving will be done. Also no other callback will
-        be called any more. So the ISocket instance passed can be safely deleted here.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance. Because the socket is closed, the given instance can be deleted here.</td></tr>
-            <tr><td class="param">shutdownreason_t <b>reason</b></td><td>The reason why the socket had been closed. See data type <a href="shutdownreason_t">shutdownreason_t</a> for more informations.</td></tr>
-        </table>
-    </dd></dl>
+    <dl>
+        <dd>
+            Will be called after the socket had been closed. It is guaranteed, that all cached data had been send and no more receiving will be done. Also no other callback will
+            be called any more. So the ISocket instance passed can be safely deleted here.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance. Because the socket is closed, the given instance can be deleted here.</td></tr>
+                <tr><td class="param">shutdownreason_t <b>reason</b></td><td>The reason why the socket had been closed. See data type <a href="shutdownreason_t">shutdownreason_t</a> for more informations.</td></tr>
+            </table>
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketSendResult</div>
-    <dl><dd>
-        Will be called after ISocket::Send() had sent the given data or after the data had been cached and sent after that. Even if ISocket::Send() can send the data directly,
-        it is guaranteed that USocket::SocketSendResult() will never ever be called before returning from ISocket::Send(). It will be a good idea to use USocket::SocketSendResult()
-        to send the next data package. Doing this gives a nice flow controll to the application.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
-        </table>
-    </dd></dl>
+    <dl>
+        <dd>
+            Will be called after ISocket::Send() had sent the given data or after the data had been cached and sent after that. Even if ISocket::Send() can send the data directly,
+            it is guaranteed that USocket::SocketSendResult() will never ever be called before returning from ISocket::Send(). It will be a good idea to use USocket::SocketSendResult()
+            to send the next data package. Doing this gives a nice flow controll to the application.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
+            </table>
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketRecvResult</div>
-    <dl><dd>
-        Will be called, after the application calls ISocket::Recv() and after data had been received.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
-            <tr><td class="param">void * <b>buf</b></td><td>The buffer that holds the received data. It is the same as passed to ISocket::Recv().</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of bytes read. If ISocket::Recv() is called with recvPartitial true, len can be anything between 1 and the number of bytes passed
-																										to ISocket::Recv(). If ISocket::Recv() is called with recvPartitial fase, it is guaranteed, that len is the same as passed to ISocket::Recv() before.</td></tr>
-        </table>
-    </dd></dl>
+    <dl>
+        <dd>
+            Will be called, after the application calls ISocket::Recv() and after data had been received.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
+                <tr><td class="param">void * <b>buf</b></td><td>The buffer that holds the received data. It is the same as passed to ISocket::Recv().</td></tr>
+                <tr>
+                    <td class="param">size_t <b>len</b></td>
+                    <td>
+                        The number of bytes read. If ISocket::Recv() is called with recvPartitial true, len can be anything between 1 and the number of bytes passed
+                        to ISocket::Recv(). If ISocket::Recv() is called with recvPartitial fase, it is guaranteed, that len is the same as passed to ISocket::Recv() before.
+                    </td>
+                </tr>
+            </table>
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketRecvFromResult</div>
-    <dl><dd>
-        The same as Recv(), with the difference that the origin of the data will be passed, too. Only for UDP sockets.
-        <h4>Parameters</h4>
-        <table style="margin-left:-12px">
-            <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
-            <tr><td class="param">void * <b>buf</b></td><td>The buffer that holds the received data. It is the same as passed to ISocket::Recv().</td></tr>
-            <tr><td class="param">size_t <b>len</b></td><td>The number of bytes read. If ISocket::Recv() is called with recvPartitial true, len can be anything between 1 and the number of bytes passed
-																										to ISocket::Recv(). If ISocket::Recv() is called with recvPartitial fase, it is guaranteed, that len is the same as passed to ISocket::Recv() before.</td></tr>
-            <tr><td class="param">sockaddr_storage * <b>dstAddr</b></td><td><i>Depracated, will be replaced by an interface internaly data type</i></td></tr>
-        </table>
-        <h4>Remarks</h4>
-        This callback will only be called from UDP ISocket instances.
-    </dd></dl>
+    <dl>
+        <dd>
+            The same as Recv(), with the difference that the origin of the data will be passed, too. Only for UDP sockets.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr><td class="param">ISocket * const <b>socket</b></td><td>The calling ISocket instance.</td></tr>
+                <tr><td class="param">void * <b>buf</b></td><td>The buffer that holds the received data. It is the same as passed to ISocket::Recv().</td></tr>
+                <tr>
+                    <td class="param">size_t <b>len</b></td>
+                    <td>
+                        The number of bytes read. If ISocket::Recv() is called with recvPartitial true, len can be anything between 1 and the number of bytes passed
+                        to ISocket::Recv(). If ISocket::Recv() is called with recvPartitial fase, it is guaranteed, that len is the same as passed to ISocket::Recv() before.
+                    </td>
+                </tr>
+                <tr><td class="param">sockaddr_storage * <b>dstAddr</b></td><td><i>Depracated, will be replaced by an interface internaly data type</i></td></tr>
+            </table>
+            <h4>Remarks</h4>
+            This callback will only be called from UDP ISocket instances.
+        </dd>
+    </dl>
 
     <div class="fnhead">SocketRecvCanceled</div>
     <dl>
@@ -609,6 +724,31 @@ public:
             </table>
         </dd>
     </dl>
+
+    <div class="fnhead">SocketAcceptSelectedALPNProtocol</div>
+    <dl>
+        <dd>
+            If an ALPN list is provided by the given ISocketContext, this function is called with the accepted protocol.
+            <h4>Parameters</h4>
+            <table style="margin-left:-12px">
+                <tr>
+                    <td class="param">ISocket * const <b>socket</b></td>
+                    <td>
+                        The calling ISocket instance.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="param">const char * <b>protocol</b></td>
+                    <td>
+                        The selected protocol.
+                    </td>
+                </tr>
+            </table>
+            <h4>Return value</h4>
+            A boolean. Return true if you support the given protocol, otherwise false, which will terminate the connection.
+        </dd>
+    </dl>
+
 
     <h1>Data types</h1>
     <a name="shutdownreason_t"><h2>shutdownreason_t</h2></a>

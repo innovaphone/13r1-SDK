@@ -21,61 +21,73 @@
     </p>
 
     <h2>File information</h2>
-        <table style="margin-left:-12px">
-            <tr><td><b>File</b></td><td>common/lib/httplib.h<br><br></td></tr>
-            <tr><td><b>Classes</b></td><td>
-                                        <a href="#HTTPLib">HTTPLib</a><br>
-                                        <a href="#HTTPHeader">HTTPHeader</a><br/>
-                                        <a href="#HTTPParser">HTTPParser</a><br>
-                                        <a href="#UHTTPParser">UHTTPParser</a><br>
-                                        <a href="#HTTPHeaderField">HTTPHeaderField</a><br>
-                                        <a href="#HTTPRange">HTTPRange</a><br>
-                                        <br>
-                                   </td></tr>
-            <tr><td><b>Data types</b></td><td>
-                                          <a href="#CLRF">CLRF</a><br>
-                                          <a href="#HTTP_GET_KEY">HTTP_GET_KEY</a><br>
-                                          <a href="#HTTP_HEAD_KEY">HTTP_HEAD_KEY</a><br>
-                                          <a href="#HTTP_POST_KEY">HTTP_POST_KEY</a><br>
-                                          <a href="#HTTP_PUT_KEY">HTTP_PUT_KEY</a><br>
-                                          <a href="#HTTP_CONNECT_KEY">HTTP_CONNECT_KEY</a><br>
-                                          <a href="#HTTP_OPTIONS_KEY">HTTP_OPTIONS_KEY</a><br>
-                                          <a href="#HTTP_TRACE_KEY">HTTP_TRACE_KEY</a><br>
-                                          <a href="#HTTP_PROPFIND_KEY">HTTP_PROPFIND_KEY</a><br>
-                                          <a href="#HTTP_MKCOL_KEY">HTTP_MKCOL_KEY</a><br>
-                                          <a href="#HTTP_COPY_KEY">HTTP_COPY_KEY</a><br>
-                                          <a href="#HTTP_MOVE_KEY">HTTP_MOVE_KEY</a><br>
-                                          <a href="#HTTP_DELETE_KEY">HTTP_DELETE_KEY</a><br>
-                                          <a href="#HTTP_LOCK_KEY">HTTP_LOCK_KEY</a><br>
-                                          <a href="#HTTP_UNLOCK_KEY">HTTP_UNLOCK_KEY</a><br>
-                                          <a href="#HTTP_PROPPATCH_KEY">HTTP_PROPPATCH_KEY</a><br>
-                                          <a href="#HTTP_SYSCLIENT_KEY">HTTP_SYSCLIENT_KEY</a><br>
-                                          <a href="#HTTP_VERSION_1_0">HTTP_VERSION_1_0</a><br>
-                                          <a href="#HTTP_VERSION_1_1">HTTP_VERSION_1_1</a><br>
-                                          <a href="#http_request_method_t">HTTPLib::http_request_method_t</a><br>
-                                          <a href="#http_connection_t">HTTPLib::http_connection_t</a><br>
-                                          <a href="#http_upgrade_t">HTTPLib::http_upgrade_t</a><br>
-                                          <a href="#http_encoding_t">HTTPLib::http_encoding_t</a><br>
-                                          <a href="#http_result_t">HTTPLib::http_result_t</a><br>
-                                          <a href="#result_codes">HTTP result codes</a><br>
-                                          <br>
-                                      </td></tr>
-            <tr><td><b>Examples</b></td><td>
-                                          <a href="#example">Code Example</a><br>
-                                          <br>
-                                      </td></tr>
-        </table>
-    
+    <table style="margin-left:-12px">
+        <tr><td><b>File</b></td><td>common/lib/httplib.h<br><br></td></tr>
+        <tr>
+            <td><b>Classes</b></td>
+            <td>
+                <a href="#HTTPLib">HTTPLib</a><br>
+                <a href="#HTTPHeader">HTTPHeader</a><br />
+                <a href="#HTTPParser">HTTPParser</a><br>
+                <a href="#UHTTPParser">UHTTPParser</a><br>
+                <a href="#HTTPHeaderField">HTTPHeaderField</a><br>
+                <a href="#HTTPRange">HTTPRange</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Data types</b></td>
+            <td>
+                <a href="#CLRF">CLRF</a><br>
+                <a href="#HTTP_GET_KEY">HTTP_GET_KEY</a><br>
+                <a href="#HTTP_HEAD_KEY">HTTP_HEAD_KEY</a><br>
+                <a href="#HTTP_POST_KEY">HTTP_POST_KEY</a><br>
+                <a href="#HTTP_PUT_KEY">HTTP_PUT_KEY</a><br>
+                <a href="#HTTP_CONNECT_KEY">HTTP_CONNECT_KEY</a><br>
+                <a href="#HTTP_OPTIONS_KEY">HTTP_OPTIONS_KEY</a><br>
+                <a href="#HTTP_TRACE_KEY">HTTP_TRACE_KEY</a><br>
+                <a href="#HTTP_PROPFIND_KEY">HTTP_PROPFIND_KEY</a><br>
+                <a href="#HTTP_MKCOL_KEY">HTTP_MKCOL_KEY</a><br>
+                <a href="#HTTP_COPY_KEY">HTTP_COPY_KEY</a><br>
+                <a href="#HTTP_MOVE_KEY">HTTP_MOVE_KEY</a><br>
+                <a href="#HTTP_DELETE_KEY">HTTP_DELETE_KEY</a><br>
+                <a href="#HTTP_LOCK_KEY">HTTP_LOCK_KEY</a><br>
+                <a href="#HTTP_UNLOCK_KEY">HTTP_UNLOCK_KEY</a><br>
+                <a href="#HTTP_PROPPATCH_KEY">HTTP_PROPPATCH_KEY</a><br>
+                <a href="#HTTP_SYSCLIENT_KEY">HTTP_SYSCLIENT_KEY</a><br>
+                <a href="#HTTP_VERSION_1_0">HTTP_VERSION_1_0</a><br>
+                <a href="#HTTP_VERSION_1_1">HTTP_VERSION_1_1</a><br>
+                <a href="#http_request_method_t">HTTPLib::http_request_method_t</a><br>
+                <a href="#http_connection_t">HTTPLib::http_connection_t</a><br>
+                <a href="#http_upgrade_t">HTTPLib::http_upgrade_t</a><br>
+                <a href="#http_encoding_t">HTTPLib::http_encoding_t</a><br>
+                <a href="#http_result_t">HTTPLib::http_result_t</a><br>
+                <a href="#result_codes">HTTP result codes</a><br>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Examples</b></td>
+            <td>
+                <a href="#example">Code Example</a><br>
+                <br>
+            </td>
+        </tr>
+    </table>
+
     <h1>Classes</h1>
     <h2 id="HTTPLib">HTTPLib</h2>
     <pre><code class="C++">class HTTPLib {
 public:
     static inline const char * GetHTTPRequestMethodName(http_request_method_t method);
+    inline static const http_result_t * HTTPResultFromStatusNumber(int number);
+    inline static const http_result_t * HTTPResultFromStatusNumberStr(const char * numStr);
+
 };
-</code></pre>    
+</code></pre>
     <p>
-    This class actually is only for wrapping the types and constants used by the HTTP lib (beside the one helper function described here). The other parts of
-    that class are described in the data types section of this document (see below).<br/>
+        This class actually is only for wrapping the types and constants used by the HTTP lib (beside the one helper function described here). The other parts of
+        that class are described in the data types section of this document (see below).<br />
     </p>
 
     <h3>Public functions</h3>
@@ -87,9 +99,35 @@ public:
         <table style="margin-left:-12px">
             <tr><td class="param">http_request_method_t <b>method</b></td><td>The method id to get the name for.</td></tr>
         </table>
-        
+
         <h4>Return Values</h4>
         The name of the method as string.
+    </dd>
+
+    <div class="fnhead">HTTPResultFromStatusNumber</div>
+    <dd>
+        This inline function simply is for converting the integer status code to http_result_t *.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">int <b>number</b></td><td>The status code as int.</td></tr>
+        </table>
+
+        <h4>Return Values</h4>
+        The corresponding http_result_t *.
+    </dd>
+
+    <div class="fnhead">HTTPResultFromStatusNumberStr</div>
+    <dd>
+        This inline function simply is for converting a char * "integer" status code to http_result_t *.
+
+        <h4>Parameters</h4>
+        <table style="margin-left:-12px">
+            <tr><td class="param">const char * <b>numStr</b></td><td>The status code as char * which contains numbers.</td></tr>
+        </table>
+
+        <h4>Return Values</h4>
+        The corresponding http_result_t *.
     </dd>
 
     <h2 id="HTTPHeader">HTTPHeader</h2>
@@ -115,7 +153,7 @@ public:
 
     const char * GetHeaderData() { return buffer; }
     size_t GetHeaderSize() { return contentSize; }
-};</code></pre> 
+};</code></pre>
     <p>
         This class is used for creating an HTTP header asresponse or request. If you want to parse an HTTP Header, <a href="HTTPParser">HTTPParse</a> must be used.
     </p>
@@ -125,19 +163,19 @@ public:
     <dd>
         Sets the major and minor version of the HTTP protocol you want to use. If a header will be created as a response, the HTTP version requested can be obtained
         from an HTTPParser instance by calling HTTPParser::GetMajorVersion() or HTTPParser::GetMinorVersion() and set the same version for the response as used for
-        the request.<br/>
-        <br/>
+        the request.<br />
+        <br />
         This function must be called before using any other function, or the header you're going to build up will be incorrect. However, if you need to build a HTTP
         header multiple times for response to requests, you can reuse a HTTPHeader instance, setting the version only once and reuse it by setting the HTTP result
         code at first.
-        
+
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">int <b>major</b></td><td>The major HTTP version to set.</td></tr>
             <tr><td class="param">int <b>minor</b></td><td>The minor HTTP version to set.</td></tr>
         </table>
     </dd>
-    
+
     <div class="fnhead">SetHTTPResult</div>
     <dd>
         Set the result code for the HTTP header, to response to a HTTP request. This function will reset all other, previous set header data (except the HTTP version).
@@ -148,7 +186,7 @@ public:
             <tr><td class="param">HTTPLib::http_result_t * <b>result</b></td><td>Pointer to the result code. Must be one of the HTTPLib::HTTP_* constants (see below).</td></tr>
         </table>
     </dd>
-    
+
     <div class="fnhead">SetContentSize</div>
     <dd>
         Set the content-length field of the header. It should be set every time, regardless if the size is 0 (for no content) or not.
@@ -171,7 +209,7 @@ public:
             <tr><td class="param">ulong64 <b>completeSize</b></td><td>The complete size of the requested resource.</td></tr>
         </table>
     </dd>
-    
+
     <div class="fnhead">SetContentType</div>
     <dd>
         Set the mime-type of the content field of the header.
@@ -201,7 +239,7 @@ public:
             <tr><td class="param">HTTPLib::http_encoding_t <b>enc</b></td><td>The encoding type to set.</td></tr>
         </table>
     </dd>
-    
+
     <div class="fnhead">SetETag</div>
     <dd>
         Set the etag. The etag field will be used to support browser side caching of data.
@@ -264,7 +302,7 @@ public:
             <tr><td class="param">const char * <b>key</b></td><td>The value for that field.</td></tr>
         </table>
     </dd>
-    
+
     <div class="fnhead">SetDate</div>
     <dd>
         Set the date-time field for the HTTP header, using the current time.
@@ -281,7 +319,7 @@ public:
             <tr><td class="param">const char * <b>resource</b></td><td>The resource to request.</td></tr>
         </table>
     </dd>
-    
+
     <div class="fnhead">GetHeaderData</div>
     <dd>
         <h4>Return Value</h4>
@@ -293,7 +331,7 @@ public:
         <h4>Return Value</h4>
         The length of the HTTP header.
     </dd>
-    <br/>
+    <br />
 
     <h2 id="HTTPParser">HTTPParser</h2>
     <pre><code class="C++">class HTTPParser {
@@ -341,7 +379,7 @@ public:
     size_t GetHeaderSize() const { return 0; }
     char * MakeHeaderCopy() const { return nullptr; };
     void GetFieldListCopy(byte * & buffer, size_t & bufferSize) const;
-};</code></pre> 
+};</code></pre>
     <p>
         This class will be used to parse a byte stream for a HTTP header and extract the fields / data from the header. Note that the byte stream
         must begin with a valid HTTP header, or an error will be returned.
@@ -352,23 +390,28 @@ public:
     <dd>
         Parsed the given data with the given length. You have to first call this function and then call GetParseResult() to check the status of the parsing process.
         Everything will be copied to an inside buffer, so the given buffer can be reused to receive additional header data to parse.
-           
+
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
             <tr><td class="param">char * <b>data</b></td><td>The data to parse.</td></tr>
             <tr><td class="param">size_t <b>len</b></td><td>The number of bytes inside the given data buffer.</td></tr>
-            <tr><td class="param">UHTTPParser * <b>user</b></td><td>An UHTTPParser instance that will be called after the request line had been parsed. This helps to define, wheter
-                                                                    parsing should continue or not. See <a href="UHTTPParser">UHTTPParser</a> for more information.</td></tr>
+            <tr>
+                <td class="param">UHTTPParser * <b>user</b></td>
+                <td>
+                    An UHTTPParser instance that will be called after the request line had been parsed. This helps to define, wheter
+                    parsing should continue or not. See <a href="UHTTPParser">UHTTPParser</a> for more information.
+                </td>
+            </tr>
         </table>
-        
+
         <h4>Callbacks</h4>
         If the header indicates a HTTP request and if user is not nullptr, UHTTPParser::HTTPParserValidateRequest() will be called after parsing the first line (which is the request
         line), so that the request can be accepted or recjected before continue parsing the rest of the header.
-        
+
         <h4>Return Values</h4>
         The number of bytes processed from the given data buffer. If less then len, the value should be added to data to acces the data behind the header inside the byte stream.
     </dd>
-    
+
     <div class="fnhead">GetParseResult</div>
     <dd>
         <h4>Return Value</h4>
@@ -434,18 +477,18 @@ public:
         <table style="margin-left:-12px">
             <tr><td class="param">const char * <b>fieldName</b></td><td>The name of the header field to get.</td></tr>
         </table>
-        
+
         <h4>Return Value</h4>
         If the header field canot be found, the function returns nullptr. Else a HTTPHeaderField instance will be returned, providing the detail of the field. That instance
         canot be deleted and will completely managed by HTTPParser itself.
     </dd>
-    
+
 
     <div class="fnhead">GetContentLength</div>
     <dd>
         <h4>Return Value</h4>
         (For response only) Reports the content length defined by the header. This will be the amount of data to read from the byte stream to completely process the response. Can be 0.
-        
+
         <h4>Remarks</h4>
         The return value of 0 doesn't mean, that there is no further data to process. The data send with a response can also be chunk encoded. Check IsChunkedTransfer() to get
         that information.
@@ -462,7 +505,7 @@ public:
 
         <h4>Return Value</h4>
         True, of the conenction type given is defined in the header, else false.
-        
+
         <h4>Remarks</h4>
         The value for ct must be HTTP_CONNECTION_NONE, HTTP_CONNECTION_KEEP_ALIVE or HTTP_CONNECTION_UPGRADE. See the data types section below for details.
     </dd>
@@ -478,7 +521,7 @@ public:
         <h4>Return Value</h4>
         Returns the value of the cookie header field.
     </dd>
-    
+
     <div class="fnhead">GetETag</div>
     <dd>
         <h4>Return Value</h4>
@@ -507,7 +550,7 @@ public:
     <dd>
         <h4>Return Value</h4>
         Returns an HTTPRange object to access the values given by the range header field. If there is no range request, nullptr will be returned.
-		The returned object is the start of a linked list of ranges. See <a href="HTTPRange">HTTPRange</a> for more information.
+        The returned object is the start of a linked list of ranges. See <a href="HTTPRange">HTTPRange</a> for more information.
     </dd>
 
     <div class="fnhead">GetEncoding</div>
@@ -521,7 +564,7 @@ public:
         <h4>Return Value</h4>
         Returns the websocket key.
     </dd>
-    
+
     <div class="fnhead">GetWebsocketVersion</div>
     <dd>
         <h4>Return Value</h4>
@@ -533,14 +576,14 @@ public:
         <h4>Return Value</h4>
         Returns the value of the origin field.
     </dd>
-    
+
     <div class="fnhead">GetHTTPResultCode</div>
     <dd>
         <h4>Return Value</h4>
         For response headers, the function returns the HTTP result code of the previous request. If the incomming header was a request and there was an error during parsing the header,
         the function returns the HTTP result code to send as an answer.
     </dd>
-    
+
     <div class="fnhead">GetFieldListCopy</div>
     <dd>
         Makes a copy of the field list from the header.
@@ -550,25 +593,25 @@ public:
             <tr><td class="param">byte * &amp; <b>buffer</b></td><td><i>(Out)</i> A reference to a byte * variable the buffer with the copy will be written to.</td></tr>
             <tr><td class="param">size_t &amp; <b>bufferSize</b></td><td><i>(Out)</i> A reference to a size_t variable the size of the buffer with the copy will be written to.</td></tr>
         </table>
-        
+
         <h4>Return Value</h4>
         After creating the copy, the pointer to the malloced buffer will be stored int the variable bufffer, and the size of it in bufferSize. The caller is responsible for
         releasing the buffer if no longer needed by calling free(buffer).
     </dd>
-    <br/>
+    <br />
 
     <h2 id="UHTTPParser">UHTTPParser</h2>
     <pre><code class="C++">class UHTTPParser {
 public:
     virtual ~UHTTPParser() {}
     virtual bool HTTPParserValidateRequest(class HTTPParser * httpParser) = 0;
-};</code></pre> 
+};</code></pre>
     <p>
         This class is for passing a user to HTTPParser::ParseData(). After parsing the request line, UHTTPParser::HTTPParserValidateRequest() will be called. The app can
         check the request and validate it the HTTPParser continues with parsing the rest of the header. This can be done by checking the values of the given HTTPParser
         instance. Note that only the request type and the requested resource will be available at this point, but no header fields.
     </p>
-    
+
     <h3>Public functions</h3>
     <div class="fnhead">HTTPParserValidateRequest</div>
     <dd>
@@ -578,28 +621,28 @@ public:
         <table style="margin-left:-12px">
             <tr><td class="param">HTTPParser * <b>httpParser</b></td><td>The calling HTTPParser object.</td></tr>
         </table>
-        
+
         <h4>Return Value</h4>
         True to continue parsing, false to cancel it.
-        
+
         <h4>Remarks</h4>
         When canceling the parsing process, the app must take care of eating up all unused data to clean the byte stream (if the same byte stream should be used for parsing
         the next header).
     </dd>
-    <br/>
+    <br />
 
     <h2 id="HTTPHeaderField">HTTPHeaderField</h2>
     <pre><code class="C++">class HTTPHeaderField {
 public:
     const char * GetValue(size_t idx) const { return values[idx]; }
     size_t GetValueCount() const { return valueCount; }
-};</code></pre> 
+};</code></pre>
     <p>
         Represents a HTTP header field and its values. Even if a field can have more values (that means, that field appears mutltiple times in the header), there also can be
         multiple values set, seperated by ';'. Those will be handled as one value only, so an app must seperate them if needed. An header field can be obtained by calling
         HTTPParser::GetHeaderField().
     </p>
-    
+
     <h3>Public functions</h3>
     <div class="fnhead">GetValue</div>
     <dd>
@@ -609,20 +652,20 @@ public:
         <table style="margin-left:-12px">
             <tr><td class="param">size_t <b>idx</b></td><td>The index of the value to get. Must be between 0 and GetValueCount().</td></tr>
         </table>
-        
+
         <h4>Return Value</h4>
         The value of the header.
-        
+
         <h4>Remarks</h4>
         Don't manipulate that string (even not by typecasting). If there is need to edit the items, a copy of that return value mast be made.
     </dd>
-    
+
     <div class="fnhead">GetValueCount</div>
     <dd>
         <h4>Return Value</h4>
         The number of values available for that field.
     </dd>
-    <br/>
+    <br />
 
     <h2 id="HTTPRange">HTTPRange</h2>
     <pre><code class="C++">class HTTPRange {
@@ -639,25 +682,25 @@ public:
     size_t start;
     size_t end;
     HTTPRange * next;
-};</code></pre> 
+};</code></pre>
     <p>
         Represents the values of ranges send with an HTTP header. An instance of HTTPRange will be returned by HTTPParser::GetRange(). The retunred instance is the start of a linked list.
         So you must not call delete on it! HTTPParser itself will take care of releasing the objects when needed. The class itself has no functions. You have access directly to the fields
         of the class.
-    </p>        
-    
-    
+    </p>
+
+
     <div class="fnhead">start</div>
     <dd>
         The start of the range given by the HTTP header.
     </dd>
-    
-    
+
+
     <div class="fnhead">end</div>
     <dd>
         The end of the range given by the HTTP header.
     </dd>
-    
+
     <div class="fnhead">rangeType</div>
     <dd>
         The type of the range. Depending on the type the values of start and end need to be interpreted. rangeType can be one of the following:
@@ -693,7 +736,7 @@ public:
 
 #define HTTP_VERSION_1_0    0x0100
 #define HTTP_VERSION_1_1    0x0101</code></pre>
-    <br/>
+    <br />
     <dd>
         <table style="margin-left: 20px">
             <tr><td id="CLRF"><b>CLRF</b></td><td>The end of line, used inside the HTTP header. The Header ends with on empty line, which is a line that only holds CLRF.</td></tr>
@@ -717,8 +760,8 @@ public:
             <tr><td id="HTTP_VERSION_1_1"><b>HTTP_VERSION_1_1</b></td><td>Dword constant for HTTP 1.1.</td></tr>
         </table>
     </dd>
-    <br/>
-    
+    <br />
+
     <h2 id="http_request_method_t">http_request_method_t</h2>
 <pre><code style="laguage-cpp">typedef enum {
     HTTP_NONE,
@@ -740,7 +783,7 @@ public:
     HTTP_SYSCLIENT
 } http_request_method_t;</code></pre>
     <p>
-       This enum is used to define the method to use for a HTTP request and must be one of the following:
+        This enum is used to define the method to use for a HTTP request and must be one of the following:
     </p>
     <dd>
         <table style="margin-left: 20px">
@@ -763,8 +806,8 @@ public:
             <tr><td><b>HTTP_SYSCLIENT</b></td><td>(Used internally only) Sysclient request to authenticate localsocket requests - internally used.</td></tr>
         </table>
     </dd>
-    <br/>
-    
+    <br />
+
     <h2 id="http_connection_t">http_connection_t</h2>
 <pre><code style="laguage-cpp">typedef enum {
     HTTP_CONNECTION_NONE = 0x00,
@@ -773,7 +816,7 @@ public:
     HTTP_CONNECTION_UPGRADE = 0x04
 } http_connection_t;</code></pre>
     <p>
-       This enum describes the type of a connection and must be one of the following:
+        This enum describes the type of a connection and must be one of the following:
     </p>
     <dd>
         <table style="margin-left: 20px">
@@ -787,7 +830,7 @@ public:
         not set, the connection must close after responding or receiving the response of a request. For HTTP 1.1, keep alive is the default. So the connection should only be closed after receiving the
         response or responding a request, if HTTP_CONNECTION_CLOSE is set.
     </dd>
-    <br/>
+    <br />
 
     <h2 id="http_upgrade_t">http_upgrade_t</h2>
     <pre><code style="laguage-cpp">typedef enum {
@@ -795,7 +838,7 @@ public:
     HTTP_UPGRADE_WEBSOCKET
 } http_upgrade_t;</code></pre>
     <p>
-       These are the upgrades the a request can define.
+        These are the upgrades the a request can define.
     </p>
     <dd>
         <table style="margin-left: 20px">
@@ -803,15 +846,15 @@ public:
             <tr><td><b>HTTP_UPGRADE_WEBSOCKET</b></td><td>The connection had been or should be upgraded to be a websocket connection.</td></tr>
         </table>
     </dd>
-    <br/>
-    
+    <br />
+
     <h2 id="http_encoding_t">http_encoding_t</h2>
     <pre><code style="laguage-cpp">typedef enum {
     HTTP_ENCODING_NONE,      // Default
     HTTP_ENCODING_GZIP
 } http_encoding_t;</code></pre>
     <p>
-       These are the encoding types for a HTTP connection (the moment, only gzip is supported as special encoding).
+        These are the encoding types for a HTTP connection (the moment, only gzip is supported as special encoding).
     </p>
     <dd>
         <table style="margin-left: 20px">
@@ -819,9 +862,9 @@ public:
             <tr><td><b>HTTP_ENCODING_GZIP</b></td><td>The data received or sent is in gzip compressed format.</td></tr>
         </table>
     </dd>
-    <br/>
-    
-    
+    <br />
+
+
     <h2 id="http_result_t">http_result_t</h2>
 <pre><code style="laguage-cpp">typedef struct {
     int code;
@@ -839,12 +882,12 @@ public:
             <tr><td>int <b>code</b></td><td>The HTTP code as interger value.</td></tr>
             <tr><td>const char * <b>description</b></td><td>The description of the code.</td></tr>
             <tr><td>size_t <b>descLen</b></td><td>The length of the description.</td></tr>
-        </table>    
+        </table>
 
         <h4 id="result_codes">Remarks</h4>
         HTTPLib has most of the HTTP return codes predefined in HTTP_* constants. The interger code of them is the same a the code of the result. So HTTP 100 has the integer number 100.
-        The Description is a combination of the code number and the description defined by RFC (e. G. "200 OK"). The following result codes are offered by HTTPLib:<br/>
-        <br/>
+        The Description is a combination of the code number and the description defined by RFC (e. G. "200 OK"). The following result codes are offered by HTTPLib:<br />
+        <br />
         <table style="margin-left: 20px">
             <tr><td><b>HTTP_100</b></td><td>Continue</td></tr>
             <tr><td><b>HTTP_101</b></td><td>Switching Protocols</td></tr>
@@ -950,6 +993,6 @@ void MyApp::ResponseGETRequest(ISocket * socket)
     // Finally - send everything.
     socket->Send(header.GetHeaderData(), header.GetHeaderSize());
     socket->Send(responseData, responseLen);
-}</code></pre>    
+}</code></pre>
 </body>
 </html>

@@ -648,7 +648,7 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
     }
 
     function replace$Args(translatedString) {
-        for (var i = 1; i < arguments.length; i++) {
+		for (var i = arguments.length - 1; i >= 1; i--) {
             var replacer = new RegExp("\\$" + i.toString(), "g");
             translatedString = translatedString.replace(replacer, arguments[i]);
         }
@@ -690,7 +690,11 @@ innovaphone.lib1 = innovaphone.lib1 || (function () {
 
         this.text = function (id, args) {
             var t = texts[that.current][id] || texts["en"][id] || (id ? "{" + id + "}" : "");
-            if (t && args) args.forEach(function (e, i) { t = t.replace(new RegExp("\\$" + i.toString(), "g"), e); });
+            if (t && args) {
+                for (var i = args.length - 1; i >= 0; i--) {
+                    t = t.replace(new RegExp("\\$" + i.toString(), "g"), args[i]);
+                }
+            }
             return t;
         };
 
