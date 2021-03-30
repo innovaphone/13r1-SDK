@@ -120,6 +120,13 @@ enum SetupRole {
     SETUP_ROLE_HOLDCONN = 0x04,
 };
 
+enum IceAbortReason {
+    ICE_PATH_FOUND = 0x00,
+    CALL_TERMINATED = 0x01,
+    RESET_ICE_PATH = 0x2,
+    UNKNOWN = 0x03,
+};
+
 // Codecs: h264, vp8, FB
 class CodecAssignments : public istd::listElement<CodecAssignments> {
 public:
