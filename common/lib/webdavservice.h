@@ -252,6 +252,7 @@ public:
     void GetFailed(ulong64 & parent, bool & isFolder, const char * &path);
     ulong64 GetFileId();
     void Close() override;
+    void CloseProgress();
 };
 
 class WebdavServicePut : public IWebdavServiceTask, public UWebdavServiceTask {
@@ -265,6 +266,7 @@ class WebdavServicePut : public IWebdavServiceTask, public UWebdavServiceTask {
     bool chunkEncoded;
     bool pendingRequestWebserver;
     bool pendingRequestDBFiles;
+    bool waitfordatatowrite;
 
 public:
     WebdavServicePut(IWebserverPlugin * const webserverPlugin, class WebdavService * webdavservice, char * path, ulong64 dataSize);

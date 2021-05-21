@@ -155,7 +155,7 @@ public:
     size_t GetHeaderSize() { return contentSize; }
 };</code></pre>
     <p>
-        This class is used for creating an HTTP header asresponse or request. If you want to parse an HTTP Header, <a href="HTTPParser">HTTPParse</a> must be used.
+        This class is used for creating an HTTP header asresponse or request. If you want to parse an HTTP Header, <a href="#HTTPParser">HTTPParser</a> must be used.
     </p>
 
     <h3>Public functions</h3>
@@ -399,7 +399,7 @@ public:
                 <td class="param">UHTTPParser * <b>user</b></td>
                 <td>
                     An UHTTPParser instance that will be called after the request line had been parsed. This helps to define, wheter
-                    parsing should continue or not. See <a href="UHTTPParser">UHTTPParser</a> for more information.
+                    parsing should continue or not. See <a href="#UHTTPParser">UHTTPParser</a> for more information.
                 </td>
             </tr>
         </table>
@@ -550,7 +550,7 @@ public:
     <dd>
         <h4>Return Value</h4>
         Returns an HTTPRange object to access the values given by the range header field. If there is no range request, nullptr will be returned.
-        The returned object is the start of a linked list of ranges. See <a href="HTTPRange">HTTPRange</a> for more information.
+        The returned object is the start of a linked list of ranges. See <a href="#HTTPRange">HTTPRange</a> for more information.
     </dd>
 
     <div class="fnhead">GetEncoding</div>

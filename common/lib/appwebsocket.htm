@@ -22,7 +22,7 @@
     <p>
         JSON messages are used on this interface. There are some common properties, which are defined
         by the this library already, which is documented as
-        <a href="../../doc/protocol/appwebsocket.htm">AppWebsocket</a>
+        <a href="../../doc/appwebsocket/appwebsocket.htm">AppWebsocket</a>
     </p>
     <h3>APIs</h3>
     <p>
@@ -56,14 +56,14 @@
     <!-- Block with the classes -->
     <h1>Classes</h1>
 
-    <h2 id="AppWebsocket">AppWebsocket</h2>
+    <a name="AppWebsocket"><h2 id="AppWebsocket">AppWebsocket</h2></a>
 
     <pre><code class="C++">class AppWebsocket : public UWebsocket, public IJsonApiConnection {
 
     ...
 
 public:
-    <a href="AppWebsocket">AppWebsocket(IWebserverPlugin * plugin, class IInstanceLog * const log, class JsonApiContext * jsonApiContext = 0);</a>
+    <a href="#AppWebsocket">AppWebsocket(IWebserverPlugin * plugin, class IInstanceLog * const log, class JsonApiContext * jsonApiContext = 0);</a>
     ~AppWebsocket();
 
     <a href="#AppWebsocketPassword1">virtual char * AppWebsocketPassword() { return 0; };</a>
@@ -203,7 +203,7 @@ public:
                 <td class="param">word <b>info</b></td>
                 <td>
                     Indicates the location of the info structure inside the message. The info structure contains additional user, app and licensing information.
-                    For Details see the protocol definition: <a href="../../doc/protocol/appwebsocket.htm">AppWebsocket</a>.
+                    For Details see the protocol definition: <a href="../../doc/appwebsocket/appwebsocket.htm">AppWebsocket</a>.
                 </td>
             </tr>
         </table>

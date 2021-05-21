@@ -12,7 +12,7 @@
 
     <h1>Webserver Plugin</h1>
     <p>
-		One of the cores of the innovaphone App Platform is the webserver (see <a href="../../doc/introduction.htm#Core">"The core of the innovaphone App Platform"</a> for details). An App can plugin itself to the webserver
+		One of the cores of the innovaphone App Platform is the webserver (see <a href="../../doc/architecture.htm#ap">"The core of the innovaphone App Platform"</a> for details). An App can plugin itself to the webserver
 		to receive HTTP or websocket requests. If an App whants to offer an JavaScript UI too, it actually must plugin itself into the webserver. However, this can be done by using the IWebserverPlugin interface.<br/><br/>
 		The app needs to give a path to the IWebserverPlugin on creation and call IWebserverPlugin::HttpListen(), IWebserverPlugin::WebsocketListen() or IWebserverPlugin::PassthroughListen() to receive the different requests.
 		The path given to the interface on creation will be the applications web root. So if e. G. the system is accassibly under http://192.168.1.100 and the application passes "/myapp" as path, it will be accessibly under
@@ -473,7 +473,7 @@ public:
     <div class="fnhead">WebsocketAccept</div>
     <dd>
 		If a websocket request comes in, it can be accepted using the WebsocketAccept() function. (To deny, call Cancel()). When accepting, an instance of a class derived from UWebsocket must be passed. This instance will be responsible for the websocket
-		connections. See <a href="UWebsocket">UWebsocket</a> for details. If nullptr will be passed to WebsocketAccept(), the request will be denied in the same way as calling IWebserverPlugin::Cancel().
+		connections. See <a href="#UWebsocket">UWebsocket</a> for details. If nullptr will be passed to WebsocketAccept(), the request will be denied in the same way as calling IWebserverPlugin::Cancel().
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -799,7 +799,7 @@ public:
 	
     <div class="fnhead">GetRange</div>
     <dd>
-		Returns the range with teh given index. See <a href="IWebserverGetRange">IWebserverGetRange</a> for details.
+		Returns the range with teh given index. See <a href="#IWebserverGetRange">IWebserverGetRange</a> for details.
 		
 		<h4>Parameters</h4>
         <table style="margin-left:-12px">
@@ -823,7 +823,7 @@ public:
 
         <h4>Parameters</h4>
         <table style="margin-left:-12px">
-            <tr><td class="param">wsr_cancel_type_t <b>reason</b></td><td>The reason for the cancel. See <a href="wsr_cancel_type_t">wsr_cancel_type_t</a> for more details.</td></tr>
+            <tr><td class="param">wsr_cancel_type_t <b>reason</b></td><td>The reason for the cancel. See <a href="#wsr_cancel_type_t">wsr_cancel_type_t</a> for more details.</td></tr>
         </table>
 		
 		<h4>Remarks</h4>
@@ -839,7 +839,7 @@ public:
             <tr><td class="param">wsr_type_t <b>resourceType</b></td><td>The type of the reosurce the application is going to send. Dis should combine with the type of resource requested. The helper functon
 																																	<a href="#GetResponseTypeForFileName">GetResponseTypeForFileName</a> can be used to get the right resource type depending on the resource sufix.</td></tr>
             <tr><td class="param">ulong64 <b>dataSize</b></td><td>The data size of the requests data. If unkown, the application must used chunked encoding by setting dataSize to WS_RESPONSE_CHUNKED.</td></tr>
-            <tr><td class="param">wsr_flags_t <b>flags</b></td><td><i>(Default WSP_FLAG_NONE)</i>Optional, additional flags. See <a href="wsr_flags_t ">wsr_flags_t </a> for details.</td></tr>
+            <tr><td class="param">wsr_flags_t <b>flags</b></td><td><i>(Default WSP_FLAG_NONE)</i>Optional, additional flags. See <a href="#wsr_flags_t ">wsr_flags_t </a> for details.</td></tr>
             <tr><td class="param">const char * <b>etag</b></td><td><i>(Default nullptr)</i> An optional etag used for caching purposed of an HTTP client.</td></tr>
         </table>
 		
@@ -1061,7 +1061,7 @@ public:
                 </td>
             </tr>
             <tr><td class="param">ulong64 <b>dataSize</b></td><td>The data size of the requests data. If unkown, the application must used chunked encoding by setting dataSize to WS_RESPONSE_CHUNKED.</td></tr>
-            <tr><td class="param">wsr_flags_t <b>flags</b></td><td><i>(Default WSP_FLAG_NONE)</i>Optional, additional flags. See <a href="wsr_flags_t ">wsr_flags_t </a> for details.</td></tr>
+            <tr><td class="param">wsr_flags_t <b>flags</b></td><td><i>(Default WSP_FLAG_NONE)</i>Optional, additional flags. See <a href="#wsr_flags_t ">wsr_flags_t </a> for details.</td></tr>
             <tr><td class="param">const char * <b>etag</b></td><td><i>(Default nullptr)</i> An optional etag used for caching purposed of an HTTP client.</td></tr>
         </table>
 
@@ -3074,7 +3074,7 @@ public:
 
     <h3>Overview</h3>
     This handler is for handling websocket requests. To get websocket requests the app must call IWebserverPlugin::WebsocketListen() must be called. An incomming websocket request will lead to the
-    UWebserverPlugin::WebserverPluginWebsocketListenResult() callback. See <a href=IWebserverPlugin>IWebserverPlugin</a> and <a href=UWebserverPlugin>UWebserverPlugin</a> for details.
+    UWebserverPlugin::WebserverPluginWebsocketListenResult() callback. See <a href=#IWebserverPlugin>IWebserverPlugin</a> and <a href=#UWebserverPlugin>UWebserverPlugin</a> for details.
 
     <h3>Public functions</h3>
     <div class="fnhead">GetHost</div>
@@ -3252,7 +3252,7 @@ public:
     includes parsing and creating of a correct header. So generally there is no need to implement passthrough functionality to our application. On the other
     hand it can help to create apps with proxy functionality.<br/>
     To receive passthrough requests, the application must call IWebserverPlugin::PassthroughListen(). An incomming request will call the
-    UWebserverPlugin::WebserverPassthroughListenResult(). See <a href=IWebserverPlugin>IWebserverPlugin</a> and <a href=UWebserverPlugin>UWebserverPlugin</a>
+    UWebserverPlugin::WebserverPassthroughListenResult(). See <a href=#IWebserverPlugin>IWebserverPlugin</a> and <a href="#UWebserverPlugin">UWebserverPlugin</a>
     for details.
     
     <h3>Public functions</h3>

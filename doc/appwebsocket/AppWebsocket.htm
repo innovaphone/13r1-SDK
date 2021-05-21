@@ -43,13 +43,13 @@
         <li><a href="#MessageFlow">Message flow</a></li>
     </ul>
 
-	<a name="BaseMessage"><h2>Basic message format</h2></a>
+    <a name="BaseMessage"><h2>Basic message format</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": string,
     "api": string,
     "src": string
-}</code></pre><br/>
+}</code></pre><br />
 
     <p>
         The base message format consists of the three properties mt, api and src.
@@ -90,18 +90,19 @@
         </dd>
     </dl>
 
-	<a name="messages"><h2>AppWebsocket Messages</h2></a>
+    <a name="messages"><h2>AppWebsocket Messages</h2></a>
 
-	<ul>
-		<li><a href="#AppChallenge">AppChallenge</a> - Request a challenge for authentication</li>
-		<li><a href="#AppChallengeResult">AppChallengeResult</a> - Response to AppChallenge</li>
-		<li><a href="#AppLogin">AppLogin</a> - Login</li>
-		<li><a href="#AppLoginResult">AppLoginResult</a> - Response to  AppLogin</li>
-		<li><a href="#CheckBuild">CheckBuild</a> - Check for current build</li>
-		<li><a href="#CheckBuildResult">CheckBuildResult</a> - Response to CheckBuild</li>
-		<li><a href="#AppInfo">AppInfo</a> - Request information about the App Service</li>
-		<li><a href="#AppInfoResult">AppInfo</a> - Response to AppInfo</li>
-	</ul>
+    <ul>
+        <li><a href="#AppChallenge">AppChallenge</a> - Request a challenge for authentication</li>
+        <li><a href="#AppChallengeResult">AppChallengeResult</a> - Response to AppChallenge</li>
+        <li><a href="#AppLogin">AppLogin</a> - Login</li>
+        <li><a href="#AppLoginResult">AppLoginResult</a> - Response to  AppLogin</li>
+        <li><a href="#CheckBuild">CheckBuild</a> - Check for current build</li>
+        <li><a href="#CheckBuildResult">CheckBuildResult</a> - Response to CheckBuild</li>
+        <li><a href="#AppInfo">AppInfo</a> - Request information about the App Service</li>
+        <li><a href="#AppInfoResult">AppInfo</a> - Response to AppInfo</li>
+        <li><a href="#PbxInfo">PbxInfo</a> - Information sent by the PBX on outgoing connections</li>
+    </ul>
 
     <div><a href="#Objects">Objects</a> - recurring definitions</div>
 
@@ -138,13 +139,13 @@
     </p>
 
 
-    <br/><br/>
+    <br /><br />
     <img src="AppWebsocketAppLoginSequence.svg" alt="AppWebsocket Login Sequence Diagramm">
-    <br/><br/>
+    <br /><br />
 
-	<a name="AppChallenge"><h2>AppChallenge</h2></a>
+    <a name="AppChallenge"><h2>AppChallenge</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": "AppChallenge"
 }</code></pre>
 
@@ -154,10 +155,10 @@
         shared secret (password) and other parameters. With this mechanism an an adequately
         random string, replay attacks are not possible.
     </p>
-	
-	<a name="AppChallengeResult"><h2>AppChallengeResult</h2></a>
 
-	<pre><code class="json">{
+    <a name="AppChallengeResult"><h2>AppChallengeResult</h2></a>
+
+    <pre><code class="json">{
     "mt": "AppChallengeResult",
     "challenge": string
 }</code></pre>
@@ -169,14 +170,14 @@
     <dl>
         <dt>challenge</dt>
         <dd>
-    	    A random string with a maximum of 16 characters. Only non-control character with a single
+            A random string with a maximum of 16 characters. Only non-control character with a single
             byte representation in UTF-8 shall be used. Innovaphone implementations only use 0-9.
         </dd>
     </dl>
 
-	<a name="AppLogin"><h2>AppLogin</h2></a>
+    <a name="AppLogin"><h2>AppLogin</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": "AppLogin",
     "app": string,
     "domain": string,
@@ -233,7 +234,7 @@
                 <pre><code class="json">&lt;app&gt;:&lt;domain&gt;:&lt;sip&gt;:&lt;guid&gt;:&lt;dn&gt;:&lt;challenge&gt;:&lt;password&gt;</code></pre>
             </p>
             <p>
-                Following examples can be used as test vectors for your implementation of the digest calculation. 
+                Following examples can be used as test vectors for your implementation of the digest calculation.
             </p>
             <p>
                 <b>Example 1:</b><br />
@@ -331,9 +332,9 @@
         </dd>
     </dl>
 
-	<a name="AppLoginResult"><h2>AppLoginResult</h2></a>
+    <a name="AppLoginResult"><h2>AppLoginResult</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": "AppLoginResult",
     "ok": bool
 }</code></pre>
@@ -343,9 +344,9 @@
         of true;
     </p>
 
-	<a name="CheckBuild"><h2>CheckBuild</h2></a>
+    <a name="CheckBuild"><h2>CheckBuild</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": "CheckBuild",
     "url": string
 }</code></pre>
@@ -369,9 +370,9 @@
         </dd>
     </dl>
 
-	<a name="CheckBuildResult"><h2>CheckBuildResult</h2></a>
+    <a name="CheckBuildResult"><h2>CheckBuildResult</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": "CheckBuildResult",
     "url": string
 }</code></pre>
@@ -380,9 +381,9 @@
         Used to send back the current URL.
     </p>
 
-	<a name="AppInfo"><h2>AppInfo</h2></a>
+    <a name="AppInfo"><h2>AppInfo</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": "AppInfo",
     "app": string
 }</code></pre>
@@ -401,9 +402,9 @@
         </dd>
     </dl>
 
-	<a name="AppInfoResult"><h2>AppInfoResult</h2></a>
+    <a name="AppInfoResult"><h2>AppInfoResult</h2></a>
 
-	<pre><code class="json">{
+    <pre><code class="json">{
     "mt": "AppInfo",
     "info": <a href="#app-info">AppInfo</a>
 }</code></pre>
@@ -419,7 +420,41 @@
         </dd>
     </dl>
 
-	<a name="Objects"><h2>Objects</h2></a>
+    <a name="PbxInfo"><h2>PbxInfo</h2></a>
+
+    <pre><code class="json">{
+    "mt": "PbxInfo",
+    "domain": string,
+    "pbx": string,
+    "pbxDns": string,
+    "apis": [ string ]
+}</code></pre>
+
+    <p>
+        This messages is sent by the PBX app object on outgoing websocket connections directly after receiving the <a href="#AppLoginResult">AppLoginResult</a> message from the app service.
+        It contains certain information about the PBX and the PBX APIs that the app service can use on that connection.
+    </p>
+
+    <dl>
+        <dt>domain</dt>
+        <dd>
+            The domain of the PBX. This attribute contains the value configured in the "System Name" field on the PBX.
+        </dd>
+        <dt>pbx</dt>
+        <dd>
+            The name of the PBX. This attribute contains the value configured in the "PBX Name" field on the PBX.
+        </dd>
+        <dt>pbxDns</dt>
+        <dd>
+            The DNS name of the PBX.  This attribute contains the value configured in the "DNS" field in the PBX.
+        </dd>
+        <dt>apis</dt>
+        <dd>
+            An array of the sting IDs of all <a href="../reference.htm#APIs_PBX">PBX APIs</a> that can be used on this AppWebsocket connection. The field contains all APIs activated at the app object.
+        </dd>
+    </dl>
+
+    <a name="Objects"><h2>Objects</h2></a>
 
     <a name="info"><div class="fnhead">Info</div></a>
 

@@ -79,7 +79,7 @@ public:
             <tr><td class="param">class UWebsocketClient * const <b>user</b></td><td>The UWebsocketClient instance that will receive the callbacks of IWebsocketClient.</td></tr>
             <tr><td class="param">class ISocketProvider * const <b>tcpSocketProvider</b></td><td>A <a href="socket.htm#ISocketProvider">ISocketProvider</a> instance that can create a TCP ISocket.</td></tr>
             <tr><td class="param">class ISocketProvider * const <b>tlsSocketProvider</b></td><td>A <a href="socket.htm#ISocketProvider">ISocketProvider</a> instance that can create a TLS ISocket.</td></tr>
-            <tr><td class="param">class IDns * const <b>dns</b></td><td>The <a href="../dns.htm#IDns">IDns</a> instance used to resolve the server name if needed.</td></tr>
+            <tr><td class="param">class IDns * const <b>dns</b></td><td>The <a href="dns.htm#IDns">IDns</a> instance used to resolve the server name if needed.</td></tr>
             <tr><td class="param">class IInstanceLog * const <b>log</b></td><td>The <a href="../lib/appservice.htm#IInstanceLog">IInstanceLog</a> instance used for loging purposes.</td></tr>
         </table>
         <h4>Return value</h4>
@@ -138,7 +138,7 @@ public:
         Tells the IWebsocketClient instance to receive data. The data will be written to the given buffer. The websocket client will read data to the
 		given buffer, until the number of bytes passed had been received. Although the IWebsocketClient won't support partitial read, at least a nullptr
 		(and a len of 0) can be passed to Recv(). This leads to a callback to ask for a buffer with the size needed. Doing this allows to make some kind
-		of partitial read and comes in handy, if the size of data to receive is unkown. See <a href="UWebsocketClient">UWebsocketClient::WebsocketRecvBuffer</a>
+		of partitial read and comes in handy, if the size of data to receive is unkown. See <a href="#UWebsocketClient">UWebsocketClient::WebsocketRecvBuffer</a>
 		for more information.
 
         <h4>Parameters</h4>
@@ -151,7 +151,7 @@ public:
 		On success, UWebsocketClient::WebsocketRecvResult() will be called after data had been received.
 		If an error occurres, UWebsocketClient::WebsocketCloseComplete() will be called. Details of that error can be found inside the log, if logging for the websocket client is activated. Reason can be one of the following values:
 		<table style="margin-left: 20px">
-        	<tr><td><b>WSCR_BUFFER_OVERFLOW</b></td><td>A websocket  frame had been received, that exceeded the internal limit of frame size. See <a href="websocket_max_payload_size">WEBSOCKET_MAX_PAYLOAD_SIZE</a> for details.</td></tr>
+        	<tr><td><b>WSCR_BUFFER_OVERFLOW</b></td><td>A websocket  frame had been received, that exceeded the internal limit of frame size. See <a href="#websocket_max_payload_size">WEBSOCKET_MAX_PAYLOAD_SIZE</a> for details.</td></tr>
         	<tr><td><b>WSCR_PROTOCOL_ERROR</b></td><td>Something went wrong during the weboscket communication. Details of that error can be found inside the log, if logging for the websocket client is enabled.</td></tr>
     	</table>
 		
@@ -232,7 +232,7 @@ public:
         <tr><td><b>WSCR_NORMAL_CLOSE</b></td><td>The conenction had been closed because of a call to IWebsocketClient::Close().</td></tr>
         <tr><td><b>WSCR_CONNECTION_FAILED</b></td><td>An error occured while trying to connect to the websocket server. Details of that error can be found inside the log, if logging for the websocket client is enabled.</td></tr>
         <tr><td><b>WSCR_URI_INVALID</b></td><td>The address, passed to IWebsocketClient::Connect(), has a wrong format.</td></tr>
-        <tr><td><b>WSCR_BUFFER_OVERFLOW</b></td><td>A websocket  frame had been received, that exceeded the internal limit of frame size. See <a href="websocket_max_payload_size">WEBSOCKET_MAX_PAYLOAD_SIZE</a> for details.</td></tr>
+        <tr><td><b>WSCR_BUFFER_OVERFLOW</b></td><td>A websocket  frame had been received, that exceeded the internal limit of frame size. See <a href="#websocket_max_payload_size">WEBSOCKET_MAX_PAYLOAD_SIZE</a> for details.</td></tr>
         <tr><td><b>WSCR_PROTOCOL_ERROR</b></td><td>Something went wrong during the weboscket communication. Details of that error can be found inside the log, if logging for the websocket client is enabled.</td></tr>
         <tr><td><b>WSCR_SOCKET_LOST</b></td><td>The socket got lost unexpected. Details of that error can be found inside the log, if logging for the websocket client is enabled.</td></tr>
         <tr><td><b>WSCR_SERVER_CLOSED</b></td><td>The socket connection had been close from the server side.</td></tr>
